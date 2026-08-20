@@ -140,6 +140,12 @@ The cross-reference graph is being maintained by hand, in prose, inside publishe
 
 ---
 
+## Reception
+
+See `reception.md`. The short version: the five M1 pieces are 70% of views and 74% of subscribers. The reading of the archive and the reading of the audience agree, with the caveat that the M1 pieces are also the longest and most worked, so effort is confounded with subject.
+
+---
+
 ## Recurring sources
 
 Counted across the 12, excluding the guest post. Anything at 2 or more.
