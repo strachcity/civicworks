@@ -1,8 +1,3 @@
 __pycache__/
 *.pyc
 .DS_Store
-
-# Published CIVICWORKS essays, kept locally for analysis. Ignored until Jack
-# decides whether the archive belongs in a public repo. Remove this line to
-# commit them.
-archive/

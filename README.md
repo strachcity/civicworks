@@ -38,6 +38,8 @@ Worth pointing it at finished pieces as well as drafts. A rule that fires on som
 
 **[wiki/prompts/](wiki/prompts/)** holds articles the corpus is asking for. Each states what it would argue, the evidence in hand, what is missing, and what would make the piece fail.
 
+The loop is: publish, add it to `archive/`, re-mine, and see what it changes. A piece either instantiates a mechanism that already exists, contradicts one, or leaves an argument with nowhere to go. The third case is a prompt. `archive/README.md` has the detail.
+
 Notes here are deliberately blunt and provisional. Prose written to essay standard turns a note into a draft, and the wiki into a backlog of unfinished essays.
 
 ## What stays out
@@ -46,7 +48,7 @@ Notes here are deliberately blunt and provisional. Prose written to essay standa
 
 The rule is pull, not push. A source earns a place here when a piece of writing needs it, not when it is found. If a wiki entry wants the deeper notes, it links out.
 
-**The essay archive.** The 13 published pieces sit in `archive/`, gitignored, pending a decision on whether already-public writing belongs in this repo.
+**The archive.** [`archive/`](archive/) holds the published writing as files: 13 CIVICWORKS posts, the MPA thesis and the UN80 article. All already public, all re-minable without hunting down the originals.
 
 ## Open threads
 
