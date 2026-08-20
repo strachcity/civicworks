@@ -104,6 +104,47 @@ class TestParsing(unittest.TestCase):
         self.assertEqual(3, stats["sentences"])
 
 
+class TestNonProse(unittest.TestCase):
+    def test_italic_caption_is_not_a_paragraph(self):
+        text = ("A real paragraph with two sentences. Here is the second one.\n\n"
+                "*Waterfall policymaking, The Radical How.*\n\n"
+                "*Source: 2023 OECD Digital Government Index.*\n\n"
+                "Another real paragraph. With a second sentence again.\n")
+        self.assertNotIn("stacked-singles", rules(text))
+
+    def test_captions_excluded_from_stats(self):
+        _, stats = run("Real prose here. A second sentence.\n\n*A caption.*\n")
+        self.assertEqual(1, stats["paragraphs"])
+
+    def test_genuine_stacking_still_caught(self):
+        text = ("One sentence standing alone.\n\nAnother sentence standing alone.\n\n"
+                "A third one alone as well.\n")
+        self.assertIn("stacked-singles", rules(text))
+
+
+class TestRealProse(unittest.TestCase):
+    """Typographic quotes are what actual exports contain."""
+
+    def test_curly_apostrophe_reframe_is_caught(self):
+        self.assertIn("negative-parallelism",
+                      rules("It isn\u2019t a technology problem, it\u2019s a funding problem."))
+
+    def test_curly_apostrophe_dead_phrase_is_caught(self):
+        self.assertIn("dead-phrase", rules("It\u2019s worth noting that the team disagreed."))
+
+    def test_curly_apostrophes_count_as_contractions(self):
+        _, stats = run("I\u2019m sure it\u2019s fine and they aren\u2019t wrong about it.\n")
+        self.assertEqual(3, stats["contractions"])
+
+    def test_dynamic_capabilities_is_allowed(self):
+        # Section 3C names this as the word doing technical work.
+        self.assertNotIn("context-sensitive", rules("A theory of dynamic capabilities in the state."))
+        self.assertIn("context-sensitive", rules("It was a dynamic and exciting programme."))
+
+    def test_integrated_service_is_allowed(self):
+        self.assertNotIn("context-sensitive", rules("They built an integrated service for it."))
+
+
 class TestCleanProse(unittest.TestCase):
     def test_clean_passage_is_quiet(self):
         text = (

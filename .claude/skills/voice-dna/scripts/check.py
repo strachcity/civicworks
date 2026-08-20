@@ -152,6 +152,23 @@ SPELLED_NUMBERS = (
     r"times|examples?|reasons?|things?)\b"
 )
 
+# Section 3C keeps these words when they are doing technical work. The phrases
+# below are the ones a regex can recognise; the rest is judgment.
+ALLOWED_PHRASES = [
+    r"\bdynamic capabilit(?:y|ies)\b",
+    r"\bintegrated (?:service|care|settlement)s?\b",
+    r"\bdata-driven (?:decision|policy)\w*\b",
+]
+
+
+def in_allowed_phrase(text, match):
+    for pat in ALLOWED_PHRASES:
+        for m in re.finditer(pat, text, re.I):
+            if match.start() < m.end() and m.start() < match.end():
+                return True
+    return False
+
+
 HEADER_STOPWORDS = {
     "a", "an", "and", "as", "at", "but", "by", "for", "from", "in", "is",
     "of", "on", "or", "the", "to", "with", "we", "it", "its", "that", "this",
@@ -171,6 +188,22 @@ def word_pattern(word):
     if word.endswith("y"):
         return r"\b" + re.escape(word[:-1]) + r"(?:y|ies|ied|ying)\b"
     return r"\b" + re.escape(word) + r"(?:s|es|ed|ing|ly|ness|ment|ments)?\b"
+
+
+SMART_QUOTES = {"\u2019": "'", "\u2018": "'", "\u201c": '"', "\u201d": '"',
+                "\u02bc": "'"}
+
+
+def normalise_quotes(line):
+    """Straighten typographic quotes.
+
+    Substack and every word processor emit curly apostrophes, so without this
+    every rule that matches an apostrophe (the reframe constructions, half the
+    dead phrases, the contraction count) silently sees nothing on real prose.
+    """
+    for smart, plain in SMART_QUOTES.items():
+        line = line.replace(smart, plain)
+    return line
 
 
 def mask(line):
@@ -212,6 +245,7 @@ def strip_structure(lines):
             continue
         if in_fence:
             continue
+        raw = normalise_quotes(raw)
         if re.match(r"^#{1,6}\s", raw):
             headers.append((i, raw))
             continue
@@ -233,6 +267,20 @@ def paragraphs_of(checkable):
     if buf:
         paras.append((start, " ".join(buf)))
     return paras
+
+
+def is_prose(text):
+    """Paragraph shape and rhythm stats only make sense over actual prose.
+
+    Lists, quotes, tables and the wholly-italic lines that carry subtitles and
+    image captions are not paragraphs, and counting them as single-sentence
+    ones invents a rhythm problem that is not in the writing.
+    """
+    if text.startswith(("- ", "* ", "> ", "|")) or re.match(r"^\d+\.\s", text):
+        return False
+    if re.fullmatch(r"\*[^*]+\*", text) or re.fullmatch(r"_[^_]+_", text):
+        return False
+    return True
 
 
 def sentences_of(text):
@@ -313,6 +361,8 @@ def check_vocabulary(checkable, report):
         for word in CONTEXT_SENSITIVE:
             for m in re.finditer(word_pattern(word), text, re.I):
                 if word == "crucial" and m.group(0).lower().startswith("crucially"):
+                    continue
+                if in_allowed_phrase(text, m):
                     continue
                 report.add(WARN, line_no, "context-sensitive",
                            f'"{m.group(0)}": would a plainer word say exactly the same thing?',
@@ -418,7 +468,7 @@ def check_tics(checkable, headers, report):
 def check_paragraph_shape(paras, report):
     run, run_start, run_text = 0, None, ""
     for start, text in paras:
-        if text.startswith(("- ", "* ", "> ", "|")) or re.match(r"^\d+\.\s", text):
+        if not is_prose(text):
             run, run_start, run_text = 0, None, ""
             continue
         if len(sentences_of(text)) == 1:
@@ -435,8 +485,7 @@ def check_paragraph_shape(paras, report):
 
 
 def stats_of(paras):
-    prose = [t for _, t in paras
-             if not (t.startswith(("- ", "* ", "> ", "|")) or re.match(r"^\d+\.\s", t))]
+    prose = [t for _, t in paras if is_prose(t)]
     sents = [s for t in prose for s in sentences_of(t)]
     lengths = [len(s.split()) for s in sents]
     words = sum(lengths)
