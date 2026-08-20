@@ -20,13 +20,22 @@ ln -s ~/civicworks/.claude/skills/voice-dna ~/.claude/skills/voice-dna
 
 The symlink keeps one source of truth, so anything the skill learns lands back here and gets committed.
 
-The mechanical rules also run standalone:
+Two scripts do the mechanical parts, both standalone, no dependencies, Python 3.8 or later.
 
 ```bash
 python3 .claude/skills/voice-dna/scripts/check.py draft.md
 ```
 
-Em dashes, banned vocabulary, dead phrases, reframe constructions, tic clusters, Americanisms, title case headers. It catches what a regex can catch, which is the least interesting half of the file. No dependencies, Python 3.8 or later.
+Em dashes, banned vocabulary, dead phrases, reframe constructions, tic clusters, Americanisms, title case headers. It catches what a regex can catch, which is the least interesting half of the file.
+
+```bash
+python3 .claude/skills/voice-dna/scripts/observe.py diff drafts/piece.md samples/piece.md --append
+python3 .claude/skills/voice-dna/scripts/observe.py status
+```
+
+The first turns the difference between a draft and what actually got published into observation candidates, and reports where the published version trips the checker, which is the interesting direction: a rule firing on finished work is a rule that needs loosening. The second shows what has recurred often enough to be worth promoting.
+
+Keeping drafts as files is what makes any of this work. A draft that only existed in a chat window cannot be compared against the version that went out.
 
 ## Later
 

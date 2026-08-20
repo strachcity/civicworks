@@ -4,6 +4,57 @@
 
 The design has one asymmetry at its centre: **capture is cheap and promotion is expensive.** Observations accumulate freely. Rules do not. Without that gap the file would grow into a list of every passing preference, which is the failure mode section 5 of the voice file warns about.
 
+## 0. In practice
+
+The design below is sound and will still learn nothing if capture never fires.
+So the working habits matter more than the model does, and there are only
+three.
+
+**Keep drafts as files.** A draft that existed only as chat output cannot be
+diffed against what Jack published. `drafts/piece-name.md`, edited in place,
+each version kept until the piece is finished.
+
+**Paste the published version back.** One action, worth more than everything
+else here combined. Substack and text-editor edits are invisible to the
+session, and the published piece carries all of them at once:
+
+```bash
+python3 scripts/observe.py diff drafts/piece.md samples/2026-08-20-piece.md --append
+```
+
+**Say the thing out loud when correcting.** "That's not how I'd put it" is
+worth more than silently rewriting, because it marks the edit as being about
+voice rather than about this sentence. Silent rewrites still get caught by the
+diff, but the diff cannot tell the difference between a rule and a one-off.
+
+### What Jack can say
+
+These are the phrases the skill acts on. None is magic, they are just clear:
+
+| Say | What happens |
+|---|---|
+| "learn from this" + a finished piece | Diff against the draft, log candidates, report checker rules the published text trips |
+| "log that" | The correction just made goes into `observations.md` now |
+| "that's a rule" | Goes in as `active`, applies to the next draft, promotable on its own |
+| "review the log" | The promotion pass: what has hit 3, what to promote, what to prune |
+| "what have you learned" | Read back the open observations without changing anything |
+
+### A rough rhythm
+
+Per piece: draft to a file, edit, paste the final back, diff it, spend 2 minutes
+cleaning up the candidates.
+
+Every 5 or 6 pieces, or when `observe.py status` says the queue is ready: a
+review pass. Promote what has recurred, retire what has not held up, and check
+whether the tag spread is honest. A log made entirely of `vocabulary` and
+`punctuation` entries is learning the easy half.
+
+Expect the first month to produce mostly noise. Three sightings is a low bar
+and a lot of single entries will never reach it, which is the threshold working
+rather than failing.
+
+---
+
 ## 1. Capture
 
 Append to `observations.md` whenever any of these happen. Do it in the moment, not at the end of the session.
