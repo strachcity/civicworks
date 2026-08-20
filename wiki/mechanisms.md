@@ -6,6 +6,11 @@ Working notes, not prose. Blunt on purpose: if an entry starts reading like an e
 
 Mined from the archive on 2026-08-20. Piece numbers refer to publication order. Piece 03 is a guest post by Jack O'Connor and is excluded throughout.
 
+Two pieces published outside CIVICWORKS are now included, and they change the picture:
+
+- **T** = *(Re)imagining Mission Neighbourhoods: Emerging Practices of Urban Transformation.* MPA thesis, UCL IIPP. Submitted Sept 2025, published Feb 2026. Grounded theory, 15 interviews across the UK, Belgium, Canada and Australia. Supervised by Rainer Kattel and Kwame Baafi.
+- **UN** = *How UN80 Can Reform the UN for a Volatile, Uncertain World.* IPI Global Observatory, Jun 2026. Uses "we" throughout; only one author bio appears in the saved page. Attribution needs confirming.
+
 ---
 
 ## M1. Capability exists, and sits downstream of the decision
@@ -21,15 +26,21 @@ This is the spine of the newsletter. Stated five times about five different subj
 | 09 | Mar 26 | Futures and foresight | "Futures is not absent from government. It is just not where decisions are made." |
 | 10 | Apr 26 | Service design | "It arrives after the policy is set, after the commitments are made, after the assumptions have hardened." |
 | 11 | May 26 | Innovation labs | "They produced excellent work and lost the argument about how decisions are made." |
+| UN | Jun 26 | The United Nations | "the biggest decisions made up front when the least is known" |
+
+**The claim is about institutions, not about Whitehall.** This was the open question before UN80 was read: every prior instance was UK central government. The UN piece transfers the argument intact to a member-state-driven multilateral body, and names the same origin: "These dynamics are not unique to the UN. They are inherited from the 'new public management' era." It also lands the sharpest available version of M4 in one line: "The core words of UN80, impact, effectiveness, efficiency, are hallmarks of new public management."
+
+Same *Radical How* figure, same waterfall diagnosis, same conclusion that learning arrives after commitment. The mechanism travels.
 
 **Sub-claims that travel with it.**
 - The waterfall shape puts the most consequential decisions where uncertainty is highest and learning where it is weakest (04, 06, 10, via *The Radical How*).
 - Insight without authority gets absorbed rather than acted on. The "policy drawer" (06).
 - Learning experienced as exception rather than condition is dismissed as "interesting but unrealistic" (06).
+- **Prevention is invisible to the accountability system.** UN: "When anticipatory action averts crisis, there is no headline, ribbon-cutting moment, or clear line of attribution. The absence of failure is politically quieter than the management of visible emergencies." 04, on the same logic inside HMRC: civil servants are "punished for being wrong, rewarded for nothing going wrong, and rarely recognised when things go right." Two sightings, both sharp. Probably wants its own entry once there is a third.
 
 **Best single formulation.** 06: "This is not a capability problem. It is an architectural one."
 
-**What is unresolved.** 09 admits it directly: how a studio gains authority to reshape live decisions rather than inform them from a distance is "one I'm still working through". The diagnosis is five pieces deep. The mechanism by which capability moves upstream is not.
+**What is unresolved.** See "The institutionalisation paradox" below. This is not a gap in the thinking; it is a genuine bind, and the thesis had already named it before the essays started.
 
 **Sources.** *The Radical How* / Public Digital. Pahlka, "policy vomit". Kattel & Mazzucato on the epistemic turn. Demos Helsinki, *Missions for Governance*.
 
@@ -62,10 +73,13 @@ Two uses, 8 months apart, same illustration both times.
 | 09 | The studio is a "place", a sociomaterial infrastructure, not a team |
 | 11 | "the lab itself was never really the innovation. The innovation was the institutional conditions" |
 | 13 | "the container itself tells us very little about whether that authority is real" |
+| UN | "differentiated governance modes that can be activated to address systemic risks and deactivated when conditions stabilize" |
+
+**UN is 06's architecture restated.** "Conditional, not universal", "triggered by uncertainty, not default", "time-bound and reversible" (06) and "activated... and deactivated when conditions stabilize" (UN) are the same design, five months apart, applied to Whitehall and then to the UN. The clearest evidence in the corpus that this is a portable claim rather than a local observation.
 
 **Note the convergence.** 11 and 13 are the same argument applied to a lab and to a department. 13's "container" is 11's "lab, unit, NewCo, programme". These may be one entry or two; currently reads as one.
 
-**What is unresolved.** Conditions are named consistently but never operationalised. What creates protected authority, who grants it, and what makes it survive a change of sponsor is asked in 11 and left open in 12 ("We are too early to know").
+**What is unresolved.** Conditions are named consistently but never operationalised. What creates protected authority, who grants it, and what makes it survive a change of sponsor is asked in 11 and left open in 12 ("We are too early to know"). T reaches the same wall from fieldwork.
 
 ---
 
@@ -79,6 +93,7 @@ Two uses, 8 months apart, same illustration both times.
 | 08 | Western industrial policy | Market failure theory, intervene then withdraw |
 | 10 | The DDaT capability framework | Commercial service design DNA from GDS 2011, "never fully been interrogated" |
 | 13 | Blue tape | An interpretation that became a rule and lost its relationship to the concern that produced it |
+| UN | UN80's own vocabulary | "impact, effectiveness, efficiency" as NPM hallmarks, inside a reform programme |
 
 **Why 13 belongs here.** Blue tape is this mechanism at the scale of a single approval process, which makes it the most testable version of the claim. 10 is the most fully argued version.
 
@@ -100,15 +115,75 @@ Appears in 05, 06, 07, 09, 12. The most consistent theme after M1, and the least
 
 **Tension worth noticing.** M1 says power sits at decision gates. M5 says change is sustained through relationships. The archive has not yet reconciled these. 06 gestures at it via "dark matter", 13 gets closest: "which relationships help them move across formal boundaries."
 
-**Sources.** Cottam, *Revolution 5.0* and relational welfare. Dark Matter Labs. Sam Rye. Human Learning Systems.
+**T is the empirical base for this entry and is not cited as such anywhere.** The thesis identifies *relational stewardship* as one of nine routines, with "moving at the speed of trust" as a direct participant quote (Participant N). Essay 07 uses "the pace of trust" and "the messy middle" without attributing either to his own fieldwork. Both phrases come from T's interviews.
+
+**Sources.** Cottam, *Revolution 5.0* and relational welfare. Dark Matter Labs. Sam Rye. Human Learning Systems. T: Ehnert, Kivimaa, Kanda, Sovacool, Von Wirth on transition intermediaries.
+
+---
+
+## M6. Portfolio logic as the organising principle
+
+**The claim.** Under uncertainty the unit of management is the portfolio, not the programme. Some interventions underperform, others prove catalytic, and the objective is directional progress across the system rather than uniform delivery. Portfolio logic distributes risk instead of concentrating it, which is what allows a funder to tolerate individual failures.
+
+Three sightings, argued once.
+
+- **04** (Nov 25), in passing: "learning at portfolio scale rather than programme-by-programme".
+- **T** (Sept 25), from fieldwork: "aligning portfolios of initiatives" as a routine of dynamic stewardship.
+- **UN** (Jun 26), argued properly: portfolio management is the organising principle that makes the other three shifts cohere. Leuven 2030 as the worked case.
+
+**Why this is now an entry rather than a watch item.** It is the only proposal in the corpus that answers "how does funding follow evidence in practice", which M1 needs and does not otherwise have. UN: "funding should follow evidence, not the other way around", with quarterly reallocation across a climate-displacement portfolio as the worked example. Compare 11 on early GDS: "Governance, funding, resources all followed the evidence. Not the other way round." Same claim, one from institutional history, one as a design proposal.
+
+**Sources.** Leuven 2030 (also cited in 02). Vinnova. Mazzucato.
+
+---
+
+## The institutionalisation paradox
+
+Not a mechanism. The corpus's central unresolved question, and the reason M1 has five diagnoses and no transition.
+
+**T states it precisely, in Sept 2025, before almost all of the essays:**
+
+> "This raises the unresolved question of institutionalisation: without it, practices risk remaining peripheral; with it, they may lose the freedom and adaptability that makes them effective in the first place."
+
+Every later piece that reaches this wall reaches the same formulation, independently and from a different direction:
+
+| Piece | Date | How it arrives |
+|---|---|---|
+| T | Sept 25 | 15 interviews, 4 countries. Intermediaries compensate for weak dynamic capabilities and are precarious without institutionalisation |
+| 09 | Mar 26 | How a studio gains authority to reshape live decisions rather than inform them from a distance is "one I'm still working through" |
+| 11 | May 26 | Whether a NewCo can hold protected authority as it scales, or is absorbed into the governance logic that constrained its predecessors |
+| 12 | Jun 26 | "Do these protected spaces eventually replace parts of the original organisation? Do they get absorbed back into it? Or do they diffuse into nothing once the attention moves elsewhere? We are too early to know" |
+
+**Why this matters for the wiki.** The question is not open because it has been under-thought. It is a genuine bind with a formulation already in hand, arrived at four times from four different evidence bases. That is a much stronger position than the essays individually suggest, and none of them says so, because none of them can see the other three at once.
+
+**T's own answer, such as it is.** "The challenge is less about treating intermediaries as fillers of capability gaps, and more about exploring how their practices can be stabilised and resourced without neutralising their generative potential." That is a restatement of the bind rather than a way out, and the thesis says so.
+
+**The nearest thing to a resolution in the corpus** is 11 on early GDS: authority, learning and delivery stayed connected "long enough for evidence to accumulate", and legitimacy came from working software rather than reports. 09 makes the same bet explicitly: "legitimacy in this space is built through action, not insight." Both propose that the paradox is dissolved by sequencing, not by design. Untested.
+
+---
+
+## An inconsistency to resolve
+
+Two capability schemas, same author, five months apart, never reconciled.
+
+| | Schema | Mapped to |
+|---|---|---|
+| **T** (Sept 25) | Dynamic stewardship, shaping, sensemaking, framing. 4 dimensions, 9 routines | Teece via Kattel: sensing, seizing, transforming, plus directionality and legitimacy |
+| **06** (Jan 26) | Sense-making, connecting, shaping. 3 capabilities | IIPP dynamic capabilities |
+
+The thesis version is richer and empirically grounded: it adds stewardship and framing, and it explains what each compensates for (stewardship for weak seizing, shaping for weak transforming, sensemaking for weak sensing). 06 uses the thinner triad and drops the two dimensions T found most load-bearing.
+
+Worth deciding which is the working schema. Everything downstream of 06 inherits the three.
 
 ---
 
 ## Watch list, not yet entries
 
-**Terms of partnership as the design object.** 08 only. Public risk matched to public reward, conditionality designed rather than defaulted. The NICE/NHS England antimicrobial subscription model is a strong case with nothing else attached to it yet. One sighting.
+**Terms of partnership as the design object.** 08 only. Public risk matched to public reward, conditionality designed rather than defaulted. The NICE/NHS England antimicrobial subscription model is a strong case with nothing else attached to it yet. Adjacent to M6 but not the same claim: M6 is about how a funder holds a spread of bets, this is about who captures the return.
 
 **Test and learn as organisational self-knowledge.** 12 only, though it connects to M3. "Test the organisation, not just the service."
+
+**Shifting altitudes.** T only, as a named routine: moving between the "meta" and the "matter", translating lived experience upwards and systemic shifts downwards. 13 reaches for something similar without the vocabulary ("Direction and public purpose travel down. Evidence about what helps or obstructs delivery travels back up"). Two sightings, one of them unnamed.
 
 ---
 
@@ -156,7 +231,7 @@ Counted across the 12, excluding the guest post. Anything at 2 or more.
 | Dan Hill (dark matter, MacGuffins, strategic design, snowballing) | 4 |
 | Jen Pahlka ("policy vomit") | 3 |
 | James Plunkett (local maximum, energy at the edges) | 3 |
-| Rainer Kattel (agile stability, dynamic capabilities) | 3 |
+| Rainer Kattel (agile stability, dynamic capabilities; T supervisor) | 4 |
 | Hilary Cottam (relational welfare) | 3 |
 | Mariana Mazzucato | 3 |
 | Scott, *Seeing Like a State* | 2 |
@@ -165,13 +240,16 @@ Counted across the 12, excluding the guest post. Anything at 2 or more.
 | Human Learning Systems | 2 |
 | Demos Helsinki | 2 |
 | Vinnova | 2 |
+| Leuven 2030 | 2 (02, UN) |
 | Lucy Kimbell | 2 |
 | David Eaves (DPI, red and blue tape) | 2 |
 | Tõnurist (islands of experimentation) | 2 |
 | Andrew Greenway (method vs movement) | 2 |
 | Julian Thompson / Rooted | 2 |
 
-A standalone `sources.md` is what stage 2 looks like. Not yet: nothing has needed it.
+T adds a large academic apparatus not otherwise present: Sørensen & Torfing (three orders of public innovation), Hill & Melander (pace layers), Von Wirth, Kanda, Kivimaa, Ehnert, Sovacool, Bellinson on transition intermediaries, Dorst on design typologies, Gioia on grounded theory.
+
+A standalone `sources.md` is what stage 2 looks like. Closer now than it was: T alone roughly doubles the bibliography.
 
 ---
 
@@ -198,7 +276,9 @@ Framings already deployed and available for reuse. Knowing how often each has be
 
 Honest gaps, which are as useful as the entries.
 
-- **No failure case written up in detail.** The argument is consistently that the architecture defeats good work. No piece follows a single decision through the architecture to show it happening.
-- **M1 has no proposed transition.** Five diagnoses, one proposed architecture (06), and 09 concedes the authority question is unresolved.
+- **No failure case written up in detail.** The argument is consistently that the architecture defeats good work. No piece follows a single decision through the architecture to show it happening. T is the closest, and its cases are intermediaries succeeding precariously rather than a decision going wrong.
+
+- **The thesis is uncited by the writing that depends on it.** 02 and 04 promise it as forthcoming. 05 covers the same territory via Recurve. 07 uses two of its participant phrases. Nothing links to it. It is the corpus's largest single piece of primary evidence, 15 interviews across 4 countries, and it is invisible from the newsletter.
+- **M1 has no proposed transition, and now there is a reason.** See the institutionalisation paradox. The corpus has four independent arrivals at the same bind and one untested bet on sequencing.
 - **M5 and M1 are not reconciled.** Power at decision gates versus change through relationships.
 - **Almost no citizen-side evidence outside 07 and 12.** The archive argues about institutions from inside institutions.

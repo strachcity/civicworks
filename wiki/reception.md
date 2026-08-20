@@ -83,10 +83,10 @@ Do not read the open rate as a quality signal.
 
 ## What this cannot see
 
-External writing is not in here and is not in `mechanisms.md` either:
+These numbers cover CIVICWORKS only. Two pieces published elsewhere are now in `mechanisms.md` and have no reception data here:
 
-- MPA thesis, *(Re)imagining Mission Neighbourhoods: Emerging Practices of Urban Transformation*, UCL IIPP, Feb 2026. Promised in 02 and 04 ("I will write about those practices elsewhere"), so it is a thread the archive opens and does not close.
-- *How UN80 can reform the UN for a volatile, uncertain world*, IPI Global Observatory, Jun 2026.
-- The Recurve piece on neighbourhood missions, referenced by 05.
+- MPA thesis, UCL IIPP, Feb 2026. Promised in 02 and 04, never linked from the newsletter.
+- *How UN80 can reform the UN*, IPI Global Observatory, Jun 2026.
+- The Recurve piece on neighbourhood missions, referenced by 05. Still not read.
 
-The UN piece is the interesting one for `mechanisms.md`: it applies the argument outside UK central government for the first time, which is the strongest available test of whether M1 is a claim about institutions or a claim about Whitehall.
+**Worth noting against the zero-conversion finding.** 05 converted nobody while pointing at the Recurve article, and the thesis it also draws on has never been linked at all. The two lowest-performing posts in the archive are both pointing at work that is stronger than the post pointing at it.
