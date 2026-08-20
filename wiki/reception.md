@@ -89,4 +89,4 @@ These numbers cover CIVICWORKS only. Two pieces published elsewhere are now in `
 - *How UN80 can reform the UN*, IPI Global Observatory, Jun 2026.
 - The Recurve piece on neighbourhood missions, referenced by 05. Still not read.
 
-**Worth noting against the zero-conversion finding.** 05 converted nobody while pointing at the Recurve article, and the thesis it also draws on has never been linked at all. The two lowest-performing posts in the archive are both pointing at work that is stronger than the post pointing at it.
+**Worth noting against the zero-conversion finding.** 05 converted no one while pointing at the Recurve article, and the thesis it also draws on has never been linked at all. The two lowest-performing posts in the archive are both pointing at work that is stronger than the post pointing at it.

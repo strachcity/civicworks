@@ -162,18 +162,13 @@ Every later piece that reaches this wall reaches the same formulation, independe
 
 ---
 
-## An inconsistency to resolve
+## Capability schema: settled
 
-Two capability schemas, same author, five months apart, never reconciled.
+Two schemas existed. The working one is **sense-making, connecting, shaping**, from *Beyond the waterfall state* (06) via IIPP.
 
-| | Schema | Mapped to |
-|---|---|---|
-| **T** (Sept 25) | Dynamic stewardship, shaping, sensemaking, framing. 4 dimensions, 9 routines | Teece via Kattel: sensing, seizing, transforming, plus directionality and legitimacy |
-| **06** (Jan 26) | Sense-making, connecting, shaping. 3 capabilities | IIPP dynamic capabilities |
+The thesis used four dimensions and nine routines, mapped to sensing, seizing and transforming. That was a point in time and is superseded. It stays in the corpus as evidence, not as vocabulary: its fieldwork is still the empirical base for M5 and its formulation of the institutionalisation paradox is still the best one anyone has written. The schema is retired.
 
-The thesis version is richer and empirically grounded: it adds stewardship and framing, and it explains what each compensates for (stewardship for weak seizing, shaping for weak transforming, sensemaking for weak sensing). 06 uses the thinner triad and drops the two dimensions T found most load-bearing.
-
-Worth deciding which is the working schema. Everything downstream of 06 inherits the three.
+Anything drafted from here uses the three.
 
 ---
 

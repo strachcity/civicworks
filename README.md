@@ -36,21 +36,25 @@ Worth pointing it at finished pieces as well as drafts. A rule that fires on som
 
 **[wiki/reception.md](wiki/reception.md)** is the Substack data, kept separate and read with suspicion. It says which arguments travelled, not which are right.
 
+**[wiki/prompts/](wiki/prompts/)** holds articles the corpus is asking for. Each states what it would argue, the evidence in hand, what is missing, and what would make the piece fail.
+
 Notes here are deliberately blunt and provisional. Prose written to essay standard turns a note into a draft, and the wiki into a backlog of unfinished essays.
+
+## What stays out
+
+**Notion stays in Notion.** It holds every paper read and annotated, MPA essays, a reading list. That is the raw source layer, and the wiki is a distillate that sits between the writing and it. Migrating it would import hundreds of sources to serve the eighteen that are actually load-bearing, and would turn a working file into an archive.
+
+The rule is pull, not push. A source earns a place here when a piece of writing needs it, not when it is found. If a wiki entry wants the deeper notes, it links out.
+
+**The essay archive.** The 13 published pieces sit in `archive/`, gitignored, pending a decision on whether already-public writing belongs in this repo.
 
 ## Open threads
 
-Decisions parked rather than made.
+**Deferred on purpose.** The voice file is not being reviewed yet; the writing is still evolving and a review now would fix a moving target. The findings are logged below for when it happens.
 
-**Publishing the archive.** The 13 essays sit in `archive/`, gitignored. The wiki cites them by number and would read better citing them by file. Committing them puts already-public writing into a public repo, which is a choice, not a default.
-
-**Which capability schema.** The thesis uses four dimensions and nine routines; *Beyond the waterfall state* uses three capabilities. Everything downstream of that essay inherits the thinner one. Unreconciled.
-
-**Three places the voice file and the writing disagree**, found by running the checker over finished pieces:
+**Three places the voice file and the writing disagree**, found by running the checker over finished pieces with `--published`:
 - Single-sentence paragraphs. The file says "never stacked to manufacture punch". They are stacked, repeatedly, and it works.
 - Sentence length. The real baseline is 20 to 31 words with high variance. The file reads as though describing something more mixed.
-- "Not just X, but Y" appears 4 to 11 times per recent essay. Section 3B targets the reframe ("it isn't X, it's Y"), which is a different construction: one negates, the other expands. The checker currently collapses them.
+- "Not just X, but Y" runs to 11 in a single essay. The checker no longer treats it as a 3B violation, since it expands rather than negates, but at that rate it is a tic.
 
-**Two checker improvements identified and not built.** Separating the additive construction from the reframe, and a `--published` mode that mutes the draft-only rules so finished work can be reviewed without 70 em dash findings.
-
-**Splitting the wiki.** `mechanisms.md` is past 280 lines. One more ingest and it wants one file per mechanism plus an index.
+**Splitting the wiki.** `mechanisms.md` is around 280 lines. Not yet worth splitting: one file per mechanism buys an index to maintain and cross-links to keep correct, and nothing is currently hard to find. The trigger is a mechanism growing past roughly 60 lines on its own, or an entry needing its own sub-pages. Length alone is not the signal.
