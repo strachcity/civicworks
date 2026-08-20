@@ -30,6 +30,27 @@ Em dashes, banned vocabulary, dead phrases, reframe constructions, tic clusters,
 
 Worth pointing it at finished pieces as well as drafts. A rule that fires on something already published is a rule that needs loosening, and that is the most useful thing it does.
 
-## Later
+## Wiki
 
-A wiki, maybe, in the [style of Karpathy's](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f): practice notes, reading, the accumulated arguments about civic technology currently scattered across drafts. Unresolved, and worth exploring before committing to a shape.
+**[wiki/mechanisms.md](wiki/mechanisms.md)** holds the claims that recur across the writing: six mechanisms, the positions that have moved, the framings already spent, and an honest list of what the corpus does not have. Mined from 13 CIVICWORKS pieces, the MPA thesis and the UN80 article rather than from a structure guessed in advance.
+
+**[wiki/reception.md](wiki/reception.md)** is the Substack data, kept separate and read with suspicion. It says which arguments travelled, not which are right.
+
+Notes here are deliberately blunt and provisional. Prose written to essay standard turns a note into a draft, and the wiki into a backlog of unfinished essays.
+
+## Open threads
+
+Decisions parked rather than made.
+
+**Publishing the archive.** The 13 essays sit in `archive/`, gitignored. The wiki cites them by number and would read better citing them by file. Committing them puts already-public writing into a public repo, which is a choice, not a default.
+
+**Which capability schema.** The thesis uses four dimensions and nine routines; *Beyond the waterfall state* uses three capabilities. Everything downstream of that essay inherits the thinner one. Unreconciled.
+
+**Three places the voice file and the writing disagree**, found by running the checker over finished pieces:
+- Single-sentence paragraphs. The file says "never stacked to manufacture punch". They are stacked, repeatedly, and it works.
+- Sentence length. The real baseline is 20 to 31 words with high variance. The file reads as though describing something more mixed.
+- "Not just X, but Y" appears 4 to 11 times per recent essay. Section 3B targets the reframe ("it isn't X, it's Y"), which is a different construction: one negates, the other expands. The checker currently collapses them.
+
+**Two checker improvements identified and not built.** Separating the additive construction from the reframe, and a `--published` mode that mutes the draft-only rules so finished work can be reviewed without 70 em dash findings.
+
+**Splitting the wiki.** `mechanisms.md` is past 280 lines. One more ingest and it wants one file per mechanism plus an index.
