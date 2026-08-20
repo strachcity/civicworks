@@ -69,6 +69,14 @@ negative parallelism, and those are his to place.
 When the ask is open ("tighten this", "does this work"), work through
 `references/critique.md` rather than jumping to line edits.
 
+## What this skill does not cover
+
+Working notes in `wiki/` are deliberately not in this voice. They are blunt,
+claim-first and provisional, and that is what keeps them usable. Prose written
+to CIVICWORKS standard turns a note into a draft, and the wiki into a backlog
+of unfinished essays. Do not apply the voice file to them, and do not treat
+`check.py` findings there as faults.
+
 ## Reviewing the voice file
 
 Jack maintains `voice-dna.md` himself. Never edit it as a side effect of a
