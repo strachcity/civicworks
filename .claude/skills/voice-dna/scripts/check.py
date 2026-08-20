@@ -118,16 +118,32 @@ DEAD_PHRASES = {
 
 COPULA_DODGES = r"\b(serves as|serving as|stands as|marks a|represents a|represents the|features a|offers a)\b"
 
-NEGATIVE_PARALLELISM = [
+# Two different moves, and section 3B is only about the first.
+#
+# A reframe negates a position and substitutes another: "it isn't X, it's Y".
+# That is the construction models overproduce, because it makes a shallow
+# claim sound profound, and it drafts at zero.
+#
+# The additive construction expands a definition instead: "not simply a team,
+# but a structured environment". Nothing is being displaced. It is all over
+# the published writing, doing real definitional work, and flagging it as a
+# 3B violation buries the reframes that matter.
+REFRAME = [
     r"\bis ?n'?t\b[^.?!]{0,80}?\bit'?s\b",
     r"\bis not\b[^.?!]{0,80}?\bit is\b",
     r"\bthe (question|problem|issue|point|answer) is ?n'?t\b",
     r"\bthe (question|problem|issue|point|answer) is not\b",
-    r"\bnot (just|only|merely|simply)\b[^.?!]{0,70}?\bbut\b",
     r"(?:^|\. )not \w[^.?!]{0,50}, but\b",
     r"\bless about\b[^.?!]{0,60}\bmore about\b",
     r"\bwas ?n'?t\b[^.?!]{0,80}?\bit was\b",
 ]
+
+ADDITIVE = [
+    r"\bnot (just|only|merely|simply)\b[^.?!]{0,70}?\bbut\b",
+]
+
+# Above this many in one piece it has stopped being a choice.
+ADDITIVE_BUDGET = 4
 
 PARTICIPLE_ANALYSIS = (
     r",\s+(highlighting|reflecting|underscoring|underlining|demonstrating|"
@@ -409,16 +425,25 @@ def check_phrases(checkable, report):
 
 
 def check_negative_parallelism(paras, report):
-    hits = 0
     for start, text in paras:
-        for pat in NEGATIVE_PARALLELISM:
+        for pat in REFRAME:
             for m in re.finditer(pat, text, re.I):
-                hits += 1
-                report.add(WARN, start, "negative-parallelism",
+                report.add(WARN, start, "reframe",
                            "reframe construction: drafting default is zero. "
                            "If it is earned, flag it as a suggestion instead",
                            excerpt_at(text, m), m.span(), scope="para")
-    return hits
+
+    additive = []
+    for start, text in paras:
+        for pat in ADDITIVE:
+            for m in re.finditer(pat, text, re.I):
+                additive.append((start, excerpt_at(text, m)))
+    if len(additive) > ADDITIVE_BUDGET:
+        start, excerpt = additive[0]
+        report.add(NOTE, start, "additive-parallelism",
+                   f'"not just X, but Y" {len(additive)} times. It expands rather '
+                   "than negates, so 3B does not ban it, but at this rate it is "
+                   "a tic rather than a choice", excerpt)
 
 
 def check_headers(headers, report):
@@ -511,7 +536,7 @@ COLOURS = {ERROR: "\033[31m", WARN: "\033[33m", NOTE: "\033[36m"}
 RESET = "\033[0m"
 
 
-def render(path, report, stats, colour):
+def render(path, report, stats, colour, published=False):
     out = [f"\n{path}"]
     if not report.findings:
         out.append("  nothing mechanical to fix.")
@@ -542,12 +567,25 @@ def render(path, report, stats, colour):
         f"stdev {stats['sentence_length_stdev']} "
         f"(low stdev means metronome rhythm), {stats['contractions']} contractions")
     out.append("")
+    if published:
+        out.append("")
+        out.append("  Draft-only rules muted. A rule firing here is firing on")
+        out.append("  finished writing, which is evidence about the rule.")
+    out.append("")
     out.append("  The checker cannot see whether the argument found a mechanism,")
     out.append("  whether the paragraphs build, or whether the ending earns itself.")
     return "\n".join(out)
 
 
-def check_file(path):
+# Section 3A scopes the dash rule to drafts ("my published punctuation uses
+# spaced dashes; I'll add them where they belong"), and 3B scopes the reframe
+# rule the same way ("when editing my text, leave mine alone"). Running them
+# over a finished piece produces dozens of findings that are the rules working
+# as designed, and buries everything else.
+DRAFT_ONLY = {"em-dash", "reframe"}
+
+
+def check_file(path, published=False):
     lines = read_lines(path)
     checkable, headers = strip_structure(lines)
     paras = paragraphs_of(checkable)
@@ -559,6 +597,8 @@ def check_file(path):
     check_headers(headers, report)
     check_tics(checkable, headers, report)
     check_paragraph_shape(paras, report)
+    if published:
+        report.findings = [f for f in report.findings if f["rule"] not in DRAFT_ONLY]
     return report, stats_of(paras)
 
 
@@ -568,6 +608,9 @@ def main():
     ap.add_argument("paths", nargs="+", help="markdown files, or - for stdin")
     ap.add_argument("--json", action="store_true", help="machine-readable output")
     ap.add_argument("--strict", action="store_true", help="warnings fail too")
+    ap.add_argument("--published", action="store_true",
+                    help="reviewing finished work: mute the draft-only rules "
+                         "(em dashes, reframes) so the rest is readable")
     ap.add_argument("--no-colour", action="store_true")
     args = ap.parse_args()
 
@@ -575,11 +618,11 @@ def main():
     results, failed = {}, False
 
     for path in args.paths:
-        report, stats = check_file(path)
+        report, stats = check_file(path, published=args.published)
         results[path] = {"findings": report.findings, "stats": stats,
                          "counts": report.counts()}
         if not args.json:
-            print(render(path, report, stats, colour))
+            print(render(path, report, stats, colour, args.published))
         counts = report.counts()
         if counts[ERROR] or (args.strict and counts[WARN]):
             failed = True

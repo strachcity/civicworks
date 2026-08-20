@@ -41,11 +41,61 @@ class TestHardRules(unittest.TestCase):
     def test_copula_dodge(self):
         self.assertIn("copula-dodge", rules("The paper serves as a warning."))
 
-    def test_reframe(self):
-        self.assertIn("negative-parallelism",
+
+class TestParallelism(unittest.TestCase):
+    """The reframe displaces a position. The additive expands a definition."""
+
+    def test_reframe_is_flagged(self):
+        self.assertIn("reframe",
                       rules("It isn't a technology problem, it's a funding problem."))
-        self.assertIn("negative-parallelism",
-                      rules("The question isn't whether to build it."))
+        self.assertIn("reframe", rules("The question isn't whether to build it."))
+
+    def test_additive_is_not_a_reframe(self):
+        found = rules("Studios are not simply places where ideas are generated, "
+                      "but environments where problems are worked through.")
+        self.assertNotIn("reframe", found)
+
+    def test_additive_under_budget_is_silent(self):
+        text = "\n\n".join(
+            f"Case {i} is not just a thing, but another thing entirely here."
+            for i in range(3))
+        self.assertNotIn("additive-parallelism", rules(text))
+
+    def test_additive_over_budget_is_noted_once(self):
+        text = "\n\n".join(
+            f"Case {i} is not just a thing, but another thing entirely here."
+            for i in range(7))
+        found = [f for f in run(text)[0] if f["rule"] == "additive-parallelism"]
+        self.assertEqual(1, len(found))
+        self.assertIn("7 times", found[0]["message"])
+
+
+class TestPublishedMode(unittest.TestCase):
+    """Section 3A and 3B scope themselves to drafts."""
+
+    SAMPLE = ("A finished sentence — with a dash in it.\n\n"
+              "It isn't one thing, it's another thing.\n\n"
+              "Furthermore, the programme was organized badly.\n")
+
+    def test_draft_rules_fire_by_default(self):
+        found = {f["rule"] for f in run(self.SAMPLE)[0]}
+        self.assertIn("em-dash", found)
+        self.assertIn("reframe", found)
+
+    def test_published_mutes_only_the_draft_rules(self):
+        import tempfile, os
+        fd, path = tempfile.mkstemp(suffix=".md")
+        with os.fdopen(fd, "w", encoding="utf-8") as fh:
+            fh.write(self.SAMPLE)
+        try:
+            report, _ = check.check_file(path, published=True)
+        finally:
+            os.unlink(path)
+        found = {f["rule"] for f in report.findings}
+        self.assertNotIn("em-dash", found)
+        self.assertNotIn("reframe", found)
+        self.assertIn("dead-phrase", found)
+        self.assertIn("british-english", found)
 
 
 class TestSoftRules(unittest.TestCase):
@@ -126,7 +176,7 @@ class TestRealProse(unittest.TestCase):
     """Typographic quotes are what actual exports contain."""
 
     def test_curly_apostrophe_reframe_is_caught(self):
-        self.assertIn("negative-parallelism",
+        self.assertIn("reframe",
                       rules("It isn\u2019t a technology problem, it\u2019s a funding problem."))
 
     def test_curly_apostrophe_dead_phrase_is_caught(self):
