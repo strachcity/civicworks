@@ -10,7 +10,7 @@ Public because there is no reason for it to be private, but written for an audie
 
 It is wrapped in a [Claude skill](.claude/skills/voice-dna/) that drafts, redrafts and critiques against it. The file is maintained by hand. Every few pieces, read it against what actually got published and change what has stopped being true, which is what section 5 asks for anyway: when recent finished work conflicts with the file, the writing wins.
 
-**[Download the skill (zip)](https://raw.githubusercontent.com/strachcity/civicworks/claude/voice-dna-skill-install-od4986/dist/voice-dna-skill.zip)** to use it somewhere other than this repo, e.g. uploading to Claude.ai Skills. Keep `SKILL.md` named as-is once unzipped, since that filename is what makes Claude recognise the folder as a skill.
+**[Download the skill (zip)](https://raw.githubusercontent.com/strachcity/civicworks/main/dist/voice-dna-skill.zip)** to use it somewhere other than this repo, e.g. uploading to Claude.ai Skills. Keep `SKILL.md` named as-is once unzipped, since that filename is what makes Claude recognise the folder as a skill.
 
 ### Using it
 
