@@ -15,7 +15,7 @@ It is wrapped in a [Claude skill](.claude/skills/voice-dna/) that drafts, redraf
 
 ## Wiki
 
-The idea came from [Karpathy's append-and-review wiki](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f).
+The idea came from [Karpathy's LLM wiki concept](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f) – an LLM that incrementally builds and maintains a persistent wiki — a structured, interlinked collection of markdown files that sits between me and the raw sources. 
 
 **[wiki/mechanisms.md](wiki/mechanisms.md)** holds the claims that recur across the writing: six mechanisms, the positions that have moved, the framings already spent, and an honest list of what the corpus does not have. Mined from 13 CIVICWORKS pieces, the MPA thesis and the UN80 article rather than from a structure guessed in advance.
 
