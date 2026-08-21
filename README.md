@@ -10,27 +10,8 @@ Public because there is no reason for it to be private, but written for an audie
 
 It is wrapped in a [Claude skill](.claude/skills/voice-dna/) that drafts, redrafts and critiques against it. The file is maintained by hand. Every few pieces, read it against what actually got published and change what has stopped being true, which is what section 5 asks for anyway: when recent finished work conflicts with the file, the writing wins.
 
-**[Download the skill (zip)](https://raw.githubusercontent.com/strachcity/civicworks/main/dist/voice-dna-skill.zip)** to use it somewhere other than this repo, e.g. uploading to Claude.ai Skills. Keep `SKILL.md` named as-is once unzipped, since that filename is what makes Claude recognise the folder as a skill.
+**[Download the skill (zip)](https://raw.githubusercontent.com/strachcity/civicworks/main/dist/voice-dna-skill.zip)** to use it somewhere other than this repo, e.g. uploading to Claude.ai Skills as a zip folder. 
 
-### Using it
-
-The skill loads automatically when Claude Code runs inside this repo. To have it available everywhere:
-
-```bash
-ln -s ~/civicworks/.claude/skills/voice-dna ~/.claude/skills/voice-dna
-```
-
-The symlink keeps one source of truth, so an edit made anywhere lands back here and gets committed.
-
-The mechanical rules also run standalone:
-
-```bash
-python3 .claude/skills/voice-dna/scripts/check.py draft.md
-```
-
-Em dashes, banned vocabulary, dead phrases, reframe constructions, tic clusters, Americanisms, title case headers. It catches what a regex can catch, which is the least interesting half of the file. No dependencies, Python 3.8 or later.
-
-Worth pointing it at finished pieces as well as drafts. A rule that fires on something already published is a rule that needs loosening, and that is the most useful thing it does.
 
 ## Wiki
 
