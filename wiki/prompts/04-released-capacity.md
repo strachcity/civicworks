@@ -1,6 +1,6 @@
 # What released capacity is for
 
-**Status:** claim in hand, evidence almost absent. Comes from a Substack note (Aug 2026, url TK) rather than from the archive. The corpus has two passing mentions of AI across 13 pieces and no position.
+**Status:** claim in hand, evidence almost absent. Comes from a Substack note ([Aug 2026](https://substack.com/@jackstrachan/note/c-321460859)) rather than from the archive. The corpus has two passing mentions of AI across 13 pieces and no position.
 
 ## The claim
 
