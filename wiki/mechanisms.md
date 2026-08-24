@@ -176,7 +176,7 @@ Anything drafted from here uses the three.
 
 **Terms of partnership as the design object.** 08 only. Public risk matched to public reward, conditionality designed rather than defaulted. The NICE/NHS England antimicrobial subscription model is a strong case with nothing else attached to it yet. Adjacent to M6 but not the same claim: M6 is about how a funder holds a spread of bets, this is about who captures the return.
 
-**Test and learn as organisational self-knowledge.** 12 only, though it connects to M3. "Test the organisation, not just the service."
+**Test and learn as organisational self-knowledge.** 12, and a Substack note ([Aug 2026](https://substack.com/@jackstrachan/note/c-321460859)). "Test the organisation, not just the service." 12 points inwards: can the organisation tolerate the uncertainty learning requires. The note points forwards: what released capacity makes possible, which roles become more important, where people spend more time on judgement, relationships and complexity. The object list is nearly the same both times — 12's "operating models, risk tolerance, policy constraints and organisational boundaries", the note's "future roles, operating models, decision rights, risk and capabilities". Two sightings, one of them not an article, so it is still a watch item. Connects to M3. See `prompts/04-released-capacity.md`.
 
 **Shifting altitudes.** T only, as a named routine: moving between the "meta" and the "matter", translating lived experience upwards and systemic shifts downwards. 13 reaches for something similar without the vocabulary ("Direction and public purpose travel down. Evidence about what helps or obstructs delivery travels back up"). Two sightings, one of them unnamed.
 
@@ -277,3 +277,5 @@ Honest gaps, which are as useful as the entries.
 - **M1 has no proposed transition, and now there is a reason.** See the institutionalisation paradox. The corpus has four independent arrivals at the same bind and one untested bet on sequencing.
 - **M5 and M1 are not reconciled.** Power at decision gates versus change through relationships.
 - **Almost no citizen-side evidence outside 07 and 12.** The archive argues about institutions from inside institutions.
+
+- **No position on AI.** Two passing mentions across 13 pieces, 06 and 13, both asides. It is currently the frame most public sector transformation is being scoped inside, and the corpus has nothing to say about it. See `prompts/04-released-capacity.md`.
