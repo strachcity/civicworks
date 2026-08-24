@@ -10,6 +10,12 @@ All of it is already public. Nothing unpublished goes here.
 
 `x1` and `x2` are published elsewhere. Both are machine-extracted working copies with the canonical source in their frontmatter; the extraction lost layout and figures, so quote from the source, not from these.
 
+## Notes are not archived
+
+Substack notes stay on Substack. They are too short to mine, there are too many of them, and numbering them alongside the articles would break publication order, which the mechanism tables depend on.
+
+When a note supplies something the wiki actually needs — a second sighting, a formulation sharper than the published one, an argument with nowhere else to go — cite it where it is used, with its date and link, and say it is a note. The wiki should never leave the impression that an argument was published at length when it was a paragraph.
+
 ## Adding a piece
 
 Export it, name it by publication order, and give it frontmatter matching the others: title, subtitle, author, date, publication, source. Then re-run the mining pass, which means reading it against `wiki/mechanisms.md` and asking three questions.
