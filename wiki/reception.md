@@ -2,6 +2,8 @@
 
 Substack performance, 13 pieces, Sept 2025 to Jul 2026. Pulled 2026-08-20.
 
+**Piece 14, *The future isn't multidisciplinary*, is not in the table.** Published 25 Aug 2026, after the pull, and too recent to say anything. Re-pull when it has had a few weeks. Until then `mechanisms.md` has an entry the audience has not voted on, which is the right way round.
+
 **Read this file with suspicion.** It says which arguments travelled, not which are right. Reach on Substack is mostly decided by things outside the text: whether someone with an audience shared it, whether the network recommended it, what was in the news that week. With n=13, everything below is suggestive at best.
 
 The reason it exists is narrower: `mechanisms.md` identified a spine by reading the archive. This is an independent check on whether readers found the same thing. They did.
