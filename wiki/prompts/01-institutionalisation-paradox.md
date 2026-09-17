@@ -24,6 +24,10 @@ The fourth of those is his own, current, at CustomerFirst. Almost no one else ca
 
 The lab history in 11 (MindLab folded, Helsinki Design Lab closed in 2013 after SITRA concluded embedding beat concentrating, GDS institutionalised). The thesis fieldwork on intermediaries compensating for weak capabilities and staying precarious. The DVLA "NewCo" language travelling in 12, which he reads as either weight or capture and cannot yet tell apart.
 
+**New, and it changes the shape of this prompt.** X3 (Sept 26), published in role on the GDS blog, is the first public account anywhere in the corpus of the conditions being deliberately manufactured rather than observed: capacity created by backfilling roles, organisational knowledge held inside the team, and a named escalation route, all resting on a commitment senior sponsors made before delivery began. So the prompt no longer has to argue that protected space is buildable. It is buildable, and here is one built.
+
+What that does is sharpen the bind rather than loosen it. Every condition X3 describes traces back to particular leaders agreeing to it in advance, which is exactly the dependency 11 worried about. The piece can now open from a live, public, named case and ask the question the case cannot ask about itself: what happens to any of it when those sponsors move on. Note the genre limit before leaning on it — X3 is institutional writing and cannot publish doubt about its own arrangement, so it supplies the mechanism and none of the doubt. The doubt has to come from 11, 12 and T.
+
 ## What is missing
 
 A resolution, or an honest account of why there is not one. The nearest thing in the corpus is a bet on sequencing: 11 on early GDS, where authority, learning and delivery stayed connected "long enough for evidence to accumulate", and 09's "legitimacy in this space is built through action, not insight." Untested in both.
