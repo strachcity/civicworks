@@ -8,7 +8,9 @@ All of it is already public. Nothing unpublished goes here.
 
 `01` to `14` are CIVICWORKS posts in publication order, exported from Substack as markdown. Piece `03` is a guest post by Jack O'Connor and is excluded from anything about voice, since the voice file describes one writer and not the publication.
 
-`x1` and `x2` are published elsewhere. Both are machine-extracted working copies with the canonical source in their frontmatter; the extraction lost layout and figures, so quote from the source, not from these.
+`x1` to `x3` are published elsewhere. `x1` and `x2` are machine-extracted working copies with the canonical source in their frontmatter; the extraction lost layout and figures, so quote from the source, not from these. `x3` is the author's own copy, so its text is exact, but the published page is still canonical and still the thing to link to.
+
+`x3` is also the only piece here written in role rather than under his own name: institutional writing in the first person plural, published by the organisation it describes. That changes what it is able to say, so it cannot be mined like an essay. `wiki/mechanisms.md` carries the caveat.
 
 ## Notes are not archived
 
