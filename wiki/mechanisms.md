@@ -1,15 +1,18 @@
 # Mechanisms
 
-Claims made more than once across CIVICWORKS, 14 pieces, Sept 2025 to Aug 2026.
+Claims made more than once across CIVICWORKS, 14 pieces, Sept 2025 to Sept 2026.
 
 Working notes, not prose. Blunt on purpose: if an entry starts reading like an essay it has stopped being useful and become a draft.
 
-Mined from the archive on 2026-08-20, piece 14 added 2026-08-25. Piece numbers refer to publication order. Piece 03 is a guest post by Jack O'Connor and is excluded throughout.
+Mined from the archive on 2026-08-20, piece 14 added 2026-08-25, X3 added 2026-09-17. Piece numbers refer to publication order. Piece 03 is a guest post by Jack O'Connor and is excluded throughout.
 
-Two pieces published outside CIVICWORKS are now included, and they change the picture:
+Three pieces published outside CIVICWORKS are now included, and they change the picture:
 
 - **T** = *(Re)imagining Mission Neighbourhoods: Emerging Practices of Urban Transformation.* MPA thesis, UCL IIPP. Submitted Sept 2025, published Feb 2026. Grounded theory, 15 interviews across the UK, Belgium, Canada and Australia. Supervised by Rainer Kattel and Kwame Baafi.
 - **UN** = *How UN80 Can Reform the UN for a Volatile, Uncertain World.* IPI Global Observatory, Jun 2026. Uses "we" throughout; only one author bio appears in the saved page. Attribution needs confirming.
+- **X3** = *Creating the conditions for transformation.* GDS blog, Sept 2026. Written in role at CustomerFirst, on the DVLA Drivers Medical partnership. Names three conditions from inside a live NewCo.
+
+**X3 is a different genre and has to be read as one.** Everything else in the archive is a personal essay, a thesis or an op-ed, where the writer can say what he does not know. X3 is institutional writing in the first person plural, published by the organisation it describes. It can report conditions and it cannot report doubt. So what X3 says is usable, and what X3 omits proves nothing. Every entry below that cites it carries that discount.
 
 ---
 
@@ -40,6 +43,10 @@ Same *Radical How* figure, same waterfall diagnosis, same conclusion that learni
 - Insight without authority gets absorbed rather than acted on. The "policy drawer" (06).
 - Learning experienced as exception rather than condition is dismissed as "interesting but unrealistic" (06).
 - **Prevention is invisible to the accountability system.** UN: "When anticipatory action averts crisis, there is no headline, ribbon-cutting moment, or clear line of attribution. The absence of failure is politically quieter than the management of visible emergencies." 04, on the same logic inside HMRC: civil servants are "punished for being wrong, rewarded for nothing going wrong, and rarely recognised when things go right." Two sightings, both sharp. Probably wants its own entry once there is a third.
+
+**X3 is the first piece that works against M1 rather than diagnosing it.** Every row above puts a capability downstream of a decision. X3 describes a deliberate attempt to put it upstream: conditions agreed before delivery began, a standing route to the decisions sitting above the team, and small tests that give the team "something concrete to decide against, reducing how much depends on assertion or hierarchy and keeping decisions close to the people doing the work."
+
+Not a resolution, and not yet evidence of one. It is the only account in the corpus of anyone trying, and it is written by the people trying. Read it as intent with a mechanism attached, not as a result.
 
 **Best single formulation.** 06: "This is not a capability problem. It is an architectural one."
 
@@ -81,6 +88,7 @@ Three uses. The first two, 8 months apart, run the same illustration.
 | 13 | "the container itself tells us very little about whether that authority is real" |
 | UN | "differentiated governance modes that can be activated to address systemic risks and deactivated when conditions stabilize" |
 | 14 | The same professions can stay exactly where they are; "what cannot stay fixed is the architecture between them" |
+| X3 | Three conditions named from inside a live NewCo: real capacity, organisational knowledge held in the team, working in the open with known routes to authority |
 
 **UN is 06's architecture restated.** "Conditional, not universal", "triggered by uncertainty, not default", "time-bound and reversible" (06) and "activated... and deactivated when conditions stabilize" (UN) are the same design, five months apart, applied to Whitehall and then to the UN. The clearest evidence in the corpus that this is a portable claim rather than a local observation.
 
@@ -88,7 +96,15 @@ Three uses. The first two, 8 months apart, run the same illustration.
 
 **14 is the strongest form of the claim.** Prior sightings compare containers: lab against unit, department against NewCo. 14 holds the container completely fixed. Same professions, same people, same team, and the argument is that only the architecture between them has to move. If M3 is right, that should be enough. Nothing in the corpus tests it.
 
-**What is unresolved.** Conditions are named consistently but never operationalised. What creates protected authority, who grants it, and what makes it survive a change of sponsor is asked in 11 and left open in 12 ("We are too early to know"). T reaches the same wall from fieldwork. 14 is the fifth arrival and puts it to the reader as a closing provocation: "who in government is responsible for creating the conditions that let that architecture move?" Asked five times, answered nowhere.
+**X3 is the first operationalisation, and it closes two of the three questions.** Six sightings named conditions and none said how one is made. X3 gives each of its three a mechanism.
+
+- *Real capacity:* roles backfilled so seconded staff leave their old jobs rather than hold two. "Backfilling sounds like a resourcing detail, but it changes the relationship people have with the work."
+- *Organisational knowledge:* the people who know why the processes exist sit inside the team instead of being interviewed by it.
+- *Authority:* working in the open as the default, with a named escalation route held in reserve.
+
+It also answers who grants them, which 11 asked and nothing answered: "Before delivery began, senior stakeholders across DVLA and GDS agreed a commitment to a shared ambition for the transformation work and to protecting the conditions the team would need to pursue it." Agreed up front, by named sponsors, as a precondition of starting. That is the corpus's first account of conditions being manufactured rather than observed.
+
+**What is unresolved.** The third question survives intact. What makes conditions last through a change of sponsor is still unanswered, and X3 is the sharpest possible statement of the dependency rather than a way out of it: every condition it describes traces back to a commitment particular leaders made in advance. So the position has moved from "conditions are never operationalised" to "conditions have been operationalised once, wholly sponsor-dependent, by a team that says it is still early". 14's closing provocation, "who in government is responsible for creating the conditions that let that architecture move?", now has an answer in one case: the sponsors, in advance, in writing. Whether that is a repeatable mechanism or one well-run partnership is `prompts/01-institutionalisation-paradox.md`.
 
 ---
 
@@ -109,6 +125,10 @@ Three uses. The first two, 8 months apart, run the same illustration.
 
 **Why 13 belongs here.** Blue tape is this mechanism at the scale of a single approval process, which makes it the most testable version of the claim. 10 is the most fully argued version.
 
+**X3 qualifies the mechanism, and it is the first pushback in the corpus.** M4 has always carried an implication that interrogating the framework releases something: the logic is inherited, nobody chose it, so surfacing it is the intervention. 13's blue tape is the purest form, an interpretation that became a rule and lost its relationship to the concern that produced it. X3, from inside a live attempt to move one: "Sometimes the team discovers that a constraint is protecting something important." And: "Understanding why a constraint exists, what it is protecting and how fixed it really is can tell us as much as successfully removing it."
+
+Inherited logic and live protection look identical from outside. The diagnostic move M4 recommends is the same for both; the conclusion is not. The mechanism is unchanged and removal stops being its implied endpoint. Worth carrying into anything that reuses 13, because blue tape as written invites the assumption that the rule is always degraded.
+
 **Strongest evidence in the archive.** 10's DDaT reading: "a method of designing end-to-end journeys of a service to help users complete their goals and deliver policy intent." Then: "Deliver. Not shape. Not challenge. Not co-produce. Deliver."
 
 ---
@@ -117,7 +137,7 @@ Three uses. The first two, 8 months apart, run the same illustration.
 
 **The claim.** Public systems designed around managing needs and delivering transactions systematically underinvest in relationships, despite relationships being where change is sustained. The intermediary layer that holds relationships, integrates fragmented systems and carries learning over time is missing.
 
-Appears in 05, 06, 07, 09, 12, 14. The most consistent theme after M1, and the least resolved.
+Appears in 05, 06, 07, 09, 12, 14, X3. The most consistent theme after M1, and the least resolved.
 
 - **05:** social infrastructure institutions, the missing middle. Citizen Hub, Monash living labs.
 - **06:** "dark matter", Dan Hill's "soft eyes", relational practices marginal to where decisions are made.
@@ -125,6 +145,9 @@ Appears in 05, 06, 07, 09, 12, 14. The most consistent theme after M1, and the l
 - **09:** place as sociomaterial infrastructure, Sam Rye on prototypes as devices for reorganising relationships.
 - **12:** the people who run the service know the workarounds because they built them.
 - **14:** the bridging between disciplines is done by individuals. "Most of this movement has happened because individuals have made it happen, which is effort rather than architecture", and "if the same people keep bridging the gaps, those bridges have to become part of the model."
+- **X3:** organisational knowledge held inside the team rather than consulted, paid for by backfilling the roles people leave. Second sighting of 12's claim that the people who run the service know why it works as it does, now with a budget line attached.
+
+**X3 answers 14's complaint directly, and it is the first time anything does.** 14 says the bridging is effort rather than architecture, and that if the same people keep bridging the gaps those bridges have to become part of the model. X3 describes a funding decision doing exactly that: backfilled roles, so holding the relationship is someone's job rather than their goodwill. M5 says relational infrastructure is structurally underfunded. This is the corpus's only instance of it being funded on purpose.
 
 **Tension worth noticing, and the first move on it.** M1 says power sits at decision gates. M5 says change is sustained through relationships. The archive has not reconciled these. 06 gestures at it via "dark matter", 13 gets close with "which relationships help them move across formal boundaries", and 14 goes furthest with *sideways legibility*: making the architecture visible to the people trying to move through the work rather than only to the people managing it from above. That makes relationships the route to authority rather than the alternative to it. One paragraph, one sighting, own coinage. Watch it.
 
@@ -161,12 +184,17 @@ Three sightings, three evidence bases, one object.
 | T | Sept 25 | Named as a routine: "shifting altitudes", moving between the "meta" and the "matter", translating lived experience upwards and systemic shifts downwards |
 | 13 | Jul 26 | Unnamed: "Direction and public purpose travel down. Evidence about what helps or obstructs delivery travels back up" |
 | 14 | Aug 26 | Argued: work moves horizontally across kinds of expertise and vertically through layers of institutional authority, and a team can be complete on the first while having no route through the second |
+| X3 | Sept 26 | Given a route and a name: "air cover", a standing line to senior sponsorship for decisions sitting above the team |
 
 **Why this is an entry now rather than a watch item.** It sat on the watch list on two sightings, one of them unnamed. 14 argues it at length and separates it cleanly from the horizontal movement that the cross-disciplinary literature already covers, which is what the other two lacked. It also supplies the chain: interaction, process, rule, judgement, policy intent.
 
 **Relationship to M1.** This is M1 from inside the team. M1 says the capability sits downstream of the decision. M7 says what that is like for the people holding it: they can see where the work needs to go and have no way to get there. M1 is the diagnosis, M7 is the movement the diagnosis blocks.
 
-**What is unresolved.** No sighting says who is permitted to move vertically, what the route is where one exists, or what it costs. T's routine is descriptive, observed in intermediaries doing it without sanction. 14 names the gap and stops. Nothing in the corpus describes a successful vertical move in a UK department with the authority trail attached. Nothing says how anyone gets good at it either. See `prompts/06-depth-that-travels.md`.
+**X3 supplies a route and a price.** "When something does need authority elsewhere, the partnership gives us a route to senior sponsorship. We call this 'air cover'. Leaders have already committed to the conditions around the work, so escalation is about unblocking rather than re-stating the case." First named vertical route in the corpus, and the first that exists before it is needed rather than being improvised at the point of blockage.
+
+It also prices it, which no prior sighting does: "Escalating too quickly moves decisions away from the people closest to the work and turns senior sponsorship into part of the everyday operating model." The route degrades through use. Air cover spent on ordinary decisions stops being air cover and becomes a hierarchy. That cuts against the corpus's own instinct, which has been to treat access to authority as the scarce good and therefore more of it as better.
+
+**What is unresolved.** X3 answers what the route is and what it costs, for one team. It does not say who is permitted to use it, how the judgement about when to escalate actually gets made, or what happens to the route when the sponsors who granted it move on. T's routine is still descriptive, observed in intermediaries doing it without sanction. The corpus still has no completed vertical move with the authority trail attached, only a standing permission to attempt one. Nothing says how anyone gets good at the judgement either. See `prompts/06-depth-that-travels.md`.
 
 **Sources.** T, on shifting altitudes as a routine of dynamic stewardship. Wright Morton, Eigenbrode and Martin on architectures of adaptive integration (14).
 
@@ -189,6 +217,9 @@ Every later piece that reaches this wall reaches the same formulation, independe
 | 11 | May 26 | Whether a NewCo can hold protected authority as it scales, or is absorbed into the governance logic that constrained its predecessors |
 | 12 | Jun 26 | "Do these protected spaces eventually replace parts of the original organisation? Do they get absorbed back into it? Or do they diffuse into nothing once the attention moves elsewhere? We are too early to know" |
 | 14 | Aug 26 | From the research literature: institutionalising cross-disciplinary work produced "mega-silos", new vertical structures that replaced disciplinary boundaries with topic and industry ones |
+| X3 | Sept 26 | The same live case as 12, three months on, stating conditions rather than the bind: "We are still early in this work" |
+
+**X3 does not add a sixth arrival, and that is the finding.** It is 12's case three months later, and it reports conditions rather than the bind. The genre explains most of that: an institutional post cannot publish doubt about whether its own arrangement will survive. But it leaves the count at five independent arrivals, and means the case sitting closest to the question is the one least able to discuss it in public. Anything written from X3 has to get the bind from elsewhere in the corpus.
 
 **Why this matters for the wiki.** The question is not open because it has been under-thought. It is a genuine bind with a formulation already in hand, arrived at five times from five different evidence bases. That is a much stronger position than the essays individually suggest, and none of them says so, because none of them can see the other four at once.
 
@@ -218,7 +249,9 @@ Anything drafted from here uses the three.
 
 **Terms of partnership as the design object.** 08, plus a second sighting from public sector data (Aug 2026, not from the archive). Public risk matched to public reward, conditionality designed rather than defaulted. The data material widens it from public investment to public assets generally: the design object is the terms on which a publicly created asset enters private value creation. Still a watch item, since only 08 is a published piece. Adjacent to M6 but not the same claim: M6 is about how a funder holds a spread of bets, this is about who captures the return. See `prompts/02-conditionality.md`.
 
-**Test and learn as organisational self-knowledge.** 12, and a Substack note ([Aug 2026](https://substack.com/@jackstrachan/note/c-321460859)). "Test the organisation, not just the service." 12 points inwards: can the organisation tolerate the uncertainty learning requires. The note points forwards: what released capacity makes possible, which roles become more important, where people spend more time on judgement, relationships and complexity. The object list is nearly the same both times — 12's "operating models, risk tolerance, policy constraints and organisational boundaries", the note's "future roles, operating models, decision rights, risk and capabilities". Two sightings, one of them not an article, so it is still a watch item. Connects to M3. See `prompts/04-released-capacity.md`.
+**Test and learn as organisational self-knowledge.** 12, and a Substack note ([Aug 2026](https://substack.com/@jackstrachan/note/c-321460859)). "Test the organisation, not just the service." 12 points inwards: can the organisation tolerate the uncertainty learning requires. The note points forwards: what released capacity makes possible, which roles become more important, where people spend more time on judgement, relationships and complexity. The object list is nearly the same both times — 12's "operating models, risk tolerance, policy constraints and organisational boundaries", the note's "future roles, operating models, decision rights, risk and capabilities". Connects to M3. See `prompts/04-released-capacity.md`.
+
+X3 is a third sighting and the second from an article: "part of the NewCo hypothesis is that we should learn the operating model through delivery", and the assurance route as the worked instance, since working through it "shows us whether the existing assurance route fits this kind of work". That clears the numeric bar this file used to promote M7. Held back anyway, because M7 was promoted on a sighting that argued it at length and X3 states it in a subordinate clause. Promote on the next argued sighting, or now if the clause is judged enough.
 
 **Shifting altitudes.** Promoted to M7 on the third sighting, 14. Left here as a pointer because the phrase is T's and the entry is filed under 14's vocabulary.
 
@@ -302,6 +335,8 @@ T adds a large academic apparatus not otherwise present: Sørensen & Torfing (th
 
 So the corpus now runs on three largely separate literatures: public digital reform, transition intermediaries (via T), and the organisation of cross-disciplinary research. Almost nothing is cited across them, and 14 is the first piece to reach outside the first for its central device rather than for an illustration.
 
+X3 adds nothing to the table either, for a different reason from 14: it is institutional writing and cites nobody at all. Two consecutive additions to the archive that extend the corpus without extending the bibliography.
+
 A standalone `sources.md` is what stage 2 looks like. Closer now than it was: T alone roughly doubles the bibliography, and 14 adds a third shelf.
 
 ---
@@ -327,6 +362,7 @@ Framings already deployed and available for reuse. Knowing how often each has be
 | Platforms rather than silos | Russell, Wickson and Carew | 14 |
 | Mega-silos | Russell, Wickson and Carew | 14 |
 | Sideways legibility | Own | 14 |
+| Air cover | CustomerFirst, in-role | X3 |
 
 ---
 
@@ -334,10 +370,12 @@ Framings already deployed and available for reuse. Knowing how often each has be
 
 Honest gaps, which are as useful as the entries.
 
-- **No failure case written up in detail.** The argument is consistently that the architecture defeats good work. No piece follows a single decision through the architecture to show it happening. T is the closest, and its cases are intermediaries succeeding precariously rather than a decision going wrong. 14 traces the chain in the abstract — interaction, rule, evidence requirement, risk judgement, policy intent — with no case attached. That abstraction is the exact shape of the piece that is missing.
+- **No failure case written up in detail.** The argument is consistently that the architecture defeats good work. No piece follows a single decision through the architecture to show it happening. T is the closest, and its cases are intermediaries succeeding precariously rather than a decision going wrong. 14 traces the chain in the abstract — interaction, rule, evidence requirement, risk judgement, policy intent — with no case attached. That abstraction is the exact shape of the piece that is missing. X3 gets closest to naming the occasion, "an experiment may run into a technology constraint that has been treated as fixed for years", and supplies no instance of one. The gap is unchanged.
 
 - **The thesis is uncited by the writing that depends on it.** 02 and 04 promise it as forthcoming. 05 covers the same territory via Recurve. 07 uses two of its participant phrases. Nothing links to it. It is the corpus's largest single piece of primary evidence, 15 interviews across 4 countries, and it is invisible from the newsletter.
-- **M1 has no proposed transition, and now there is a reason.** See the institutionalisation paradox. The corpus has four independent arrivals at the same bind and one untested bet on sequencing.
+- **M1 has no proposed transition, and now there is a reason.** See the institutionalisation paradox. The corpus has five independent arrivals at the same bind and one untested bet on sequencing. X3 is the first described attempt at a transition, in one case, reported by the people attempting it.
+
+- **Nothing on conditions being withdrawn.** M3 now has an account of conditions being created, in X3, and none of what happens when a sponsor leaves, a partnership ends or a commitment made before delivery stops being honoured. The corpus can say how protected space gets built and still cannot say how it ends. Every live-case piece stops at the same point, because the case has not got there yet.
 - **M5 and M1 are not reconciled.** Power at decision gates versus change through relationships. 14 makes the first move with sideways legibility and it is one paragraph.
 
 - **No account of what the professions lose.** 14 argues professional boundaries should be permeable, then explicitly parks the politics. Digital specialists spent 20 years getting professional standing, and only reached occupational-group parity in 2004-5. The corpus now has an argument that runs against something its own readers fought for, and nothing on who carries the cost. See `prompts/05-politics-of-professionalisation.md`.
