@@ -33,7 +33,7 @@ Notes here are deliberately blunt and provisional. Prose written to essay standa
 
 The rule is pull, not push. A source earns a place here when a piece of writing needs it, not when it is found. If a wiki entry wants the deeper notes, it links out.
 
-**The archive.** [`archive/`](archive/) holds the published writing as files: 14 CIVICWORKS posts, the MPA thesis, the UN80 article and a GDS blog post. All already public, all re-minable without hunting down the originals.
+**The archive.** [`archive/`](archive/) holds the published writing as files: 15 CIVICWORKS posts, the MPA thesis, the UN80 article and a GDS blog post. All already public, all re-minable without hunting down the originals.
 
 ## Open threads
 
