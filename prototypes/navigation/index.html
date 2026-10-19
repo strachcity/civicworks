@@ -1,0 +1,648 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Experimentation as navigation</title>
+<meta name="description" content="A working sketch to move an experiment across value, legitimacy and capacity, and through the layers of an institution. A companion to Tasting the organisational treacle on CIVICWORKS.">
+<style>
+  :root {
+    --bg: #f6f3ef;
+    --ink: #2a2422;
+    --muted: #6f6461;
+    --red: #e2442f;
+    --red-soft: rgba(226, 68, 47, 0.14);
+    --red-faint: rgba(226, 68, 47, 0.32);
+    --line: rgba(226, 68, 47, 0.55);
+    --panel: #fffdfb;
+    --rule: #e6ddd7;
+    --focus: #1d4ed8;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #171312;
+      --ink: #f1e9e5;
+      --muted: #b2a39d;
+      --red: #ff6b52;
+      --red-soft: rgba(255, 107, 82, 0.16);
+      --red-faint: rgba(255, 107, 82, 0.34);
+      --line: rgba(255, 107, 82, 0.6);
+      --panel: #211b19;
+      --rule: #3a302d;
+      --focus: #93c5fd;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #171312;
+    --ink: #f1e9e5;
+    --muted: #b2a39d;
+    --red: #ff6b52;
+    --red-soft: rgba(255, 107, 82, 0.16);
+    --red-faint: rgba(255, 107, 82, 0.34);
+    --line: rgba(255, 107, 82, 0.6);
+    --panel: #211b19;
+    --rule: #3a302d;
+    --focus: #93c5fd;
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "Helvetica Neue", Helvetica, Arial, system-ui, sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+  }
+  .wrap {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 28px 16px 40px;
+  }
+  header h1 {
+    color: var(--red);
+    font-size: clamp(1.6rem, 4.5vw, 2.2rem);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    line-height: 1.15;
+    margin: 0 0 8px;
+  }
+  header p {
+    color: var(--red);
+    margin: 0;
+    max-width: 36em;
+  }
+  .grid {
+    display: grid;
+    gap: 24px;
+    margin-top: 24px;
+  }
+  @media (min-width: 860px) {
+    .grid { grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); align-items: start; }
+    .side { position: sticky; top: 16px; }
+  }
+
+  figure { margin: 0; }
+  svg.model {
+    display: block;
+    width: 100%;
+    height: auto;
+    max-height: 78vh;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  .hint {
+    color: var(--muted);
+    font-size: 0.875rem;
+    margin: 6px 0 0;
+    text-align: center;
+  }
+
+  /* SVG parts */
+  .cone-fill { fill: url(#hatch); }
+  .axis { stroke: var(--line); stroke-dasharray: 2 5; stroke-width: 1; fill: none; }
+  .ring { fill: none; stroke: var(--red); stroke-width: 1; transition: opacity .4s, stroke-width .2s; }
+  .ring.unreached { opacity: .22; stroke-dasharray: 3 5; }
+  .ring.reached { opacity: .7; stroke-dasharray: 3 4; }
+  .ring.active { opacity: 1; stroke-width: 1.6; stroke-dasharray: none; fill: var(--red-soft); }
+  .ring.hit { animation: hit .9s ease-out; }
+  @keyframes hit { 0% { stroke-width: 6; } 100% { stroke-width: 1.6; } }
+  .layer-label { fill: var(--ink); font-size: 15px; transition: opacity .4s; }
+  .layer-label.unreached { opacity: .28; }
+  .layer-label.reached { opacity: .7; }
+  .layer-label.active { opacity: 1; font-weight: 600; fill: var(--red); }
+  .corner { fill: var(--red); transition: opacity .4s; }
+  .corner.unreached { opacity: .2; }
+  .corner.reached { opacity: .55; }
+  .corner.active { opacity: 1; }
+  .corner-label { fill: var(--red); font-size: 15px; font-weight: 600; }
+  @media (max-width: 600px) {
+    .layer-label, .corner-label { font-size: 19px; }
+  }
+  .tri { fill: url(#hatch-dense); stroke: var(--red); stroke-width: 1; opacity: .85; }
+  .marker-hit { fill: transparent; cursor: grab; touch-action: none; }
+  .marker-dot { fill: var(--red); stroke: var(--bg); stroke-width: 2.5; }
+  .marker-halo { fill: none; stroke: var(--red); stroke-width: 1; stroke-dasharray: 2 3; }
+  #probe:focus { outline: none; }
+  #probe:focus-visible .marker-halo { stroke: var(--focus); stroke-width: 2.5; stroke-dasharray: none; }
+  .depth-g { transition: transform .6s cubic-bezier(.3,.7,.3,1); }
+  .depth-label { fill: var(--ink); font-size: 13px; font-weight: 600; letter-spacing: .04em; }
+
+  /* Controls */
+  .controls {
+    display: grid;
+    gap: 8px;
+    margin-top: 12px;
+  }
+  .row { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+  button {
+    font: inherit;
+    font-size: 0.9375rem;
+    color: var(--red);
+    background: transparent;
+    border: 1.5px dashed var(--red);
+    border-radius: 999px;
+    padding: 7px 14px;
+    min-height: 40px;
+    cursor: pointer;
+  }
+  button:hover { background: var(--red-soft); }
+  button:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+  button[aria-pressed="true"] { background: var(--red); color: var(--bg); border-style: solid; }
+  button.quiet { color: var(--muted); border-color: var(--rule); }
+
+  /* Side panel */
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--rule);
+    border-radius: 14px;
+    padding: 18px 18px 16px;
+  }
+  .panel + .panel { margin-top: 16px; }
+  .where {
+    color: var(--red);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    margin: 0 0 6px;
+  }
+  .newlayer {
+    display: inline-block;
+    font-size: 0.8125rem;
+    color: var(--red);
+    border: 1px dashed var(--red);
+    border-radius: 999px;
+    padding: 1px 10px;
+    margin: 0 0 8px;
+  }
+  .newlayer[hidden] { display: none; }
+  .question { font-size: 1.125rem; line-height: 1.4; margin: 0; }
+  .panel h2 {
+    color: var(--red);
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin: 0 0 4px;
+  }
+  .panel .sub { color: var(--muted); font-size: 0.9375rem; margin: 0 0 12px; }
+  ol.found { list-style: none; margin: 0; padding: 0; }
+  ol.found li {
+    border-top: 1px solid var(--rule);
+    padding: 10px 0;
+    animation: arrive .5s ease-out;
+  }
+  @keyframes arrive { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+  .kind {
+    display: inline-block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    color: var(--red);
+    margin-right: 6px;
+  }
+  .kind::before { content: ""; display: inline-block; width: 8px; height: 8px; margin-right: 5px; vertical-align: 1px; }
+  .kind.dependency::before { background: var(--red); border-radius: 50%; }
+  .kind.conversation::before { border: 1.5px solid var(--red); border-radius: 50%; }
+  .kind.assumption::before { background: var(--red); transform: rotate(45deg); width: 7px; height: 7px; }
+  .found .at { color: var(--muted); font-size: 0.8125rem; }
+  .found p { margin: 2px 0 0; }
+  .empty { color: var(--muted); margin: 0; }
+
+  .moves {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+    margin-top: 32px;
+    padding-top: 20px;
+    border-top: 1px solid var(--rule);
+  }
+  .moves div { color: var(--red); font-size: 0.875rem; line-height: 1.35; }
+  .moves strong { display: block; font-size: 1rem; }
+  .moves svg { display: block; width: 44px; height: 44px; margin-bottom: 6px; }
+
+  footer {
+    color: var(--muted);
+    font-size: 0.8125rem;
+    margin-top: 28px;
+  }
+  footer a { color: var(--red); }
+  footer p { margin: 0 0 6px; }
+  .sr-only {
+    position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+    overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Experimentation as navigation</h1>
+    <p>An experiment moves across value, legitimacy and capacity, and through the layers of an institution. What it learns can reshape both.</p>
+  </header>
+
+  <div class="sr-only" id="model-desc">
+    <p>The model has three dimensions. Across are three questions that never line up neatly. Value asks whether people will use what we've made and what value it might create. Legitimacy asks whether we have the support and permission to pursue it. Capacity asks whether the organisation can actually deliver it.</p>
+    <p>Through are five layers of an institution, from the smallest part upwards. Citizen interaction, service processes and technology, organisational priorities, cross-institutional arrangements, and political and strategic support. They are drawn as a cone that widens and fades as it rises, because you rarely know which layers matter until you hit them.</p>
+    <p>Depth is the learning that comes from moving across and through. It grows as the probe reveals dependencies, starts new conversations and challenges assumptions.</p>
+    <p>The probe is a slider. Use up and down arrows to move through layers, left and right arrows to move across the three questions, or the buttons below the drawing.</p>
+  </div>
+
+  <div class="grid">
+    <figure>
+      <svg class="model" id="model" viewBox="0 0 560 560" role="group" aria-labelledby="fig-title" aria-describedby="model-desc">
+        <title id="fig-title">An experiment moving across value, legitimacy and capacity, and through five layers of an institution</title>
+        <defs>
+          <pattern id="hatch" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(-45)">
+            <line x1="0" y1="0" x2="0" y2="7" style="stroke:var(--red)" stroke-width="1" opacity=".45"/>
+          </pattern>
+          <pattern id="hatch-dense" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+            <line x1="0" y1="0" x2="0" y2="4" style="stroke:var(--red)" stroke-width="1" opacity=".35"/>
+          </pattern>
+          <linearGradient id="fade" x1="0" y1="1" x2="0" y2="0">
+            <stop offset="0" stop-color="#fff" stop-opacity=".9"/>
+            <stop offset=".55" stop-color="#fff" stop-opacity=".45"/>
+            <stop offset="1" stop-color="#fff" stop-opacity="0"/>
+          </linearGradient>
+          <mask id="cone-mask"><rect x="0" y="0" width="560" height="560" fill="url(#fade)"/></mask>
+          <radialGradient id="sphere" cx=".38" cy=".35" r=".7">
+            <stop offset="0" style="stop-color:var(--red)" stop-opacity=".25"/>
+            <stop offset=".7" style="stop-color:var(--red)" stop-opacity=".6"/>
+            <stop offset="1" style="stop-color:var(--red)" stop-opacity=".8"/>
+          </radialGradient>
+        </defs>
+        <g id="cone" mask="url(#cone-mask)" aria-hidden="true"></g>
+        <g id="axes" aria-hidden="true"></g>
+        <g id="rings" aria-hidden="true"></g>
+        <g id="depth" class="depth-g" aria-hidden="true">
+          <circle r="1" fill="url(#sphere)"/>
+          <circle r="1" fill="url(#hatch-dense)" opacity=".6"/>
+        </g>
+        <g id="active" aria-hidden="true"></g>
+        <g id="probe" tabindex="0" role="slider" aria-label="Probe" aria-valuemin="0" aria-valuemax="4" aria-valuenow="0" aria-valuetext="">
+          <circle class="marker-hit" r="24"/>
+          <circle class="marker-halo" r="13"/>
+          <circle class="marker-dot" r="7"/>
+        </g>
+      </svg>
+      <p class="hint">Drag the probe, tap the drawing, or use the arrow keys.</p>
+
+      <div class="controls">
+        <div class="row" role="group" aria-label="Move through the layers">
+          <button type="button" id="down">Down a layer</button>
+          <button type="button" id="up">Up a layer</button>
+        </div>
+        <div class="row" role="group" aria-label="Move across the questions">
+          <button type="button" data-corner="value" aria-pressed="false">Value</button>
+          <button type="button" data-corner="legitimacy" aria-pressed="false">Legitimacy</button>
+          <button type="button" data-corner="capacity" aria-pressed="false">Capacity</button>
+        </div>
+      </div>
+    </figure>
+
+    <div class="side">
+      <section class="panel" aria-live="polite" aria-atomic="true">
+        <p class="where" id="where">Citizen interaction</p>
+        <p class="newlayer" id="newlayer" hidden>A layer you hadn't hit yet</p>
+        <p class="question" id="question">Start with a question. Move the probe towards value, legitimacy or capacity, then see how far up it goes.</p>
+      </section>
+
+      <section class="panel" aria-labelledby="depth-h">
+        <h2 id="depth-h">Depth</h2>
+        <p class="sub">Finding your way through the treacle, and starting to see the dark matter underneath.</p>
+        <ol class="found" id="found" aria-live="polite"></ol>
+        <p class="empty" id="empty">Nothing yet. Depth comes from moving.</p>
+        <div class="row" style="justify-content:flex-start;margin-top:12px">
+          <button type="button" class="quiet" id="reset">Start again</button>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <div class="moves" aria-label="Three moves">
+    <div>
+      <svg viewBox="0 0 44 44" aria-hidden="true"><circle cx="22" cy="22" r="20" fill="none" stroke="currentColor"/><path d="M4 26 A20 20 0 0 0 30 40 A18 18 0 0 1 4 26Z" fill="url(#hatch-dense)" stroke="currentColor" stroke-width=".6"/><circle cx="30" cy="15" r="3" fill="currentColor"/></svg>
+      <strong>Probe</strong>Start with a question.
+    </div>
+    <div>
+      <svg viewBox="0 0 44 44" aria-hidden="true"><circle cx="22" cy="22" r="20" fill="none" stroke="currentColor"/><circle cx="13" cy="20" r="2.5" fill="currentColor"/><path d="M15 18 Q24 10 30 18" fill="none" stroke="currentColor" stroke-dasharray="1.5 2"/><circle cx="31" cy="26" r="6" style="fill:var(--red-soft)" stroke="currentColor" stroke-width=".6"/></svg>
+      <strong>Navigate</strong>Discover dependencies and possibilities.
+    </div>
+    <div>
+      <svg viewBox="0 0 44 44" aria-hidden="true"><circle cx="22" cy="22" r="20" fill="none" stroke="currentColor"/><circle cx="16" cy="18" r="8" style="fill:var(--red-soft)" stroke="currentColor" stroke-width=".6"/><circle cx="28" cy="29" r="9" fill="url(#hatch-dense)" stroke="currentColor" stroke-width=".6"/><circle cx="29" cy="30" r="2.5" fill="currentColor"/></svg>
+      <strong>Change</strong>Build the conditions for what's next.
+    </div>
+  </div>
+
+  <footer>
+    <p>A working sketch from <a href="https://www.civicworks.co/">CIVICWORKS</a>, to sit alongside <a href="https://www.civicworks.co/">Tasting the organisational treacle</a>.</p>
+    <p>Strategic triangle after Mark Moore. Scales of a system diagram after Dan Hill. Prototyping across scales from Dan Hill, <cite>Designing Missions</cite> (Vinnova, 2022). Nested cultures of decision-making from Hill and Melander, <cite>Strategic Design for Public Purpose</cite> (2025). Dark matter from Bryan Boyer.</p>
+  </footer>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var SVGNS = "http://www.w3.org/2000/svg";
+  var CX = 200, APEX = 530, K = 0.42, SQUASH = 0.3;
+  var LAYER_Y = [470, 382, 294, 206, 118];
+
+  var LAYERS = [
+    { name: "Citizen interaction", lines: ["Citizen", "interaction"] },
+    { name: "Service processes and technology", lines: ["Service processes", "and technology"] },
+    { name: "Organisational priorities", lines: ["Organisational", "priorities"] },
+    { name: "Cross-institutional arrangements", lines: ["Cross-institutional", "arrangements"] },
+    { name: "Political and strategic support", lines: ["Political and", "strategic support"] }
+  ];
+
+  // Angles on each ring, in degrees, screen coordinates. Value sits at the back.
+  var CORNERS = [
+    { id: "value", name: "Value", deg: -90 },
+    { id: "capacity", name: "Capacity", deg: 30 },
+    { id: "legitimacy", name: "Legitimacy", deg: 150 }
+  ];
+  var SNAP = 28;
+
+  // What the question sounds like at each layer, and what a probe might turn up there.
+  var CELLS = {
+    value: [
+      { q: "Will someone actually use this, and does it make the thing they came to do any easier?", kind: "assumption", f: "The thing everyone said people wouldn't use, some people used." },
+      { q: "Does the change survive contact with the systems behind it, or does the value leak out somewhere in the process?", kind: "dependency", f: "The improvement at the front stops at a step nobody on the team can see." },
+      { q: "Is this a problem the organisation thinks is worth solving this year?", kind: "assumption", f: "What the team thought was a priority sits nowhere on the organisation's list." },
+      { q: "Does the value land here, or somewhere else entirely?", kind: "assumption", f: "The benefit shows up in another organisation's numbers, not yours." },
+      { q: "Can this be described as something that matters beyond the service?", kind: "conversation", f: "Someone senior asks what this would look like everywhere. Nobody has asked that before." }
+    ],
+    legitimacy: [
+      { q: "Who says this interaction has to work the way it does now? Sometimes the rule is real and sometimes it's a habit.", kind: "assumption", f: "A rule everyone treated as fixed had more room in it than anyone had checked." },
+      { q: "Who owns the process, and do they know you're testing it?", kind: "conversation", f: "The person who owns the process hears about the test for the first time, and has a view." },
+      { q: "Who has to put it on their list, and what comes off to make room?", kind: "conversation", f: "Two teams who both thought it was the other's job finally talk about it." },
+      { q: "Whose agreement do you need that you don't yet know you need?", kind: "conversation", f: "A partner you'd never needed before turns out to hold a veto." },
+      { q: "Who has the authority to change any of it, and would they want to?", kind: "dependency", f: "The rule that shaped the form was decided up here, for a different reason, a long time ago." }
+    ],
+    capacity: [
+      { q: "Can the team run it for a small number of real people without it falling over?", kind: "dependency", f: "It only worked because someone was quietly doing the bit the system couldn't." },
+      { q: "Can you do this with what already exists, or does it need integration nobody has resourced?", kind: "dependency", f: "The workaround runs on automations built for something else. Useful, and fragile." },
+      { q: "Who would pay for it, staff it and look after it once the test ends?", kind: "dependency", f: "Nobody's budget covers the thing after the test. It belongs to no one yet." },
+      { q: "Does the change depend on another organisation's systems, data or timetable?", kind: "dependency", f: "Your change waits on someone else's release, contract or timetable." },
+      { q: "Is there money, mandate and patience for more than a test?", kind: "assumption", f: "What looked impossible was mostly unasked." }
+    ]
+  };
+
+  var BETWEEN = {
+    "legitimacy|value": "Somewhere between value and legitimacy. What people would use and what you're allowed to try rarely line up.",
+    "capacity|legitimacy": "Somewhere between legitimacy and capacity. Permission to do it and the means to do it tend to arrive at different times.",
+    "capacity|value": "Somewhere between capacity and value. What the organisation can deliver pulls against what would be worth delivering."
+  };
+
+  var KIND_LABEL = { dependency: "Dependency", conversation: "Conversation", assumption: "Assumption" };
+
+  // ---- state
+  var state;
+  function fresh() {
+    return { layer: 0, deg: 90, reached: { 0: true }, visited: {}, found: [], moved: false, lastHit: -1 };
+  }
+
+  // ---- geometry
+  function rx(y) { return K * (APEX - y); }
+  function ry(y) { return rx(y) * SQUASH; }
+  function point(layer, deg) {
+    var y = LAYER_Y[layer], a = deg * Math.PI / 180;
+    return { x: CX + rx(y) * Math.cos(a), y: y + ry(y) * Math.sin(a) };
+  }
+  function norm(d) { d = ((d % 360) + 360) % 360; return d > 180 ? d - 360 : d; }
+  function dist(a, b) { return Math.abs(norm(a - b)); }
+
+  function where(deg) {
+    var sorted = CORNERS.slice().sort(function (a, b) { return dist(deg, a.deg) - dist(deg, b.deg); });
+    if (dist(deg, sorted[0].deg) <= SNAP) return { corner: sorted[0] };
+    return { between: [sorted[0].id, sorted[1].id].sort().join("|") };
+  }
+
+  // ---- drawing
+  function el(name, attrs, parent) {
+    var n = document.createElementNS(SVGNS, name);
+    for (var k in attrs) n.setAttribute(k, attrs[k]);
+    if (parent) parent.appendChild(n);
+    return n;
+  }
+
+  var svg = document.getElementById("model");
+  var gCone = document.getElementById("cone");
+  var gAxes = document.getElementById("axes");
+  var gRings = document.getElementById("rings");
+  var gActive = document.getElementById("active");
+  var gDepth = document.getElementById("depth");
+  var probe = document.getElementById("probe");
+  var rings = [], labels = [], cornerDots = [];
+
+  function drawStatic() {
+    var topY = 30, r = rx(topY);
+    el("path", { "class": "cone-fill", d: "M" + CX + " " + APEX + " L" + (CX - r) + " " + topY + " L" + (CX + r) + " " + topY + " Z" }, gCone);
+    el("ellipse", { cx: CX, cy: topY, rx: r, ry: r * SQUASH, fill: "url(#hatch)" }, gCone);
+
+    CORNERS.forEach(function (c) {
+      var p = point(4, c.deg);
+      var t = (APEX - 60) / (APEX - p.y);
+      el("line", { "class": "axis", x1: CX, y1: APEX, x2: CX + (p.x - CX) * t, y2: APEX + (p.y - APEX) * t }, gAxes);
+    });
+
+    LAYER_Y.forEach(function (y, i) {
+      rings.push(el("ellipse", { "class": "ring", cx: CX, cy: y, rx: rx(y), ry: ry(y) }, gRings));
+      var dots = CORNERS.map(function (c) {
+        var p = point(i, c.deg);
+        return el("circle", { "class": "corner", cx: p.x, cy: p.y, r: 3.5 }, gRings);
+      });
+      cornerDots.push(dots);
+      var t = el("text", { "class": "layer-label", x: CX + rx(y) + 14, y: y - 4 }, gRings);
+      LAYERS[i].lines.forEach(function (line, j) {
+        var ts = el("tspan", { x: CX + rx(y) + 14, dy: j ? 18 : 0 }, t);
+        ts.textContent = line;
+      });
+      labels.push(t);
+    });
+  }
+
+  function drawActive() {
+    while (gActive.firstChild) gActive.removeChild(gActive.firstChild);
+    var pts = CORNERS.map(function (c) { return point(state.layer, c.deg); });
+    el("polygon", { "class": "tri", points: pts.map(function (p) { return p.x + "," + p.y; }).join(" ") }, gActive);
+    CORNERS.forEach(function (c, i) {
+      var p = pts[i];
+      var t = el("text", {
+        "class": "corner-label",
+        x: c.id === "value" ? p.x : c.id === "legitimacy" ? p.x + 4 : p.x - 4,
+        y: c.id === "value" ? p.y - 12 : p.y + 24,
+        "text-anchor": c.id === "value" ? "middle" : c.id === "legitimacy" ? "end" : "start"
+      }, gActive);
+      t.textContent = c.name;
+    });
+  }
+
+  function render(opts) {
+    opts = opts || {};
+    var here = where(state.deg);
+
+    rings.forEach(function (r, i) {
+      var cls = i === state.layer ? "active" : state.reached[i] ? "reached" : "unreached";
+      r.setAttribute("class", "ring " + cls + (opts.hit === i ? " hit" : ""));
+      labels[i].setAttribute("class", "layer-label " + cls);
+      cornerDots[i].forEach(function (d) { d.setAttribute("class", "corner " + cls); });
+    });
+    drawActive();
+
+    var p = point(state.layer, state.deg);
+    probe.setAttribute("transform", "translate(" + p.x + " " + p.y + ")");
+
+    var n = state.found.length;
+    var y = LAYER_Y[state.layer];
+    var radius = n ? 9 + n * 2.6 : 5;
+    gDepth.style.transform = "translate(" + CX + "px," + y + "px) scale(" + radius + ")";
+    gDepth.style.opacity = n ? 1 : 0.5;
+
+    var layerName = LAYERS[state.layer].name;
+    var text, valuetext;
+    if (!state.moved) {
+      text = "Start with a question. Move the probe towards value, legitimacy or capacity, then see how far up it goes.";
+      valuetext = layerName + ", not yet leaning anywhere";
+      document.getElementById("where").textContent = layerName;
+    } else if (here.corner) {
+      text = CELLS[here.corner.id][state.layer].q;
+      valuetext = layerName + ", " + here.corner.name.toLowerCase();
+      document.getElementById("where").textContent = layerName + " · " + here.corner.name;
+    } else {
+      text = BETWEEN[here.between];
+      valuetext = layerName + ", " + here.between.split("|").join(" and ");
+      document.getElementById("where").textContent = layerName;
+    }
+    document.getElementById("question").textContent = text;
+    document.getElementById("newlayer").hidden = !(state.lastHit === state.layer && state.layer > 0);
+
+    probe.setAttribute("aria-valuenow", state.layer);
+    probe.setAttribute("aria-valuetext", valuetext);
+
+    document.querySelectorAll("[data-corner]").forEach(function (b) {
+      b.setAttribute("aria-pressed", String(!!(state.moved && here.corner && here.corner.id === b.dataset.corner)));
+    });
+    document.getElementById("up").disabled = state.layer === 4;
+    document.getElementById("down").disabled = state.layer === 0;
+
+    renderFound();
+  }
+
+  function renderFound() {
+    var list = document.getElementById("found");
+    document.getElementById("empty").hidden = state.found.length > 0;
+    var have = list.children.length;
+    if (have > state.found.length) { list.innerHTML = ""; have = 0; }
+    for (var i = have; i < state.found.length; i++) {
+      var item = state.found[i];
+      var li = document.createElement("li");
+      li.innerHTML = '<span class="kind ' + item.kind + '">' + KIND_LABEL[item.kind] + '</span>' +
+        '<span class="at"></span><p></p>';
+      li.querySelector(".at").textContent = item.at;
+      li.querySelector("p").textContent = item.f;
+      list.insertBefore(li, list.firstChild);
+    }
+  }
+
+  // ---- moving
+  function moveTo(layer, deg) {
+    layer = Math.max(0, Math.min(4, layer));
+    var hit = -1;
+    var lo = Math.min(layer, state.layer), hi = Math.max(layer, state.layer);
+    for (var i = lo; i <= hi; i++) {
+      if (!state.reached[i]) { state.reached[i] = true; hit = i; }
+    }
+    if (hit >= 0) state.lastHit = layer;
+    else if (layer !== state.layer) state.lastHit = -1;
+
+    state.layer = layer;
+    state.deg = norm(deg);
+    state.moved = true;
+
+    var here = where(state.deg);
+    if (here.corner) {
+      var key = here.corner.id + layer;
+      if (!state.visited[key]) {
+        state.visited[key] = true;
+        var cell = CELLS[here.corner.id][layer];
+        state.found.push({ kind: cell.kind, f: cell.f, at: LAYERS[layer].name + ", " + here.corner.name.toLowerCase() });
+      }
+    }
+    render({ hit: hit >= 0 ? layer : -1 });
+  }
+
+  function cornerDeg(id) {
+    for (var i = 0; i < CORNERS.length; i++) if (CORNERS[i].id === id) return CORNERS[i].deg;
+  }
+
+  // ---- input
+  probe.addEventListener("keydown", function (e) {
+    var handled = true;
+    switch (e.key) {
+      case "ArrowUp": moveTo(state.layer + 1, state.deg); break;
+      case "ArrowDown": moveTo(state.layer - 1, state.deg); break;
+      case "ArrowLeft": moveTo(state.layer, state.deg - 15); break;
+      case "ArrowRight": moveTo(state.layer, state.deg + 15); break;
+      case "PageUp": case "End": moveTo(4, state.deg); break;
+      case "PageDown": case "Home": moveTo(0, state.deg); break;
+      default: handled = false;
+    }
+    if (handled) e.preventDefault();
+  });
+
+  function svgPoint(e) {
+    var pt = svg.createSVGPoint();
+    pt.x = e.clientX; pt.y = e.clientY;
+    return pt.matrixTransform(svg.getScreenCTM().inverse());
+  }
+  function fromPointer(e) {
+    var p = svgPoint(e);
+    var layer = 0, best = Infinity;
+    LAYER_Y.forEach(function (y, i) {
+      var d = Math.abs(p.y - y);
+      if (d < best) { best = d; layer = i; }
+    });
+    var y = LAYER_Y[layer];
+    var deg = Math.atan2((p.y - y) / ry(y), (p.x - CX) / rx(y)) * 180 / Math.PI;
+    moveTo(layer, deg);
+  }
+
+  var dragging = false;
+  svg.addEventListener("pointerdown", function (e) {
+    if (e.button !== 0) return;
+    dragging = true;
+    if (e.target.closest && e.target.closest("#probe")) svg.setPointerCapture(e.pointerId);
+    fromPointer(e);
+  });
+  svg.addEventListener("pointermove", function (e) { if (dragging) fromPointer(e); });
+  ["pointerup", "pointercancel", "lostpointercapture"].forEach(function (t) {
+    svg.addEventListener(t, function () { dragging = false; });
+  });
+
+  document.getElementById("up").addEventListener("click", function () { moveTo(state.layer + 1, state.deg); });
+  document.getElementById("down").addEventListener("click", function () { moveTo(state.layer - 1, state.deg); });
+  document.querySelectorAll("[data-corner]").forEach(function (b) {
+    b.addEventListener("click", function () { moveTo(state.layer, cornerDeg(b.dataset.corner)); });
+  });
+  document.getElementById("reset").addEventListener("click", function () {
+    state = fresh();
+    render();
+    probe.focus();
+  });
+
+  state = fresh();
+  drawStatic();
+  render();
+})();
+</script>
+</body>
+</html>
