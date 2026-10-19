@@ -2,49 +2,47 @@
 <html lang="en-GB">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Experimentation as navigation</title>
 <meta name="description" content="A working sketch you can spin like a globe. Turn an experiment to face value, legitimacy or capacity, tilt it to see across or through the layers of an institution, and watch depth build up. A companion to Tasting the organisational treacle on CIVICWORKS.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@300;400;500;600&display=swap">
 <style>
+  /* Two-tone print sheet. One ink on paper, hairlines, stipple and hatching instead of fills.
+     Three columns on desktop like a poster spread, one column on a phone. */
   :root {
-    --bg: #f6f3ef;
-    --ink: #2a2422;
-    --muted: #6f6461;
-    --red: #e2442f;
-    --red-soft: rgba(226, 68, 47, 0.10);
-    --red-mid: rgba(226, 68, 47, 0.22);
-    --line: rgba(226, 68, 47, 0.6);
-    --panel: #fffdfb;
-    --rule: #e6ddd7;
-    --focus: #1d4ed8;
+    --paper: #e9e8e5;
+    --sheet: #f5f4f1;
+    --ink: #cf3a22;
+    --ink-line: #e2452b;
+    --tint: #f6c3b4;
+    --tint-faint: rgba(246, 195, 180, 0.35);
+    --focus: #1f3fd6;
+    --font: "Hanken Grotesk", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    --hair: 0.75px;
     color-scheme: light;
   }
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
-      --bg: #171312;
-      --ink: #f1e9e5;
-      --muted: #b2a39d;
-      --red: #ff6b52;
-      --red-soft: rgba(255, 107, 82, 0.11);
-      --red-mid: rgba(255, 107, 82, 0.24);
-      --line: rgba(255, 107, 82, 0.65);
-      --panel: #211b19;
-      --rule: #3a302d;
-      --focus: #93c5fd;
+      --paper: #110c0b;
+      --sheet: #1a1311;
+      --ink: #ff8166;
+      --ink-line: #ff6f52;
+      --tint: #5b2a21;
+      --tint-faint: rgba(122, 52, 40, 0.35);
+      --focus: #9db4ff;
       color-scheme: dark;
     }
   }
   :root[data-theme="dark"] {
-    --bg: #171312;
-    --ink: #f1e9e5;
-    --muted: #b2a39d;
-    --red: #ff6b52;
-    --red-soft: rgba(255, 107, 82, 0.11);
-    --red-mid: rgba(255, 107, 82, 0.24);
-    --line: rgba(255, 107, 82, 0.65);
-    --panel: #211b19;
-    --rule: #3a302d;
-    --focus: #93c5fd;
+    --paper: #110c0b;
+    --sheet: #1a1311;
+    --ink: #ff8166;
+    --ink-line: #ff6f52;
+    --tint: #5b2a21;
+    --tint-faint: rgba(122, 52, 40, 0.35);
+    --focus: #9db4ff;
     color-scheme: dark;
   }
 
@@ -52,251 +50,342 @@
   html { -webkit-text-size-adjust: 100%; }
   body {
     margin: 0;
-    background: var(--bg);
+    background: var(--paper);
     color: var(--ink);
-    font-family: "Helvetica Neue", Helvetica, Arial, system-ui, sans-serif;
-    font-size: 16px;
+    font-family: var(--font);
+    font-weight: 400;
+    font-size: 15px;
     line-height: 1.5;
   }
-  .wrap { overflow-x: clip; max-width: 1320px; margin: 0 auto; padding: 24px 16px 40px; }
+  .wrap {
+    position: relative;
+    overflow-x: clip;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding-block: 28px 48px;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+  }
+
+  /* The big hatched disc behind the sheet, as on the posters */
+  .backdrop {
+    position: absolute;
+    left: 50%; top: 120px;
+    width: min(1500px, 125vw); aspect-ratio: 1;
+    transform: translateX(-50%);
+    pointer-events: none;
+    max-width: none;
+  }
+  .backdrop circle { fill: url(#hatch-h); stroke: var(--ink-line); stroke-width: var(--hair); opacity: .5; }
+
+  .sheet {
+    position: relative;
+    background: var(--sheet);
+    padding: 14px;
+    box-shadow: 0 30px 60px -40px rgba(60, 20, 10, 0.35);
+  }
+  .frame {
+    position: relative;
+    border: 1px solid var(--ink-line);
+    padding: 22px 18px 26px;
+  }
 
   /* Stage layout */
   .stage {
     position: relative;
     display: grid;
-    gap: 16px;
+    gap: 22px;
     grid-template-columns: minmax(0, 1fr);
     grid-template-areas: "head" "obj" "card" "ctrl" "rail" "moves";
   }
-  @media (min-width: 960px) {
+  @media (min-width: 980px) {
     .stage {
-      gap: 20px 28px;
-      grid-template-columns: minmax(250px, 300px) minmax(0, 1fr) minmax(200px, 230px);
+      gap: 22px 0;
+      grid-template-columns: minmax(250px, 290px) minmax(0, 1fr) minmax(200px, 230px);
       grid-template-rows: auto auto 1fr;
       grid-template-areas:
         "head  obj  rail"
         "card  obj  rail"
         "moves ctrl rail";
     }
+    .head, .card, .moves { margin-right: 28px; }
+    .rail { padding-left: 24px; border-left: 1px dashed var(--ink-line); }
+    .obj { border-left: 1px dashed var(--ink-line); }
   }
-  .head { grid-area: head; }
-  .card { grid-area: card; }
+  .head { grid-area: head; min-width: 0; }
+  .card { grid-area: card; min-width: 0; }
   .obj { grid-area: obj; }
   .ctrl { grid-area: ctrl; }
-  .rail { grid-area: rail; }
-  .moves { grid-area: moves; }
+  .rail { grid-area: rail; min-width: 0; }
+  .moves { grid-area: moves; min-width: 0; }
 
-  .head h1 {
-    color: var(--red);
-    font-size: clamp(1.6rem, 4.5vw, 2.1rem);
-    font-weight: 600;
-    letter-spacing: -0.01em;
-    line-height: 1.12;
-    margin: 0 0 10px;
+  .bar {
+    border-left: 3px solid var(--ink);
+    padding-left: 10px;
   }
-  .head p { color: var(--red); margin: 0; }
+  .head h1 {
+    font-size: clamp(1.75rem, 4.2vw, 2.25rem);
+    font-weight: 500;
+    letter-spacing: -0.015em;
+    line-height: 1.08;
+    margin: 0;
+    text-wrap: balance;
+  }
+  .head .kicker {
+    font-size: 0.8125rem;
+    font-weight: 400;
+    letter-spacing: .02em;
+    margin: 4px 0 0;
+  }
+  .head p.lede {
+    font-weight: 300;
+    font-size: 0.9375rem;
+    margin: 16px 0 0;
+    max-width: 34em;
+  }
 
   /* The object */
   .obj {
     position: relative;
-    height: min(62vh, 460px);
-    min-height: 320px;
+    height: min(62vh, 470px);
+    min-height: 330px;
     touch-action: none;
     cursor: grab;
-    border-radius: 18px;
     outline: none;
   }
   .obj.dragging { cursor: grabbing; }
-  .obj:focus-visible { box-shadow: 0 0 0 3px var(--focus); }
-  @media (min-width: 960px) {
-    .obj { height: min(80vh, 720px); min-height: 520px; }
+  .obj:focus-visible { box-shadow: inset 0 0 0 2px var(--focus); }
+  @media (min-width: 980px) {
+    .obj { height: min(80vh, 740px); min-height: 540px; }
   }
   .obj svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
-  .obj .glow {
-    position: absolute; left: 20%; right: 20%; bottom: 0; height: 10%;
-    background: radial-gradient(ellipse at center, var(--red-mid), transparent 70%);
-    filter: blur(8px);
-    pointer-events: none;
-  }
 
-  .ring-back { fill: none; stroke: var(--red); stroke-width: 1; stroke-dasharray: 2 4; }
-  .ring-front { fill: none; stroke: var(--red); stroke-width: 1.2; stroke-dasharray: 4 3; }
+  .shadow { fill: url(#hatch-h); opacity: .7; }
+  .ring-back { fill: none; stroke: var(--ink-line); stroke-width: .7; stroke-dasharray: 1 3; stroke-linecap: round; }
+  .ring-front { fill: none; stroke: var(--ink-line); stroke-width: .8; }
   .ring-disc { fill: none; stroke: none; }
-  .layer.unreached .ring-back, .layer.unreached .ring-front { opacity: .18; }
-  .layer.reached .ring-back { opacity: .45; }
-  .layer.reached .ring-front { opacity: .8; }
-  .layer.active .ring-front { stroke-width: 2; stroke-dasharray: none; }
-  .layer.active .ring-back { opacity: .7; }
+  .layer.unreached .ring-back, .layer.unreached .ring-front { opacity: .22; }
+  .layer.unreached .ring-front { stroke-dasharray: 2 3; }
+  .layer.reached .ring-back { opacity: .55; }
+  .layer.active .ring-front { stroke-width: 1.3; }
+  .layer.active .ring-back { opacity: .9; }
   .layer.active .ring-disc { fill: url(#hatch); }
-  .layer.hit .ring-front { animation: hit 1s ease-out; }
-  @keyframes hit { 0% { stroke-width: 7; } 100% { stroke-width: 2; } }
-  .face { fill: var(--red-soft); fill-opacity: .55; stroke: var(--red); stroke-width: .8; stroke-linejoin: round; }
-  .edge-ext { stroke: var(--line); stroke-width: 1; stroke-dasharray: 2 4; }
-  .axis { stroke: var(--line); stroke-width: 1; stroke-dasharray: 1 5; }
-  .tri { fill: url(#hatch-dense); stroke: var(--red); stroke-width: 1.2; }
-  .vertex { fill: var(--red); }
-  .top-disc { fill: none; stroke: var(--red); stroke-width: 1; stroke-dasharray: 1 6; opacity: .35; }
+  .layer.hit .ring-front { animation: hit 1.1s ease-out; }
+  @keyframes hit { 0% { stroke-width: 5; } 100% { stroke-width: 1.3; } }
+  .face { fill: var(--tint-faint); stroke: none; }
+  .face.facing { fill: url(#stipple); }
+  .edge { stroke: var(--ink-line); stroke-width: .75; }
+  .edge.facing { stroke-width: 1.6; }
+  .edge-ext { stroke: var(--ink-line); stroke-width: .7; stroke-dasharray: 1 3; stroke-linecap: round; }
+  .axis { stroke: var(--ink-line); stroke-width: .6; stroke-dasharray: 1 4; stroke-linecap: round; }
+  .tri { fill: var(--tint); fill-opacity: .45; stroke: var(--ink-line); stroke-width: .8; }
+  .vertex { fill: var(--ink-line); }
+  .top-disc { fill: none; stroke: var(--ink-line); stroke-width: .6; stroke-dasharray: 1 5; opacity: .45; }
+  .sphere-base { fill: var(--tint); stroke: var(--ink-line); stroke-width: .75; }
+  .sphere-dots { fill: url(#stipple-dense); }
 
   .lbl {
     position: absolute;
     left: 0; top: 0;
-    transform: translate(-50%, -50%);
-    color: var(--red);
-    font-weight: 600;
-    font-size: 1rem;
-    white-space: nowrap;
+    width: 170px;
+    color: var(--ink);
+    text-align: center;
     pointer-events: none;
-    text-shadow: 0 0 6px var(--bg), 0 0 2px var(--bg);
     transition: opacity .3s;
   }
-  .lbl.facing { text-decoration: underline; text-underline-offset: 4px; }
-  .lbl.depth { color: var(--ink); font-size: .8125rem; letter-spacing: .06em; text-transform: uppercase; }
+  .lbl b {
+    display: inline-block;
+    font-weight: 500;
+    font-size: 0.9375rem;
+    padding: 0 4px;
+    background: var(--sheet);
+  }
+  .lbl.facing b { box-shadow: inset 0 -1px 0 var(--ink); }
+  .lbl small {
+    display: block;
+    font-weight: 300;
+    font-size: 0.75rem;
+    line-height: 1.3;
+    margin-top: 2px;
+    opacity: 0;
+    transition: opacity .3s;
+    text-shadow: 0 0 4px var(--sheet), 0 0 2px var(--sheet);
+  }
+  .lbl.facing small { opacity: 1; }
+  .lbl.depth { width: auto; font-size: 0.6875rem; font-weight: 500; letter-spacing: .14em; text-transform: uppercase; white-space: nowrap; text-shadow: 0 0 4px var(--sheet), 0 0 2px var(--sheet); }
 
   /* Leader line overlay */
   svg.leader {
     position: absolute; inset: 0; width: 100%; height: 100%;
     pointer-events: none; overflow: visible;
   }
-  .leader path { fill: none; stroke: var(--red); stroke-width: 1; stroke-dasharray: 3 3; }
-  .leader circle.pin { fill: var(--red); }
-  .leader circle.pulse { fill: none; stroke: var(--red); stroke-width: 1.5; transform-box: fill-box; transform-origin: center; animation: pulse 1.8s ease-out infinite; }
-  @keyframes pulse { 0% { transform: scale(.6); opacity: 1; } 100% { transform: scale(2.4); opacity: 0; } }
+  .leader path { fill: none; stroke: var(--ink-line); stroke-width: .75; }
+  .leader circle.pin { fill: var(--ink-line); }
+  .leader circle.ring { fill: none; stroke: var(--ink-line); stroke-width: .75; }
+  .leader circle.pulse { fill: none; stroke: var(--ink-line); stroke-width: .75; transform-box: fill-box; transform-origin: center; animation: pulse 2.4s ease-out infinite; }
+  @keyframes pulse { 0% { transform: scale(.8); opacity: .9; } 100% { transform: scale(2.6); opacity: 0; } }
 
   /* Annotation */
   .card {
     align-self: start;
     position: relative;
-    background: var(--panel);
-    border: 1px solid var(--rule);
-    border-radius: 14px;
-    padding: 16px 18px;
+    border: 1px solid var(--ink-line);
+    background: var(--sheet);
+    padding: 16px 18px 18px;
     z-index: 1;
   }
   .where {
-    color: var(--red);
-    font-size: 0.8125rem;
-    font-weight: 600;
-    letter-spacing: .06em;
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: .1em;
     text-transform: uppercase;
-    margin: 0 0 6px;
+    margin: 0 0 8px;
   }
   .newlayer {
     display: inline-block;
-    font-size: 0.8125rem;
-    color: var(--red);
-    border: 1px dashed var(--red);
+    font-size: 0.75rem;
+    border: var(--hair) dashed var(--ink-line);
     border-radius: 999px;
     padding: 1px 10px;
-    margin: 0 0 8px;
+    margin: 0 0 10px;
   }
-  .newlayer[hidden] { display: none; }
-  .question { font-size: 1.125rem; line-height: 1.4; margin: 0; }
+  .question { font-size: 1.1875rem; font-weight: 300; line-height: 1.38; margin: 0; }
 
   /* Controls */
   .ctrl { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; align-self: start; }
   button {
     font: inherit;
-    font-size: 0.9375rem;
-    color: var(--red);
-    background: transparent;
-    border: 1.5px dashed var(--red);
+    font-size: 0.875rem;
+    color: var(--ink);
+    background: var(--sheet);
+    border: 1px solid var(--ink-line);
     border-radius: 999px;
-    padding: 7px 14px;
-    min-height: 40px;
+    padding: 6px 14px;
+    min-height: 38px;
     cursor: pointer;
   }
-  button:hover { background: var(--red-soft); }
-  button:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
-  button[aria-pressed="true"] { background: var(--red); color: var(--bg); border-style: solid; }
-  button.quiet { color: var(--muted); border-color: var(--rule); }
-  .hint { color: var(--muted); font-size: 0.875rem; width: 100%; text-align: center; margin: 0 0 2px; }
+  button:hover { background: var(--tint-faint); }
+  button:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+  button[aria-pressed="true"] { background: var(--tint); }
+  button:disabled { opacity: .4; cursor: default; }
+  .hint { font-size: 0.8125rem; font-weight: 300; width: 100%; text-align: center; margin: 0 0 2px; }
 
   /* Layer rail */
-  .rail h2 { color: var(--red); font-size: 1.125rem; font-weight: 600; line-height: 1.2; margin: 0 0 12px; }
-  .rail ol { list-style: none; margin: 0; padding: 0; position: relative; }
+  .rail h2, .moves h2, .depth h2 {
+    font-size: 1.0625rem; font-weight: 500; line-height: 1.2; margin: 0;
+  }
+  .rail .sub, .depth .sub, .moves .sub { font-size: 0.8125rem; font-weight: 300; margin: 3px 0 0; }
+  .rail ol { list-style: none; margin: 18px 0 0; padding: 0; position: relative; }
   .rail ol::before {
-    content: ""; position: absolute; left: 27px; top: 4px; bottom: 18px;
-    border-left: 1.5px dashed var(--line);
+    content: ""; position: absolute; left: 28px; top: 6px; bottom: 16px;
+    border-left: var(--hair) dashed var(--ink-line);
   }
   .rail ol::after {
-    content: ""; position: absolute; left: 23px; top: -4px;
-    border: 5px solid transparent; border-bottom: 7px solid var(--red); border-top: 0;
+    content: ""; position: absolute; left: 25px; top: -2px;
+    border: 3.5px solid transparent; border-bottom: 6px solid var(--ink-line); border-top: 0;
   }
-  .rail li + li { margin-top: 4px; }
+  .rail li + li { margin-top: 2px; }
   .rail button {
     display: flex; align-items: center; gap: 10px;
     width: 100%; text-align: left;
-    border: 0; border-radius: 12px;
-    padding: 6px 8px 6px 0;
-    color: var(--red);
-    font-size: 0.875rem; line-height: 1.25;
+    border: 0; border-radius: 0;
+    padding: 6px 6px 6px 0;
+    font-size: 0.8125rem; line-height: 1.25;
     background: transparent;
-    position: relative;
   }
-  .rail button:hover { background: var(--red-soft); }
   .rail button svg { flex: none; width: 56px; height: 22px; }
-  .rail button svg ellipse { fill: var(--red-soft); stroke: var(--red); stroke-dasharray: 2 2; }
-  .rail button svg circle { fill: var(--red); }
+  .rail button svg ellipse { fill: var(--sheet); stroke: var(--ink-line); stroke-width: .75; stroke-dasharray: 1.5 2; }
+  .rail button svg circle { fill: var(--ink-line); }
   .rail button.unreached { opacity: .4; }
-  .rail button[aria-pressed="true"] { background: var(--red-soft); font-weight: 600; }
-  .rail button[aria-pressed="true"] svg ellipse { stroke-dasharray: none; stroke-width: 1.5; }
-  .rail .note { color: var(--muted); font-size: 0.8125rem; margin: 10px 0 0; }
+  .rail button[aria-pressed="true"] { font-weight: 500; background: transparent; }
+  .rail button[aria-pressed="true"] svg ellipse { fill: url(#hatch); stroke-dasharray: none; stroke-width: 1; }
+  .rail .note { font-size: 0.8125rem; font-weight: 300; margin: 14px 0 0; }
 
   /* Probe / Navigate / Change */
-  .moves { display: grid; gap: 14px; grid-template-columns: repeat(3, minmax(0, 1fr)); align-self: end; }
-  @media (min-width: 960px) { .moves { grid-template-columns: 1fr; } }
-  .moves div { color: var(--red); font-size: 0.875rem; line-height: 1.35; display: flex; gap: 12px; align-items: center; }
-  @media (max-width: 959px) { .moves div { flex-direction: column; align-items: flex-start; gap: 6px; } }
-  .moves strong { display: block; font-size: 1rem; }
-  .moves svg { flex: none; width: 46px; height: 46px; }
+  .moves { align-self: end; }
+  .moves ul { list-style: none; margin: 14px 0 0; padding: 0; display: grid; gap: 14px; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  @media (min-width: 980px) { .moves ul { grid-template-columns: 1fr; } }
+  .moves li { font-size: 0.8125rem; font-weight: 300; line-height: 1.35; display: flex; gap: 12px; align-items: center; }
+  @media (max-width: 979px) { .moves li { flex-direction: column; align-items: flex-start; gap: 6px; } }
+  .moves strong { display: block; font-size: 0.9375rem; font-weight: 500; }
+  .moves svg { flex: none; width: 52px; height: 52px; overflow: visible; }
+  .moves svg .o { fill: var(--sheet); stroke: var(--ink-line); stroke-width: .75; }
+  .moves svg .l { fill: none; stroke: var(--ink-line); stroke-width: .75; }
+  .moves svg .t { fill: var(--tint); stroke: var(--ink-line); stroke-width: .6; }
+  .moves svg .d { fill: var(--ink-line); }
 
   /* Depth */
-  .depth { margin-top: 32px; padding-top: 20px; border-top: 1px solid var(--rule); }
-  .depth-head { display: flex; flex-wrap: wrap; gap: 8px 20px; align-items: baseline; justify-content: space-between; }
-  .depth h2 { color: var(--red); font-size: 1.25rem; font-weight: 600; margin: 0; }
-  .depth .sub { color: var(--muted); margin: 4px 0 14px; }
+  .depth { margin-top: 30px; padding-top: 22px; border-top: 1px dashed var(--ink-line); }
+  .depth-head { display: flex; flex-wrap: wrap; gap: 8px 20px; align-items: flex-end; justify-content: space-between; }
   ol.found {
-    list-style: none; margin: 0; padding: 0;
-    display: grid; gap: 12px;
+    list-style: none; margin: 18px 0 0; padding: 0;
+    display: grid; gap: 0 28px;
     grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
   }
   ol.found li {
-    background: var(--panel);
-    border: 1px solid var(--rule);
-    border-radius: 12px;
-    padding: 12px 14px;
+    border-top: var(--hair) solid var(--ink-line);
+    padding: 10px 0 14px;
     animation: arrive .5s ease-out;
   }
   @keyframes arrive { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
   .kind {
     display: inline-block;
-    font-size: 0.75rem; font-weight: 600; letter-spacing: .05em; text-transform: uppercase;
-    color: var(--red);
+    font-size: 0.6875rem; font-weight: 500; letter-spacing: .12em; text-transform: uppercase;
     margin-right: 6px;
   }
-  .kind::before { content: ""; display: inline-block; width: 8px; height: 8px; margin-right: 5px; vertical-align: 1px; }
-  .kind.dependency::before { background: var(--red); border-radius: 50%; }
-  .kind.conversation::before { border: 1.5px solid var(--red); border-radius: 50%; }
-  .kind.assumption::before { background: var(--red); transform: rotate(45deg); width: 7px; height: 7px; }
-  .found .at { color: var(--muted); font-size: 0.8125rem; display: block; }
-  .found p { margin: 4px 0 0; }
-  .empty { color: var(--muted); margin: 0; }
-  .empty[hidden] { display: none; }
+  .kind::before { content: ""; display: inline-block; width: 7px; height: 7px; margin-right: 6px; vertical-align: 1px; }
+  .kind.dependency::before { background: var(--ink-line); border-radius: 50%; }
+  .kind.conversation::before { border: 1px solid var(--ink-line); border-radius: 50%; }
+  .kind.assumption::before { background: var(--ink-line); transform: rotate(45deg); width: 6px; height: 6px; }
+  .found .at { font-size: 0.75rem; font-weight: 300; display: block; margin-top: 2px; }
+  .found p { margin: 4px 0 0; font-weight: 400; }
+  .empty { font-weight: 300; margin: 16px 0 0; }
 
-  footer { color: var(--muted); font-size: 0.8125rem; margin-top: 32px; }
-  footer a { color: var(--red); }
-  footer p { margin: 0 0 6px; }
+  .topline {
+    position: relative;
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    font-size: 0.75rem; font-weight: 500; letter-spacing: .12em; text-transform: uppercase;
+    margin: 0 0 12px;
+  }
+  .theme { font-size: 0.75rem; min-height: 32px; padding: 3px 14px; letter-spacing: normal; text-transform: none; }
+  @media (max-width: 599px) { .lbl small { display: none; } }
+
+  footer { font-size: 0.75rem; font-weight: 300; margin-top: 26px; }
+  footer a { color: var(--ink); }
+  footer p { margin: 0 0 6px; max-width: 70em; }
   .sr-only {
     position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
     overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
   }
+  [hidden] { display: none !important; }
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { animation: none !important; transition: none !important; }
   }
 </style>
 </head>
 <body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <pattern id="hatch" width="3.5" height="3.5" patternUnits="userSpaceOnUse" patternTransform="rotate(-45)">
+      <line x1="0" y1="0" x2="0" y2="3.5" style="stroke:var(--ink-line)" stroke-width=".5" opacity=".6"/>
+    </pattern>
+    <pattern id="hatch-h" width="6" height="3" patternUnits="userSpaceOnUse">
+      <line x1="0" y1="0" x2="6" y2="0" style="stroke:var(--ink-line)" stroke-width=".5" opacity=".7"/>
+    </pattern>
+    <pattern id="stipple" width="5" height="5" patternUnits="userSpaceOnUse">
+      <circle cx="1.25" cy="1.25" r=".5" style="fill:var(--ink-line)"/>
+      <circle cx="3.75" cy="3.75" r=".5" style="fill:var(--ink-line)"/>
+    </pattern>
+    <pattern id="stipple-dense" width="2.6" height="2.6" patternUnits="userSpaceOnUse">
+      <circle cx=".7" cy=".7" r=".5" style="fill:var(--ink-line)"/>
+      <circle cx="2" cy="2" r=".5" style="fill:var(--ink-line)"/>
+    </pattern>
+  </defs>
+</svg>
+
 <div class="wrap">
+  <svg class="backdrop" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="49.9" vector-effect="non-scaling-stroke"/></svg>
+
   <div class="sr-only" id="model-desc">
     <p>The model has three dimensions, drawn as one object. Across are three questions that never line up neatly. Value asks whether people will use what we've made and what value it might create. Legitimacy asks whether we have the support and permission to pursue it. Capacity asks whether the organisation can actually deliver it.</p>
     <p>Through are five layers of an institution, from the smallest part upwards. Citizen interaction, service processes and technology, organisational priorities, cross-institutional arrangements, and political and strategic support. They are drawn as rings on a cone that widens and fades as it rises, because you rarely know which layers matter until you hit them.</p>
@@ -304,93 +393,103 @@
     <p>Focus the drawing to turn it with the keyboard. Left and right arrows turn it to face the next question. Up and down arrows move between layers. Page up looks from above, page down looks from below, and home looks from the side. The buttons and the layer list do the same things.</p>
   </div>
 
-  <div class="stage" id="stage">
-    <header class="head">
-      <h1>Experimentation as navigation</h1>
-      <p>Experiments move across value, legitimacy and capacity and through the layers of an institution, and what they learn can reshape both.</p>
-    </header>
-
-    <section class="card" id="card" aria-live="polite" aria-atomic="true">
-      <p class="where" id="where">Start here</p>
-      <p class="newlayer" id="newlayer" hidden>A layer you hadn't hit yet</p>
-      <p class="question" id="question">Start with a question.</p>
-    </section>
-
-    <div class="obj" id="obj" tabindex="0" role="application" aria-roledescription="model you can turn" aria-label="Experimentation as navigation" aria-describedby="model-desc">
-      <div class="glow" aria-hidden="true"></div>
-      <svg id="scene" aria-hidden="true">
-        <defs>
-          <pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(-45)">
-            <line x1="0" y1="0" x2="0" y2="6" style="stroke:var(--red)" stroke-width="1" opacity=".35"/>
-          </pattern>
-          <pattern id="hatch-dense" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
-            <line x1="0" y1="0" x2="0" y2="4" style="stroke:var(--red)" stroke-width="1" opacity=".4"/>
-          </pattern>
-          <radialGradient id="sphere" cx=".36" cy=".32" r=".75">
-            <stop offset="0" style="stop-color:var(--red)" stop-opacity=".15"/>
-            <stop offset=".65" style="stop-color:var(--red)" stop-opacity=".55"/>
-            <stop offset="1" style="stop-color:var(--red)" stop-opacity=".85"/>
-          </radialGradient>
-        </defs>
-        <g id="g-back"></g>
-        <g id="g-mid"></g>
-        <g id="g-front"></g>
-      </svg>
-      <span class="lbl" id="lbl-value">Value</span>
-      <span class="lbl" id="lbl-legitimacy">Legitimacy</span>
-      <span class="lbl" id="lbl-capacity">Capacity</span>
-      <span class="lbl depth" id="lbl-depth">Depth</span>
-    </div>
-
-    <div class="ctrl" role="group" aria-label="Turn the model">
-      <p class="hint">Spin it like a globe. Tap a ring to pick a layer.</p>
-      <button type="button" id="spin-left" aria-label="Turn left">&#8592; Turn</button>
-      <button type="button" data-view="side" aria-pressed="false">From the side</button>
-      <button type="button" data-view="above" aria-pressed="false">From above</button>
-      <button type="button" data-view="below" aria-pressed="false">From below</button>
-      <button type="button" id="spin-right" aria-label="Turn right">Turn &#8594;</button>
-    </div>
-
-    <nav class="rail" aria-labelledby="rail-h">
-      <h2 id="rail-h">Through institutional layers</h2>
-      <ol id="rail"></ol>
-      <p class="note">You rarely know which layers matter until you hit them.</p>
-    </nav>
-
-    <div class="moves" aria-label="Three moves">
-      <div>
-        <svg viewBox="0 0 46 46" aria-hidden="true"><circle cx="23" cy="23" r="21" fill="none" stroke="currentColor"/><path d="M4 27 A21 21 0 0 0 31 42 A19 19 0 0 1 4 27Z" fill="url(#hatch-dense)" stroke="currentColor" stroke-width=".6"/><circle cx="31" cy="15" r="3" fill="currentColor"/></svg>
-        <span><strong>Probe</strong>Start with a question.</span>
-      </div>
-      <div>
-        <svg viewBox="0 0 46 46" aria-hidden="true"><circle cx="23" cy="23" r="21" fill="none" stroke="currentColor"/><circle cx="13" cy="21" r="2.5" fill="currentColor"/><path d="M15 19 Q24 10 31 19" fill="none" stroke="currentColor" stroke-dasharray="1.5 2"/><circle cx="32" cy="27" r="6" style="fill:var(--red-mid)" stroke="currentColor" stroke-width=".6"/></svg>
-        <span><strong>Navigate</strong>Discover dependencies and possibilities.</span>
-      </div>
-      <div>
-        <svg viewBox="0 0 46 46" aria-hidden="true"><circle cx="23" cy="23" r="21" fill="none" stroke="currentColor"/><circle cx="17" cy="19" r="8" style="fill:var(--red-mid)" stroke="currentColor" stroke-width=".6"/><circle cx="29" cy="30" r="9" fill="url(#hatch-dense)" stroke="currentColor" stroke-width=".6"/><circle cx="30" cy="31" r="2.5" fill="currentColor"/></svg>
-        <span><strong>Change</strong>Build the conditions for what's next.</span>
-      </div>
-    </div>
-
-    <svg class="leader" id="leader" aria-hidden="true">
-      <path id="leader-path"/>
-      <circle class="pulse" id="leader-pulse" r="6"/>
-      <circle class="pin" id="leader-pin" r="4"/>
-    </svg>
+  <div class="topline">
+    <span>CIVICWORKS &middot; v0.2.0</span>
+    <button type="button" class="theme" id="theme">Dark</button>
   </div>
 
-  <section class="depth" aria-labelledby="depth-h">
-    <div class="depth-head">
-      <h2 id="depth-h">Depth</h2>
-      <button type="button" class="quiet" id="reset">Start again</button>
+  <div class="sheet">
+    <div class="frame">
+      <div class="stage" id="stage">
+        <header class="head">
+          <div class="bar">
+            <h1>Experimentation as navigation</h1>
+            <p class="kicker">A working sketch from CIVICWORKS</p>
+          </div>
+          <p class="lede">Experiments move across value, legitimacy and capacity and through the layers of an institution, and what they learn can reshape both.</p>
+        </header>
+
+        <section class="card" id="card" aria-live="polite" aria-atomic="true">
+          <p class="where" id="where">Start here</p>
+          <p class="newlayer" id="newlayer" hidden>A layer you hadn't hit yet</p>
+          <p class="question" id="question">Start with a question.</p>
+        </section>
+
+        <div class="obj" id="obj" tabindex="0" role="application" aria-roledescription="model you can turn" aria-label="Experimentation as navigation" aria-describedby="model-desc">
+          <svg id="scene" aria-hidden="true">
+            <ellipse class="shadow" id="shadow"/>
+            <g id="g-back"></g>
+            <g id="g-mid"></g>
+            <g id="g-front"></g>
+          </svg>
+          <span class="lbl" id="lbl-value"><b>Value</b><small>Will people use what we've made, and what value might it create?</small></span>
+          <span class="lbl" id="lbl-legitimacy"><b>Legitimacy</b><small>Do we have the support and permission to pursue it?</small></span>
+          <span class="lbl" id="lbl-capacity"><b>Capacity</b><small>Can the organisation actually deliver it?</small></span>
+          <span class="lbl depth" id="lbl-depth">Depth</span>
+        </div>
+
+        <div class="ctrl" role="group" aria-label="Turn the model">
+          <p class="hint">Spin it like a globe. Tap a ring to pick a layer.</p>
+          <button type="button" id="spin-left" aria-label="Turn left">&#8592; Turn</button>
+          <button type="button" data-view="side" aria-pressed="false">From the side</button>
+          <button type="button" data-view="above" aria-pressed="false">From above</button>
+          <button type="button" data-view="below" aria-pressed="false">From below</button>
+          <button type="button" id="spin-right" aria-label="Turn right">Turn &#8594;</button>
+        </div>
+
+        <nav class="rail" aria-labelledby="rail-h">
+          <div class="bar">
+            <h2 id="rail-h">Through institutional layers</h2>
+            <p class="sub">From a single interaction upwards</p>
+          </div>
+          <ol id="rail"></ol>
+          <p class="note">You rarely know which layers matter until you hit them.</p>
+        </nav>
+
+        <section class="moves" aria-labelledby="moves-h">
+          <div class="bar">
+            <h2 id="moves-h">Probe, navigate, change</h2>
+          </div>
+          <ul>
+            <li>
+              <svg viewBox="0 0 52 52" aria-hidden="true"><circle class="o" cx="26" cy="26" r="24"/><path d="M4 31 A24 24 0 0 0 36 48 A21 21 0 0 1 4 31Z" fill="url(#hatch)" class="l"/><circle class="d" cx="35" cy="17" r="3"/></svg>
+              <span><strong>Probe</strong>Start with a question.</span>
+            </li>
+            <li>
+              <svg viewBox="0 0 52 52" aria-hidden="true"><circle class="o" cx="26" cy="26" r="24"/><circle class="d" cx="15" cy="24" r="2.5"/><path class="l" d="M17 22 Q27 11 36 21" stroke-dasharray="1 2.5"/><circle class="t" cx="37" cy="31" r="7"/><circle cx="37" cy="31" r="7" fill="url(#stipple-dense)"/></svg>
+              <span><strong>Navigate</strong>Discover dependencies and possibilities.</span>
+            </li>
+            <li>
+              <svg viewBox="0 0 52 52" aria-hidden="true"><circle class="o" cx="26" cy="26" r="24"/><circle class="t" cx="19" cy="21" r="10"/><circle class="l" cx="33" cy="34" r="11" fill="url(#hatch)"/><circle class="d" cx="34" cy="35" r="2.5"/></svg>
+              <span><strong>Change</strong>Build the conditions for what's next.</span>
+            </li>
+          </ul>
+        </section>
+
+        <svg class="leader" id="leader" aria-hidden="true">
+          <path id="leader-path"/>
+          <circle class="pulse" id="leader-pulse" r="5"/>
+          <circle class="ring" id="leader-ring" r="5"/>
+          <circle class="pin" id="leader-pin" r="2.2"/>
+        </svg>
+      </div>
+
+      <section class="depth" aria-labelledby="depth-h">
+        <div class="depth-head">
+          <div class="bar">
+            <h2 id="depth-h">Depth</h2>
+            <p class="sub">Finding your way through the treacle, and starting to see the dark matter underneath.</p>
+          </div>
+          <button type="button" id="reset">Start again</button>
+        </div>
+        <ol class="found" id="found" aria-live="polite"></ol>
+        <p class="empty" id="empty">Nothing yet. Depth comes from moving.</p>
+      </section>
     </div>
-    <p class="sub">Finding your way through the treacle, and starting to see the dark matter underneath.</p>
-    <ol class="found" id="found" aria-live="polite"></ol>
-    <p class="empty" id="empty">Nothing yet. Depth comes from moving.</p>
-  </section>
+  </div>
 
   <footer>
-    <p>A working sketch from <a href="https://www.civicworks.co/">CIVICWORKS</a>, to sit alongside <a href="https://www.civicworks.co/">Tasting the organisational treacle</a>.</p>
+    <p>v0.2.0. A working sketch from <a href="https://www.civicworks.co/">CIVICWORKS</a>, to sit alongside <a href="https://www.civicworks.co/">Tasting the organisational treacle</a>.</p>
     <p>Strategic triangle after Mark Moore. Scales of a system diagram after Dan Hill. Prototyping across scales from Dan Hill, <cite>Designing Missions</cite> (Vinnova, 2022). Nested cultures of decision-making from Hill and Melander, <cite>Strategic Design for Public Purpose</cite> (2025). Dark matter from Bryan Boyer.</p>
   </footer>
 </div>
@@ -456,6 +555,27 @@
 
   var KIND_LABEL = { dependency: "Dependency", conversation: "Conversation", assumption: "Assumption" };
 
+  // ---- theme toggle, remembered per viewer where storage allows
+  var root = document.documentElement;
+  var themeBtn = document.getElementById("theme");
+  function isDark() {
+    var t = root.getAttribute("data-theme");
+    if (t) return t === "dark";
+    return window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+  }
+  function labelTheme() {
+    themeBtn.textContent = isDark() ? "Light" : "Dark";
+    themeBtn.setAttribute("aria-label", isDark() ? "Switch to light mode" : "Switch to dark mode");
+  }
+  try { var saved = localStorage.getItem("nav-theme"); if (saved) root.setAttribute("data-theme", saved); } catch (e) {}
+  labelTheme();
+  themeBtn.addEventListener("click", function () {
+    var next = isDark() ? "light" : "dark";
+    root.setAttribute("data-theme", next);
+    try { localStorage.setItem("nav-theme", next); } catch (e) {}
+    labelTheme();
+  });
+
   // ---- geometry, in world units with y pointing up
   var LAYER_Y = [-1.6, -0.8, 0, 0.8, 1.6];
   var APEX = -2.25, TOP = 2.3, K = 0.5, D = 11;
@@ -480,6 +600,7 @@
   var gFront = document.getElementById("g-front");
   var stage = document.getElementById("stage");
   var card = document.getElementById("card");
+  var shadow = document.getElementById("shadow");
   var W = 0, H = 0, SC = 1, CX = 0, CY = 0;
 
   function resize() {
@@ -487,6 +608,10 @@
     scene.setAttribute("viewBox", "0 0 " + W + " " + H);
     SC = Math.min(W / 5.8, H / 6.1);
     CX = W / 2; CY = H / 2 + SC * 0.3;
+    shadow.setAttribute("cx", CX);
+    shadow.setAttribute("cy", Math.min(H - 10, CY + SC * 2.75));
+    shadow.setAttribute("rx", SC * 1.5);
+    shadow.setAttribute("ry", SC * 0.16);
     requestFrame();
   }
 
@@ -511,9 +636,13 @@
   function poly(pts) {
     return pts.map(function (p, i) { return (i ? "L" : "M") + p.x.toFixed(1) + " " + p.y.toFixed(1); }).join(" ") + " Z";
   }
+  function setLine(n, a, b) {
+    n.setAttribute("x1", a.x); n.setAttribute("y1", a.y);
+    n.setAttribute("x2", b.x); n.setAttribute("y2", b.y);
+  }
 
   // Build persistent nodes once, update their geometry every frame.
-  var layerNodes = [], faceNodes = [], extNodes = [], vertexNodes = [];
+  var layerNodes = [], faceNodes = [], edgeNodes = [], extNodes = [], vertexNodes = [];
   var topDisc = el("path", { "class": "top-disc" }, gBack);
   var axis = el("line", { "class": "axis" }, gBack);
   LAYER_Y.forEach(function () {
@@ -523,15 +652,19 @@
     var front = el("path", { "class": "ring-front" }, g);
     layerNodes.push({ g: g, disc: disc, back: back, front: front, samples: [] });
   });
-  CORNERS.forEach(function (c, i) {
+  CORNERS.forEach(function () {
     faceNodes.push(el("path", { "class": "face" }));
+    edgeNodes.push(el("line", { "class": "edge" }));
     extNodes.push(el("line", { "class": "edge-ext" }, gBack));
-    vertexNodes.push(el("circle", { "class": "vertex", r: 3.5 }));
+    vertexNodes.push(el("circle", { "class": "vertex", r: 2.6 }));
   });
   var tri = el("path", { "class": "tri" });
   var sphere = el("g", {});
-  var sphereFill = el("circle", { fill: "url(#sphere)" }, sphere);
-  var sphereHatch = el("circle", { fill: "url(#hatch-dense)", opacity: ".55" }, sphere);
+  var clip = el("clipPath", { id: "sphere-clip" }, scene);
+  var clipCircle = el("circle", {}, clip);
+  var sphereBase = el("circle", { "class": "sphere-base" }, sphere);
+  var sphereDots = el("circle", { "class": "sphere-dots", "clip-path": "url(#sphere-clip)" }, sphere);
+  var sphereRim = el("circle", { "class": "sphere-base", style: "fill:none" }, sphere);
   var lbls = {
     value: document.getElementById("lbl-value"),
     legitimacy: document.getElementById("lbl-legitimacy"),
@@ -543,11 +676,11 @@
 
   function draw() {
     var centreZ = project([0, 0, 0]).z;
+    var face = currentFace(), r = regime();
+    var facingSide = state.touched && r === "side";
 
     // Axis and the faded top of the cone
-    var a0 = project([0, APEX, 0]), a1 = project([0, TOP, 0]);
-    axis.setAttribute("x1", a0.x); axis.setAttribute("y1", a0.y);
-    axis.setAttribute("x2", a1.x); axis.setAttribute("y2", a1.y);
+    setLine(axis, project([0, APEX, 0]), project([0, TOP, 0]));
     var topPts = [];
     for (var t = 0; t < 72; t++) topPts.push(project(ringPoint(TOP, t * 5)));
     topDisc.setAttribute("d", poly(topPts));
@@ -557,8 +690,9 @@
     var tops = CORNERS.map(function (c) { return project(ringPoint(TOP, c.deg)); });
     var upper = CORNERS.map(function (c) { return project(ringPoint(LAYER_Y[4], c.deg)); });
     CORNERS.forEach(function (c, i) {
-      extNodes[i].setAttribute("x1", upper[i].x); extNodes[i].setAttribute("y1", upper[i].y);
-      extNodes[i].setAttribute("x2", tops[i].x); extNodes[i].setAttribute("y2", tops[i].y);
+      setLine(extNodes[i], upper[i], tops[i]);
+      setLine(edgeNodes[i], apex, upper[i]);
+      edgeNodes[i].setAttribute("class", "edge" + (facingSide && face === c.id ? " facing" : ""));
     });
 
     // Rings, split into the half facing you and the half behind
@@ -593,14 +727,20 @@
     var items = [];
     CORNERS.forEach(function (c, i) {
       var j = (i + 1) % 3;
-      var z = (apex.z + tops[i].z + tops[j].z) / 3;
-      faceNodes[i].setAttribute("d", poly([apex, tops[i], tops[j]]));
+      var z = (apex.z + upper[i].z + upper[j].z) / 3;
+      faceNodes[i].setAttribute("d", poly([apex, upper[i], upper[j]]));
+      var pairKey = [c.id, CORNERS[j].id].sort().join("|");
+      faceNodes[i].setAttribute("class", "face" + (facingSide && face === pairKey ? " facing" : ""));
       items.push({ z: z, node: faceNodes[i] });
+      items.push({ z: (apex.z + upper[i].z) / 2, node: edgeNodes[i] });
     });
     var sc = project([0, state.sphereY, 0]);
     var sr = sphereRadius() * SC * sc.f;
-    sphereFill.setAttribute("cx", sc.x); sphereFill.setAttribute("cy", sc.y); sphereFill.setAttribute("r", sr);
-    sphereHatch.setAttribute("cx", sc.x); sphereHatch.setAttribute("cy", sc.y); sphereHatch.setAttribute("r", sr);
+    [sphereBase, sphereDots, sphereRim].forEach(function (n) {
+      n.setAttribute("cx", sc.x); n.setAttribute("cy", sc.y); n.setAttribute("r", sr);
+    });
+    // stipple sits on the shaded side, away from the light at top left
+    clipCircle.setAttribute("cx", sc.x + sr * 0.42); clipCircle.setAttribute("cy", sc.y + sr * 0.42); clipCircle.setAttribute("r", sr * 1.02);
     items.push({ z: sc.z, node: sphere });
 
     var ly = LAYER_Y[state.layer];
@@ -610,29 +750,29 @@
 
     items.sort(function (a, b) { return a.z - b.z; });
     while (gMid.firstChild) gMid.removeChild(gMid.firstChild);
-    // layers behind the centre go before the faces, the rest after
     LAYER_Y.forEach(function (y, i) { gBack.appendChild(layerNodes[i].g); });
     items.forEach(function (it) { gMid.appendChild(it.node); });
     CORNERS.forEach(function (c, i) {
       vertexNodes[i].setAttribute("cx", tops[i].x); vertexNodes[i].setAttribute("cy", tops[i].y);
       gFront.appendChild(vertexNodes[i]);
     });
-    // the active ring's near half sits on top of everything
+    // the active ring sits on top of everything
     gFront.appendChild(layerNodes[state.layer].g);
 
-    // Labels sit just beyond each top vertex
-    var face = currentFace();
-    CORNERS.forEach(function (c, i) {
-      var p = project(ringPoint(TOP + 0.05, c.deg).map(function (v, k) { return k === 1 ? v : v * 1.13; }));
+    // Labels sit just beyond each top vertex, kept inside the drawing
+    CORNERS.forEach(function (c) {
+      var p = project(ringPoint(TOP + 0.05, c.deg).map(function (v, k) { return k === 1 ? v : v * 1.12; }));
       var l = lbls[c.id];
-      var half = l.offsetWidth / 2 + 4;
+      var half = l.offsetWidth / 2 + 2;
       var lx = Math.max(half, Math.min(W - half, p.x));
-      l.style.transform = "translate(" + lx.toFixed(1) + "px," + p.y.toFixed(1) + "px) translate(-50%,-50%)";
-      l.style.opacity = p.z < centreZ - 0.6 ? 0.45 : 1;
-      l.classList.toggle("facing", state.touched && face === c.id && regime() === "side");
+      var ty = l.firstChild.offsetHeight / 2;
+      l.style.transform = "translate(" + (lx - l.offsetWidth / 2).toFixed(1) + "px," + (p.y - ty).toFixed(1) + "px)";
+      l.style.opacity = p.z < centreZ - 0.6 ? 0.5 : 1;
+      l.classList.toggle("facing", facingSide && face === c.id);
     });
-    lbls.depth.style.transform = "translate(" + sc.x.toFixed(1) + "px," + (sc.y + sr + 12).toFixed(1) + "px) translate(-50%,-50%)";
-    lbls.depth.style.opacity = state.found.length ? 1 : 0.6;
+    var dl = lbls.depth;
+    dl.style.transform = "translate(" + (sc.x + sr + 8).toFixed(1) + "px," + (sc.y - dl.offsetHeight / 2).toFixed(1) + "px)";
+    dl.style.opacity = state.found.length ? 1 : 0.6;
 
     drawLeader();
   }
@@ -646,6 +786,7 @@
     if (view.pitch < -48) return "below";
     return "side";
   }
+  function corner(id) { return CORNERS.filter(function (c) { return c.id === id; })[0]; }
 
   function focusPoint() {
     var r = regime();
@@ -653,18 +794,14 @@
     if (r === "above") return project([0, LAYER_Y[state.layer], 0]);
     if (r === "below") return project([0, APEX, 0]);
     var face = currentFace(), y = LAYER_Y[state.layer];
-    if (face.indexOf("|") < 0) {
-      var c = CORNERS.filter(function (c) { return c.id === face; })[0];
-      return project(ringPoint(y, c.deg));
-    }
-    var pair = face.split("|").map(function (id) { return CORNERS.filter(function (c) { return c.id === id; })[0]; });
+    if (face.indexOf("|") < 0) return project(ringPoint(y, corner(face).deg));
+    var pair = face.split("|").map(corner);
     var p1 = ringPoint(y, pair[0].deg), p2 = ringPoint(y, pair[1].deg);
     return project([(p1[0] + p2[0]) / 2, y, (p1[2] + p2[2]) / 2]);
   }
 
   var leaderPath = document.getElementById("leader-path");
-  var leaderPin = document.getElementById("leader-pin");
-  var leaderPulse = document.getElementById("leader-pulse");
+  var leaderDots = ["leader-pin", "leader-ring", "leader-pulse"].map(function (id) { return document.getElementById(id); });
   function drawLeader() {
     var sr = stage.getBoundingClientRect(), or = objEl.getBoundingClientRect(), cr = card.getBoundingClientRect();
     var fp = focusPoint();
@@ -680,8 +817,7 @@
       d = "M" + ax + " " + ay + " V" + midY + " L" + px + " " + py;
     }
     leaderPath.setAttribute("d", d);
-    leaderPin.setAttribute("cx", px); leaderPin.setAttribute("cy", py);
-    leaderPulse.setAttribute("cx", px); leaderPulse.setAttribute("cy", py);
+    leaderDots.forEach(function (n) { n.setAttribute("cx", px); n.setAttribute("cy", py); });
   }
 
   var lastKey = "";
@@ -692,8 +828,7 @@
     else {
       var face = currentFace();
       if (face.indexOf("|") < 0) {
-        var c = CORNERS.filter(function (c) { return c.id === face; })[0];
-        where = LAYERS[state.layer] + " · " + c.name;
+        where = LAYERS[state.layer] + " · " + corner(face).name;
         text = CELLS[face][state.layer].q;
       } else {
         where = LAYERS[state.layer];
@@ -707,7 +842,7 @@
     document.getElementById("question").textContent = text;
     document.getElementById("newlayer").hidden = !(state.touched && r === "side" && state.lastHit === state.layer && state.layer > 0);
     document.querySelectorAll("[data-view]").forEach(function (b) {
-      b.setAttribute("aria-pressed", String(state.touched && b.dataset.view === (r === "side" ? "side" : r)));
+      b.setAttribute("aria-pressed", String(state.touched && b.dataset.view === r));
     });
   }
 
@@ -720,8 +855,7 @@
     if (state.visited[key]) return;
     state.visited[key] = true;
     var cell = CELLS[face][state.layer];
-    var c = CORNERS.filter(function (c) { return c.id === face; })[0];
-    state.found.push({ kind: cell.kind, f: cell.f, at: LAYERS[state.layer] + ", " + c.name.toLowerCase() });
+    state.found.push({ kind: cell.kind, f: cell.f, at: LAYERS[state.layer] + ", " + corner(face).name.toLowerCase() });
     renderFound();
     requestFrame();
   }
@@ -748,7 +882,7 @@
       var li = document.createElement("li");
       var b = document.createElement("button");
       b.type = "button";
-      b.innerHTML = '<svg viewBox="0 0 56 22" aria-hidden="true"><ellipse cx="28" cy="11" rx="' + (12 + i * 3.5) + '" ry="' + (5 + i * 0.8) + '"/><circle cx="28" cy="11" r="2.5"/></svg><span></span>';
+      b.innerHTML = '<svg viewBox="0 0 56 22" aria-hidden="true"><ellipse cx="28" cy="11" rx="' + (12 + i * 3.5) + '" ry="' + (5 + i * 0.8) + '"/><circle cx="28" cy="11" r="2"/></svg><span></span>';
       b.querySelector("span").textContent = LAYERS[i];
       b.addEventListener("click", function () { touch(); setLayer(i); });
       li.appendChild(b);
@@ -832,12 +966,12 @@
   }
 
   // ---- pointer
-  var dragging = false, start = null, last = null, moved = 0;
+  var dragging = false, last = null, moved = 0;
   objEl.addEventListener("pointerdown", function (e) {
     if (e.button !== 0) return;
     touch();
     dragging = true; moved = 0;
-    start = last = { x: e.clientX, y: e.clientY, t: performance.now() };
+    last = { x: e.clientX, y: e.clientY, t: performance.now() };
     view.tYaw = null; view.tPitch = null; view.vYaw = 0;
     objEl.setPointerCapture(e.pointerId);
     objEl.classList.add("dragging");
@@ -860,7 +994,7 @@
     if (!dragging) return;
     dragging = false;
     objEl.classList.remove("dragging");
-    if (moved < 6 && e && e.type === "pointerup") { tapAt(e); }
+    if (moved < 6 && e && e.type === "pointerup") tapAt(e);
     var idle = performance.now() - last.t > 80;
     var fling = idle ? 0 : view.vYaw * 260;
     view.tYaw = Math.round((view.yaw + fling) / 60) * 60;
@@ -914,6 +1048,7 @@
 
   if (window.ResizeObserver) new ResizeObserver(resize).observe(objEl);
   window.addEventListener("resize", resize);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(requestFrame);
 
   state = fresh();
   renderFound();
