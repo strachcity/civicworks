@@ -1,0 +1,925 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Experimentation as navigation v0.1.0</title>
+<meta name="description" content="A working sketch you can spin like a globe. Turn an experiment to face value, legitimacy or capacity, tilt it to see across or through the layers of an institution, and watch depth build up. A companion to Tasting the organisational treacle on CIVICWORKS.">
+<style>
+  :root {
+    --bg: #f6f3ef;
+    --ink: #2a2422;
+    --muted: #6f6461;
+    --red: #e2442f;
+    --red-soft: rgba(226, 68, 47, 0.10);
+    --red-mid: rgba(226, 68, 47, 0.22);
+    --line: rgba(226, 68, 47, 0.6);
+    --panel: #fffdfb;
+    --rule: #e6ddd7;
+    --focus: #1d4ed8;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #171312;
+      --ink: #f1e9e5;
+      --muted: #b2a39d;
+      --red: #ff6b52;
+      --red-soft: rgba(255, 107, 82, 0.11);
+      --red-mid: rgba(255, 107, 82, 0.24);
+      --line: rgba(255, 107, 82, 0.65);
+      --panel: #211b19;
+      --rule: #3a302d;
+      --focus: #93c5fd;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #171312;
+    --ink: #f1e9e5;
+    --muted: #b2a39d;
+    --red: #ff6b52;
+    --red-soft: rgba(255, 107, 82, 0.11);
+    --red-mid: rgba(255, 107, 82, 0.24);
+    --line: rgba(255, 107, 82, 0.65);
+    --panel: #211b19;
+    --rule: #3a302d;
+    --focus: #93c5fd;
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "Helvetica Neue", Helvetica, Arial, system-ui, sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+  }
+  .wrap { overflow-x: clip; max-width: 1320px; margin: 0 auto; padding: 24px 16px 40px; }
+
+  /* Stage layout */
+  .stage {
+    position: relative;
+    display: grid;
+    gap: 16px;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: "head" "obj" "card" "ctrl" "rail" "moves";
+  }
+  @media (min-width: 960px) {
+    .stage {
+      gap: 20px 28px;
+      grid-template-columns: minmax(250px, 300px) minmax(0, 1fr) minmax(200px, 230px);
+      grid-template-rows: auto auto 1fr;
+      grid-template-areas:
+        "head  obj  rail"
+        "card  obj  rail"
+        "moves ctrl rail";
+    }
+  }
+  .head { grid-area: head; }
+  .card { grid-area: card; }
+  .obj { grid-area: obj; }
+  .ctrl { grid-area: ctrl; }
+  .rail { grid-area: rail; }
+  .moves { grid-area: moves; }
+
+  .head h1 {
+    color: var(--red);
+    font-size: clamp(1.6rem, 4.5vw, 2.1rem);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    line-height: 1.12;
+    margin: 0 0 10px;
+  }
+  .head p { color: var(--red); margin: 0; }
+
+  /* The object */
+  .obj {
+    position: relative;
+    height: min(62vh, 460px);
+    min-height: 320px;
+    touch-action: none;
+    cursor: grab;
+    border-radius: 18px;
+    outline: none;
+  }
+  .obj.dragging { cursor: grabbing; }
+  .obj:focus-visible { box-shadow: 0 0 0 3px var(--focus); }
+  @media (min-width: 960px) {
+    .obj { height: min(80vh, 720px); min-height: 520px; }
+  }
+  .obj svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+  .obj .glow {
+    position: absolute; left: 20%; right: 20%; bottom: 0; height: 10%;
+    background: radial-gradient(ellipse at center, var(--red-mid), transparent 70%);
+    filter: blur(8px);
+    pointer-events: none;
+  }
+
+  .ring-back { fill: none; stroke: var(--red); stroke-width: 1; stroke-dasharray: 2 4; }
+  .ring-front { fill: none; stroke: var(--red); stroke-width: 1.2; stroke-dasharray: 4 3; }
+  .ring-disc { fill: none; stroke: none; }
+  .layer.unreached .ring-back, .layer.unreached .ring-front { opacity: .18; }
+  .layer.reached .ring-back { opacity: .45; }
+  .layer.reached .ring-front { opacity: .8; }
+  .layer.active .ring-front { stroke-width: 2; stroke-dasharray: none; }
+  .layer.active .ring-back { opacity: .7; }
+  .layer.active .ring-disc { fill: url(#hatch); }
+  .layer.hit .ring-front { animation: hit 1s ease-out; }
+  @keyframes hit { 0% { stroke-width: 7; } 100% { stroke-width: 2; } }
+  .face { fill: var(--red-soft); fill-opacity: .55; stroke: var(--red); stroke-width: .8; stroke-linejoin: round; }
+  .edge-ext { stroke: var(--line); stroke-width: 1; stroke-dasharray: 2 4; }
+  .axis { stroke: var(--line); stroke-width: 1; stroke-dasharray: 1 5; }
+  .tri { fill: url(#hatch-dense); stroke: var(--red); stroke-width: 1.2; }
+  .vertex { fill: var(--red); }
+  .top-disc { fill: none; stroke: var(--red); stroke-width: 1; stroke-dasharray: 1 6; opacity: .35; }
+
+  .lbl {
+    position: absolute;
+    left: 0; top: 0;
+    transform: translate(-50%, -50%);
+    color: var(--red);
+    font-weight: 600;
+    font-size: 1rem;
+    white-space: nowrap;
+    pointer-events: none;
+    text-shadow: 0 0 6px var(--bg), 0 0 2px var(--bg);
+    transition: opacity .3s;
+  }
+  .lbl.facing { text-decoration: underline; text-underline-offset: 4px; }
+  .lbl.depth { color: var(--ink); font-size: .8125rem; letter-spacing: .06em; text-transform: uppercase; }
+
+  /* Leader line overlay */
+  svg.leader {
+    position: absolute; inset: 0; width: 100%; height: 100%;
+    pointer-events: none; overflow: visible;
+  }
+  .leader path { fill: none; stroke: var(--red); stroke-width: 1; stroke-dasharray: 3 3; }
+  .leader circle.pin { fill: var(--red); }
+  .leader circle.pulse { fill: none; stroke: var(--red); stroke-width: 1.5; transform-box: fill-box; transform-origin: center; animation: pulse 1.8s ease-out infinite; }
+  @keyframes pulse { 0% { transform: scale(.6); opacity: 1; } 100% { transform: scale(2.4); opacity: 0; } }
+
+  /* Annotation */
+  .card {
+    align-self: start;
+    position: relative;
+    background: var(--panel);
+    border: 1px solid var(--rule);
+    border-radius: 14px;
+    padding: 16px 18px;
+    z-index: 1;
+  }
+  .where {
+    color: var(--red);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    margin: 0 0 6px;
+  }
+  .newlayer {
+    display: inline-block;
+    font-size: 0.8125rem;
+    color: var(--red);
+    border: 1px dashed var(--red);
+    border-radius: 999px;
+    padding: 1px 10px;
+    margin: 0 0 8px;
+  }
+  .newlayer[hidden] { display: none; }
+  .question { font-size: 1.125rem; line-height: 1.4; margin: 0; }
+
+  /* Controls */
+  .ctrl { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; align-self: start; }
+  button {
+    font: inherit;
+    font-size: 0.9375rem;
+    color: var(--red);
+    background: transparent;
+    border: 1.5px dashed var(--red);
+    border-radius: 999px;
+    padding: 7px 14px;
+    min-height: 40px;
+    cursor: pointer;
+  }
+  button:hover { background: var(--red-soft); }
+  button:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+  button[aria-pressed="true"] { background: var(--red); color: var(--bg); border-style: solid; }
+  button.quiet { color: var(--muted); border-color: var(--rule); }
+  .hint { color: var(--muted); font-size: 0.875rem; width: 100%; text-align: center; margin: 0 0 2px; }
+
+  /* Layer rail */
+  .rail h2 { color: var(--red); font-size: 1.125rem; font-weight: 600; line-height: 1.2; margin: 0 0 12px; }
+  .rail ol { list-style: none; margin: 0; padding: 0; position: relative; }
+  .rail ol::before {
+    content: ""; position: absolute; left: 27px; top: 4px; bottom: 18px;
+    border-left: 1.5px dashed var(--line);
+  }
+  .rail ol::after {
+    content: ""; position: absolute; left: 23px; top: -4px;
+    border: 5px solid transparent; border-bottom: 7px solid var(--red); border-top: 0;
+  }
+  .rail li + li { margin-top: 4px; }
+  .rail button {
+    display: flex; align-items: center; gap: 10px;
+    width: 100%; text-align: left;
+    border: 0; border-radius: 12px;
+    padding: 6px 8px 6px 0;
+    color: var(--red);
+    font-size: 0.875rem; line-height: 1.25;
+    background: transparent;
+    position: relative;
+  }
+  .rail button:hover { background: var(--red-soft); }
+  .rail button svg { flex: none; width: 56px; height: 22px; }
+  .rail button svg ellipse { fill: var(--red-soft); stroke: var(--red); stroke-dasharray: 2 2; }
+  .rail button svg circle { fill: var(--red); }
+  .rail button.unreached { opacity: .4; }
+  .rail button[aria-pressed="true"] { background: var(--red-soft); font-weight: 600; }
+  .rail button[aria-pressed="true"] svg ellipse { stroke-dasharray: none; stroke-width: 1.5; }
+  .rail .note { color: var(--muted); font-size: 0.8125rem; margin: 10px 0 0; }
+
+  /* Probe / Navigate / Change */
+  .moves { display: grid; gap: 14px; grid-template-columns: repeat(3, minmax(0, 1fr)); align-self: end; }
+  @media (min-width: 960px) { .moves { grid-template-columns: 1fr; } }
+  .moves div { color: var(--red); font-size: 0.875rem; line-height: 1.35; display: flex; gap: 12px; align-items: center; }
+  @media (max-width: 959px) { .moves div { flex-direction: column; align-items: flex-start; gap: 6px; } }
+  .moves strong { display: block; font-size: 1rem; }
+  .moves svg { flex: none; width: 46px; height: 46px; }
+
+  /* Depth */
+  .depth { margin-top: 32px; padding-top: 20px; border-top: 1px solid var(--rule); }
+  .depth-head { display: flex; flex-wrap: wrap; gap: 8px 20px; align-items: baseline; justify-content: space-between; }
+  .depth h2 { color: var(--red); font-size: 1.25rem; font-weight: 600; margin: 0; }
+  .depth .sub { color: var(--muted); margin: 4px 0 14px; }
+  ol.found {
+    list-style: none; margin: 0; padding: 0;
+    display: grid; gap: 12px;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  }
+  ol.found li {
+    background: var(--panel);
+    border: 1px solid var(--rule);
+    border-radius: 12px;
+    padding: 12px 14px;
+    animation: arrive .5s ease-out;
+  }
+  @keyframes arrive { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+  .kind {
+    display: inline-block;
+    font-size: 0.75rem; font-weight: 600; letter-spacing: .05em; text-transform: uppercase;
+    color: var(--red);
+    margin-right: 6px;
+  }
+  .kind::before { content: ""; display: inline-block; width: 8px; height: 8px; margin-right: 5px; vertical-align: 1px; }
+  .kind.dependency::before { background: var(--red); border-radius: 50%; }
+  .kind.conversation::before { border: 1.5px solid var(--red); border-radius: 50%; }
+  .kind.assumption::before { background: var(--red); transform: rotate(45deg); width: 7px; height: 7px; }
+  .found .at { color: var(--muted); font-size: 0.8125rem; display: block; }
+  .found p { margin: 4px 0 0; }
+  .empty { color: var(--muted); margin: 0; }
+  .empty[hidden] { display: none; }
+
+  footer { color: var(--muted); font-size: 0.8125rem; margin-top: 32px; }
+  footer a { color: var(--red); }
+  footer p { margin: 0 0 6px; }
+  .sr-only {
+    position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+    overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="sr-only" id="model-desc">
+    <p>The model has three dimensions, drawn as one object. Across are three questions that never line up neatly. Value asks whether people will use what we've made and what value it might create. Legitimacy asks whether we have the support and permission to pursue it. Capacity asks whether the organisation can actually deliver it.</p>
+    <p>Through are five layers of an institution, from the smallest part upwards. Citizen interaction, service processes and technology, organisational priorities, cross-institutional arrangements, and political and strategic support. They are drawn as rings on a cone that widens and fades as it rises, because you rarely know which layers matter until you hit them.</p>
+    <p>Depth is the learning that comes from moving across and through. It is drawn as a sphere that grows as the experiment reveals dependencies, starts new conversations and challenges assumptions.</p>
+    <p>Focus the drawing to turn it with the keyboard. Left and right arrows turn it to face the next question. Up and down arrows move between layers. Page up looks from above, page down looks from below, and home looks from the side. The buttons and the layer list do the same things.</p>
+  </div>
+
+  <div class="stage" id="stage">
+    <header class="head">
+      <h1>Experimentation as navigation</h1>
+      <p>Experiments move across value, legitimacy and capacity and through the layers of an institution, and what they learn can reshape both.</p>
+    </header>
+
+    <section class="card" id="card" aria-live="polite" aria-atomic="true">
+      <p class="where" id="where">Start here</p>
+      <p class="newlayer" id="newlayer" hidden>A layer you hadn't hit yet</p>
+      <p class="question" id="question">Start with a question.</p>
+    </section>
+
+    <div class="obj" id="obj" tabindex="0" role="application" aria-roledescription="model you can turn" aria-label="Experimentation as navigation" aria-describedby="model-desc">
+      <div class="glow" aria-hidden="true"></div>
+      <svg id="scene" aria-hidden="true">
+        <defs>
+          <pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(-45)">
+            <line x1="0" y1="0" x2="0" y2="6" style="stroke:var(--red)" stroke-width="1" opacity=".35"/>
+          </pattern>
+          <pattern id="hatch-dense" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+            <line x1="0" y1="0" x2="0" y2="4" style="stroke:var(--red)" stroke-width="1" opacity=".4"/>
+          </pattern>
+          <radialGradient id="sphere" cx=".36" cy=".32" r=".75">
+            <stop offset="0" style="stop-color:var(--red)" stop-opacity=".15"/>
+            <stop offset=".65" style="stop-color:var(--red)" stop-opacity=".55"/>
+            <stop offset="1" style="stop-color:var(--red)" stop-opacity=".85"/>
+          </radialGradient>
+        </defs>
+        <g id="g-back"></g>
+        <g id="g-mid"></g>
+        <g id="g-front"></g>
+      </svg>
+      <span class="lbl" id="lbl-value">Value</span>
+      <span class="lbl" id="lbl-legitimacy">Legitimacy</span>
+      <span class="lbl" id="lbl-capacity">Capacity</span>
+      <span class="lbl depth" id="lbl-depth">Depth</span>
+    </div>
+
+    <div class="ctrl" role="group" aria-label="Turn the model">
+      <p class="hint">Spin it like a globe. Tap a ring to pick a layer.</p>
+      <button type="button" id="spin-left" aria-label="Turn left">&#8592; Turn</button>
+      <button type="button" data-view="side" aria-pressed="false">From the side</button>
+      <button type="button" data-view="above" aria-pressed="false">From above</button>
+      <button type="button" data-view="below" aria-pressed="false">From below</button>
+      <button type="button" id="spin-right" aria-label="Turn right">Turn &#8594;</button>
+    </div>
+
+    <nav class="rail" aria-labelledby="rail-h">
+      <h2 id="rail-h">Through institutional layers</h2>
+      <ol id="rail"></ol>
+      <p class="note">You rarely know which layers matter until you hit them.</p>
+    </nav>
+
+    <div class="moves" aria-label="Three moves">
+      <div>
+        <svg viewBox="0 0 46 46" aria-hidden="true"><circle cx="23" cy="23" r="21" fill="none" stroke="currentColor"/><path d="M4 27 A21 21 0 0 0 31 42 A19 19 0 0 1 4 27Z" fill="url(#hatch-dense)" stroke="currentColor" stroke-width=".6"/><circle cx="31" cy="15" r="3" fill="currentColor"/></svg>
+        <span><strong>Probe</strong>Start with a question.</span>
+      </div>
+      <div>
+        <svg viewBox="0 0 46 46" aria-hidden="true"><circle cx="23" cy="23" r="21" fill="none" stroke="currentColor"/><circle cx="13" cy="21" r="2.5" fill="currentColor"/><path d="M15 19 Q24 10 31 19" fill="none" stroke="currentColor" stroke-dasharray="1.5 2"/><circle cx="32" cy="27" r="6" style="fill:var(--red-mid)" stroke="currentColor" stroke-width=".6"/></svg>
+        <span><strong>Navigate</strong>Discover dependencies and possibilities.</span>
+      </div>
+      <div>
+        <svg viewBox="0 0 46 46" aria-hidden="true"><circle cx="23" cy="23" r="21" fill="none" stroke="currentColor"/><circle cx="17" cy="19" r="8" style="fill:var(--red-mid)" stroke="currentColor" stroke-width=".6"/><circle cx="29" cy="30" r="9" fill="url(#hatch-dense)" stroke="currentColor" stroke-width=".6"/><circle cx="30" cy="31" r="2.5" fill="currentColor"/></svg>
+        <span><strong>Change</strong>Build the conditions for what's next.</span>
+      </div>
+    </div>
+
+    <svg class="leader" id="leader" aria-hidden="true">
+      <path id="leader-path"/>
+      <circle class="pulse" id="leader-pulse" r="6"/>
+      <circle class="pin" id="leader-pin" r="4"/>
+    </svg>
+  </div>
+
+  <section class="depth" aria-labelledby="depth-h">
+    <div class="depth-head">
+      <h2 id="depth-h">Depth</h2>
+      <button type="button" class="quiet" id="reset">Start again</button>
+    </div>
+    <p class="sub">Finding your way through the treacle, and starting to see the dark matter underneath.</p>
+    <ol class="found" id="found" aria-live="polite"></ol>
+    <p class="empty" id="empty">Nothing yet. Depth comes from moving.</p>
+  </section>
+
+  <footer>
+    <p>A working sketch from <a href="https://www.civicworks.co/">CIVICWORKS</a>, to sit alongside <a href="https://www.civicworks.co/">Tasting the organisational treacle</a>.</p>
+    <p>Strategic triangle after Mark Moore. Scales of a system diagram after Dan Hill. Prototyping across scales from Dan Hill, <cite>Designing Missions</cite> (Vinnova, 2022). Nested cultures of decision-making from Hill and Melander, <cite>Strategic Design for Public Purpose</cite> (2025). Dark matter from Bryan Boyer.</p>
+  </footer>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  // ---- content
+  var LAYERS = [
+    "Citizen interaction",
+    "Service processes and technology",
+    "Organisational priorities",
+    "Cross-institutional arrangements",
+    "Political and strategic support"
+  ];
+
+  var CORNERS = [
+    { id: "value", name: "Value", deg: 90 },
+    { id: "legitimacy", name: "Legitimacy", deg: 210 },
+    { id: "capacity", name: "Capacity", deg: 330 }
+  ];
+
+  // Six faces, one every 60 degrees of turn. Corners face you on even turns, edges on odd.
+  var FACES = ["value", "legitimacy|value", "legitimacy", "capacity|legitimacy", "capacity", "capacity|value"];
+
+  // What the question sounds like at each layer, and what an experiment might turn up there.
+  var CELLS = {
+    value: [
+      { q: "Will someone actually use this, and does it make the thing they came to do any easier?", kind: "assumption", f: "The thing everyone said people wouldn't use, some people used." },
+      { q: "Does the change survive contact with the systems behind it, or does the value leak out somewhere in the process?", kind: "dependency", f: "The improvement at the front stops at a step nobody on the team can see." },
+      { q: "Is this a problem the organisation thinks is worth solving this year?", kind: "assumption", f: "What the team thought was a priority sits nowhere on the organisation's list." },
+      { q: "Does the value land here, or somewhere else entirely?", kind: "assumption", f: "The benefit shows up in another organisation's numbers, not yours." },
+      { q: "Can this be described as something that matters beyond the service?", kind: "conversation", f: "Someone senior asks what this would look like everywhere. Nobody has asked that before." }
+    ],
+    legitimacy: [
+      { q: "Who says this interaction has to work the way it does now? Sometimes the rule is real and sometimes it's a habit.", kind: "assumption", f: "A rule everyone treated as fixed had more room in it than anyone had checked." },
+      { q: "Who owns the process, and do they know you're testing it?", kind: "conversation", f: "The person who owns the process hears about the test for the first time, and has a view." },
+      { q: "Who has to put it on their list, and what comes off to make room?", kind: "conversation", f: "Two teams who both thought it was the other's job finally talk about it." },
+      { q: "Whose agreement do you need that you don't yet know you need?", kind: "conversation", f: "A partner you'd never needed before turns out to hold a veto." },
+      { q: "Who has the authority to change any of it, and would they want to?", kind: "dependency", f: "The rule that shaped the form was decided up here, for a different reason, a long time ago." }
+    ],
+    capacity: [
+      { q: "Can the team run it for a small number of real people without it falling over?", kind: "dependency", f: "It only worked because someone was quietly doing the bit the system couldn't." },
+      { q: "Can you do this with what already exists, or does it need integration nobody has resourced?", kind: "dependency", f: "The workaround runs on automations built for something else. Useful, and fragile." },
+      { q: "Who would pay for it, staff it and look after it once the test ends?", kind: "dependency", f: "Nobody's budget covers the thing after the test. It belongs to no one yet." },
+      { q: "Does the change depend on another organisation's systems, data or timetable?", kind: "dependency", f: "Your change waits on someone else's release, contract or timetable." },
+      { q: "Is there money, mandate and patience for more than a test?", kind: "assumption", f: "What looked impossible was mostly unasked." }
+    ]
+  };
+
+  var BETWEEN = {
+    "legitimacy|value": "Between value and legitimacy. What people would use and what you're allowed to try rarely line up.",
+    "capacity|legitimacy": "Between legitimacy and capacity. Permission to do it and the means to do it tend to arrive at different times.",
+    "capacity|value": "Between capacity and value. What the organisation can deliver pulls against what would be worth delivering."
+  };
+
+  var VIEWS = {
+    intro: { where: "Start here", q: "Start with a question. Turn it to face value, legitimacy or capacity, tip it to look from above or below, and pick a layer to see how far up it goes." },
+    above: { where: "From above · Across", q: "From above, the layers collapse and three questions are left. They never line up neatly, and learning about one changes how you approach the others. The open part is at which scale each one applies." },
+    below: { where: "From below · Through", q: "From where someone fills in the form, every layer is stacked above you, and you can't see where any of them stops. You rarely know which layers matter until you hit them." }
+  };
+
+  var KIND_LABEL = { dependency: "Dependency", conversation: "Conversation", assumption: "Assumption" };
+
+  // ---- geometry, in world units with y pointing up
+  var LAYER_Y = [-1.6, -0.8, 0, 0.8, 1.6];
+  var APEX = -2.25, TOP = 2.3, K = 0.5, D = 11;
+  function radius(y) { return K * (y - APEX); }
+  function ringPoint(y, deg) {
+    var a = deg * Math.PI / 180, r = radius(y);
+    return [r * Math.cos(a), y, r * Math.sin(a)];
+  }
+
+  // ---- view state
+  var reduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var view = { yaw: -24, pitch: 20, tYaw: null, tPitch: null, vYaw: 0 };
+  var state;
+  function fresh() {
+    return { layer: 0, reached: { 0: true }, visited: {}, found: [], touched: false, lastHit: -1, hitAnim: -1, sphereY: LAYER_Y[0] };
+  }
+
+  var objEl = document.getElementById("obj");
+  var scene = document.getElementById("scene");
+  var gBack = document.getElementById("g-back");
+  var gMid = document.getElementById("g-mid");
+  var gFront = document.getElementById("g-front");
+  var stage = document.getElementById("stage");
+  var card = document.getElementById("card");
+  var W = 0, H = 0, SC = 1, CX = 0, CY = 0;
+
+  function resize() {
+    W = objEl.clientWidth; H = objEl.clientHeight;
+    scene.setAttribute("viewBox", "0 0 " + W + " " + H);
+    SC = Math.min(W / 5.8, H / 6.1);
+    CX = W / 2; CY = H / 2 + SC * 0.3;
+    requestFrame();
+  }
+
+  function project(p) {
+    var ya = view.yaw * Math.PI / 180, pa = view.pitch * Math.PI / 180;
+    var x1 = p[0] * Math.cos(ya) + p[2] * Math.sin(ya);
+    var z1 = -p[0] * Math.sin(ya) + p[2] * Math.cos(ya);
+    var y2 = p[1] * Math.cos(pa) - z1 * Math.sin(pa);
+    var z2 = p[1] * Math.sin(pa) + z1 * Math.cos(pa);
+    var f = D / (D - z2);
+    return { x: CX + SC * x1 * f, y: CY - SC * y2 * f, z: z2, f: f };
+  }
+
+  // ---- svg helpers
+  var NS = "http://www.w3.org/2000/svg";
+  function el(name, attrs, parent) {
+    var n = document.createElementNS(NS, name);
+    for (var k in attrs) n.setAttribute(k, attrs[k]);
+    if (parent) parent.appendChild(n);
+    return n;
+  }
+  function poly(pts) {
+    return pts.map(function (p, i) { return (i ? "L" : "M") + p.x.toFixed(1) + " " + p.y.toFixed(1); }).join(" ") + " Z";
+  }
+
+  // Build persistent nodes once, update their geometry every frame.
+  var layerNodes = [], faceNodes = [], extNodes = [], vertexNodes = [];
+  var topDisc = el("path", { "class": "top-disc" }, gBack);
+  var axis = el("line", { "class": "axis" }, gBack);
+  LAYER_Y.forEach(function () {
+    var g = el("g", { "class": "layer" });
+    var disc = el("path", { "class": "ring-disc" }, g);
+    var back = el("path", { "class": "ring-back" }, g);
+    var front = el("path", { "class": "ring-front" }, g);
+    layerNodes.push({ g: g, disc: disc, back: back, front: front, samples: [] });
+  });
+  CORNERS.forEach(function (c, i) {
+    faceNodes.push(el("path", { "class": "face" }));
+    extNodes.push(el("line", { "class": "edge-ext" }, gBack));
+    vertexNodes.push(el("circle", { "class": "vertex", r: 3.5 }));
+  });
+  var tri = el("path", { "class": "tri" });
+  var sphere = el("g", {});
+  var sphereFill = el("circle", { fill: "url(#sphere)" }, sphere);
+  var sphereHatch = el("circle", { fill: "url(#hatch-dense)", opacity: ".55" }, sphere);
+  var lbls = {
+    value: document.getElementById("lbl-value"),
+    legitimacy: document.getElementById("lbl-legitimacy"),
+    capacity: document.getElementById("lbl-capacity"),
+    depth: document.getElementById("lbl-depth")
+  };
+
+  function sphereRadius() { return state.found.length ? 0.16 + state.found.length * 0.042 : 0.1; }
+
+  function draw() {
+    var centreZ = project([0, 0, 0]).z;
+
+    // Axis and the faded top of the cone
+    var a0 = project([0, APEX, 0]), a1 = project([0, TOP, 0]);
+    axis.setAttribute("x1", a0.x); axis.setAttribute("y1", a0.y);
+    axis.setAttribute("x2", a1.x); axis.setAttribute("y2", a1.y);
+    var topPts = [];
+    for (var t = 0; t < 72; t++) topPts.push(project(ringPoint(TOP, t * 5)));
+    topDisc.setAttribute("d", poly(topPts));
+
+    // Pyramid edges, extended faintly past the top layer
+    var apex = project([0, APEX, 0]);
+    var tops = CORNERS.map(function (c) { return project(ringPoint(TOP, c.deg)); });
+    var upper = CORNERS.map(function (c) { return project(ringPoint(LAYER_Y[4], c.deg)); });
+    CORNERS.forEach(function (c, i) {
+      extNodes[i].setAttribute("x1", upper[i].x); extNodes[i].setAttribute("y1", upper[i].y);
+      extNodes[i].setAttribute("x2", tops[i].x); extNodes[i].setAttribute("y2", tops[i].y);
+    });
+
+    // Rings, split into the half facing you and the half behind
+    LAYER_Y.forEach(function (y, i) {
+      var n = layerNodes[i], pts = [], back = "", front = "", prevBack = null;
+      var cz = project([0, y, 0]).z;
+      for (var s = 0; s <= 72; s++) {
+        var p = project(ringPoint(y, s * 5));
+        pts.push(p);
+        var isBack = p.z < cz - 1e-4;
+        var cmd = (prevBack === isBack) ? "L" : "M";
+        if (prevBack !== null && prevBack !== isBack) {
+          // start the new half where the old one ended so there's no gap
+          var q = pts[pts.length - 2];
+          if (isBack) back += "M" + q.x.toFixed(1) + " " + q.y.toFixed(1);
+          else front += "M" + q.x.toFixed(1) + " " + q.y.toFixed(1);
+          cmd = "L";
+        }
+        var seg = cmd + p.x.toFixed(1) + " " + p.y.toFixed(1);
+        if (isBack) back += seg; else front += seg;
+        prevBack = isBack;
+      }
+      n.samples = pts;
+      n.back.setAttribute("d", back);
+      n.front.setAttribute("d", front);
+      n.disc.setAttribute("d", poly(pts.slice(0, 72)));
+      var cls = i === state.layer ? "active" : state.reached[i] ? "reached" : "unreached";
+      n.g.setAttribute("class", "layer " + cls + (state.hitAnim === i ? " hit" : ""));
+    });
+
+    // Faces of the pyramid, the sphere and the active triangle, painted back to front
+    var items = [];
+    CORNERS.forEach(function (c, i) {
+      var j = (i + 1) % 3;
+      var z = (apex.z + tops[i].z + tops[j].z) / 3;
+      faceNodes[i].setAttribute("d", poly([apex, tops[i], tops[j]]));
+      items.push({ z: z, node: faceNodes[i] });
+    });
+    var sc = project([0, state.sphereY, 0]);
+    var sr = sphereRadius() * SC * sc.f;
+    sphereFill.setAttribute("cx", sc.x); sphereFill.setAttribute("cy", sc.y); sphereFill.setAttribute("r", sr);
+    sphereHatch.setAttribute("cx", sc.x); sphereHatch.setAttribute("cy", sc.y); sphereHatch.setAttribute("r", sr);
+    items.push({ z: sc.z, node: sphere });
+
+    var ly = LAYER_Y[state.layer];
+    var triPts = CORNERS.map(function (c) { return project(ringPoint(ly, c.deg)); });
+    tri.setAttribute("d", poly(triPts));
+    items.push({ z: sc.z + 0.001, node: tri });
+
+    items.sort(function (a, b) { return a.z - b.z; });
+    while (gMid.firstChild) gMid.removeChild(gMid.firstChild);
+    // layers behind the centre go before the faces, the rest after
+    LAYER_Y.forEach(function (y, i) { gBack.appendChild(layerNodes[i].g); });
+    items.forEach(function (it) { gMid.appendChild(it.node); });
+    CORNERS.forEach(function (c, i) {
+      vertexNodes[i].setAttribute("cx", tops[i].x); vertexNodes[i].setAttribute("cy", tops[i].y);
+      gFront.appendChild(vertexNodes[i]);
+    });
+    // the active ring's near half sits on top of everything
+    gFront.appendChild(layerNodes[state.layer].g);
+
+    // Labels sit just beyond each top vertex
+    var face = currentFace();
+    CORNERS.forEach(function (c, i) {
+      var p = project(ringPoint(TOP + 0.05, c.deg).map(function (v, k) { return k === 1 ? v : v * 1.13; }));
+      var l = lbls[c.id];
+      var half = l.offsetWidth / 2 + 4;
+      var lx = Math.max(half, Math.min(W - half, p.x));
+      l.style.transform = "translate(" + lx.toFixed(1) + "px," + p.y.toFixed(1) + "px) translate(-50%,-50%)";
+      l.style.opacity = p.z < centreZ - 0.6 ? 0.45 : 1;
+      l.classList.toggle("facing", state.touched && face === c.id && regime() === "side");
+    });
+    lbls.depth.style.transform = "translate(" + sc.x.toFixed(1) + "px," + (sc.y + sr + 12).toFixed(1) + "px) translate(-50%,-50%)";
+    lbls.depth.style.opacity = state.found.length ? 1 : 0.6;
+
+    drawLeader();
+  }
+
+  // ---- what the view means
+  function mod(n, m) { return ((n % m) + m) % m; }
+  function faceIndex(yaw) { return mod(Math.round(yaw / 60), 6); }
+  function currentFace() { return FACES[faceIndex(view.yaw)]; }
+  function regime() {
+    if (view.pitch > 60) return "above";
+    if (view.pitch < -48) return "below";
+    return "side";
+  }
+
+  function focusPoint() {
+    var r = regime();
+    if (!state.touched) return project([0, state.sphereY, 0]);
+    if (r === "above") return project([0, LAYER_Y[state.layer], 0]);
+    if (r === "below") return project([0, APEX, 0]);
+    var face = currentFace(), y = LAYER_Y[state.layer];
+    if (face.indexOf("|") < 0) {
+      var c = CORNERS.filter(function (c) { return c.id === face; })[0];
+      return project(ringPoint(y, c.deg));
+    }
+    var pair = face.split("|").map(function (id) { return CORNERS.filter(function (c) { return c.id === id; })[0]; });
+    var p1 = ringPoint(y, pair[0].deg), p2 = ringPoint(y, pair[1].deg);
+    return project([(p1[0] + p2[0]) / 2, y, (p1[2] + p2[2]) / 2]);
+  }
+
+  var leaderPath = document.getElementById("leader-path");
+  var leaderPin = document.getElementById("leader-pin");
+  var leaderPulse = document.getElementById("leader-pulse");
+  function drawLeader() {
+    var sr = stage.getBoundingClientRect(), or = objEl.getBoundingClientRect(), cr = card.getBoundingClientRect();
+    var fp = focusPoint();
+    var px = fp.x + or.left - sr.left, py = fp.y + or.top - sr.top;
+    var ax, ay, d;
+    if (cr.right <= or.left + 4) {
+      ax = cr.right - sr.left; ay = Math.min(Math.max(py, cr.top - sr.top + 24), cr.bottom - sr.top - 24);
+      var mid = ax + Math.max(16, (px - ax) * 0.35);
+      d = "M" + ax + " " + ay + " H" + mid + " L" + px + " " + py;
+    } else {
+      ax = Math.min(Math.max(px, cr.left - sr.left + 24), cr.right - sr.left - 24); ay = cr.top - sr.top;
+      var midY = ay - Math.max(14, (ay - py) * 0.3);
+      d = "M" + ax + " " + ay + " V" + midY + " L" + px + " " + py;
+    }
+    leaderPath.setAttribute("d", d);
+    leaderPin.setAttribute("cx", px); leaderPin.setAttribute("cy", py);
+    leaderPulse.setAttribute("cx", px); leaderPulse.setAttribute("cy", py);
+  }
+
+  var lastKey = "";
+  function annotate() {
+    var r = regime(), where, text, key;
+    if (!state.touched) { where = VIEWS.intro.where; text = VIEWS.intro.q; key = "intro"; }
+    else if (r !== "side") { where = VIEWS[r].where; text = VIEWS[r].q; key = r; }
+    else {
+      var face = currentFace();
+      if (face.indexOf("|") < 0) {
+        var c = CORNERS.filter(function (c) { return c.id === face; })[0];
+        where = LAYERS[state.layer] + " · " + c.name;
+        text = CELLS[face][state.layer].q;
+      } else {
+        where = LAYERS[state.layer];
+        text = BETWEEN[face];
+      }
+      key = face + state.layer;
+    }
+    if (key === lastKey) return;
+    lastKey = key;
+    document.getElementById("where").textContent = where;
+    document.getElementById("question").textContent = text;
+    document.getElementById("newlayer").hidden = !(state.touched && r === "side" && state.lastHit === state.layer && state.layer > 0);
+    document.querySelectorAll("[data-view]").forEach(function (b) {
+      b.setAttribute("aria-pressed", String(state.touched && b.dataset.view === (r === "side" ? "side" : r)));
+    });
+  }
+
+  // Record what this experiment turned up once the view comes to rest on a question.
+  function settle() {
+    if (!state.touched || regime() !== "side") return;
+    var face = currentFace();
+    if (face.indexOf("|") >= 0) return;
+    var key = face + state.layer;
+    if (state.visited[key]) return;
+    state.visited[key] = true;
+    var cell = CELLS[face][state.layer];
+    var c = CORNERS.filter(function (c) { return c.id === face; })[0];
+    state.found.push({ kind: cell.kind, f: cell.f, at: LAYERS[state.layer] + ", " + c.name.toLowerCase() });
+    renderFound();
+    requestFrame();
+  }
+
+  function renderFound() {
+    var list = document.getElementById("found");
+    document.getElementById("empty").hidden = state.found.length > 0;
+    if (list.children.length > state.found.length) list.innerHTML = "";
+    for (var i = list.children.length; i < state.found.length; i++) {
+      var item = state.found[i];
+      var li = document.createElement("li");
+      li.innerHTML = '<span class="kind ' + item.kind + '">' + KIND_LABEL[item.kind] + '</span><span class="at"></span><p></p>';
+      li.querySelector(".at").textContent = item.at;
+      li.querySelector("p").textContent = item.f;
+      list.insertBefore(li, list.firstChild);
+    }
+  }
+
+  // ---- layer rail
+  var rail = document.getElementById("rail");
+  var railButtons = [];
+  for (var i = LAYERS.length - 1; i >= 0; i--) {
+    (function (i) {
+      var li = document.createElement("li");
+      var b = document.createElement("button");
+      b.type = "button";
+      b.innerHTML = '<svg viewBox="0 0 56 22" aria-hidden="true"><ellipse cx="28" cy="11" rx="' + (12 + i * 3.5) + '" ry="' + (5 + i * 0.8) + '"/><circle cx="28" cy="11" r="2.5"/></svg><span></span>';
+      b.querySelector("span").textContent = LAYERS[i];
+      b.addEventListener("click", function () { touch(); setLayer(i); });
+      li.appendChild(b);
+      rail.appendChild(li);
+      railButtons[i] = b;
+    })(i);
+  }
+  function renderRail() {
+    railButtons.forEach(function (b, i) {
+      b.setAttribute("aria-pressed", String(i === state.layer));
+      b.classList.toggle("unreached", !state.reached[i]);
+    });
+  }
+
+  function setLayer(layer) {
+    layer = Math.max(0, Math.min(4, layer));
+    if (layer === state.layer) return;
+    var hit = false;
+    var lo = Math.min(layer, state.layer), hi = Math.max(layer, state.layer);
+    for (var i = lo; i <= hi; i++) if (!state.reached[i]) { state.reached[i] = true; hit = true; }
+    state.lastHit = hit ? layer : -1;
+    state.hitAnim = hit ? layer : -1;
+    state.layer = layer;
+    lastKey = "";
+    renderRail();
+    if (view.tYaw === null && !dragging) settle();
+    requestFrame();
+  }
+
+  // ---- motion
+  var frameReq = null, lastT = 0;
+  function requestFrame() { if (!frameReq) frameReq = requestAnimationFrame(tick); }
+  function tick(t) {
+    frameReq = null;
+    var dt = lastT ? Math.min(50, t - lastT) : 16;
+    lastT = t;
+    var moving = false;
+
+    if (!state.touched && !reduced) { view.yaw += dt * 0.008; moving = true; }
+
+    var ease = reduced ? 1 : 1 - Math.pow(0.86, dt / 16);
+    if (view.tYaw !== null) {
+      var dy = view.tYaw - view.yaw;
+      if (Math.abs(dy) < 0.05) { view.yaw = view.tYaw; view.tYaw = null; settle(); }
+      else { view.yaw += dy * ease; moving = true; }
+    }
+    if (view.tPitch !== null) {
+      var dp = view.tPitch - view.pitch;
+      if (Math.abs(dp) < 0.05) { view.pitch = view.tPitch; view.tPitch = null; settle(); }
+      else { view.pitch += dp * ease; moving = true; }
+    }
+    var ds = LAYER_Y[state.layer] - state.sphereY;
+    if (Math.abs(ds) > 0.002) { state.sphereY += ds * ease; moving = true; }
+    else state.sphereY = LAYER_Y[state.layer];
+
+    draw();
+    annotate();
+    if (moving) requestFrame(); else lastT = 0;
+  }
+
+  function touch() {
+    if (!state.touched) {
+      state.touched = true;
+      view.tYaw = Math.round(view.yaw / 60) * 60;
+      lastKey = "";
+    }
+  }
+  function turn(steps) {
+    touch();
+    var base = view.tYaw !== null ? view.tYaw : Math.round(view.yaw / 60) * 60;
+    view.tYaw = base + steps * 60;
+    lastKey = "";
+    requestFrame();
+  }
+  function look(which) {
+    touch();
+    view.tPitch = which === "above" ? 90 : which === "below" ? -90 : 14;
+    if (view.tYaw === null) view.tYaw = Math.round(view.yaw / 60) * 60;
+    lastKey = "";
+    requestFrame();
+  }
+
+  // ---- pointer
+  var dragging = false, start = null, last = null, moved = 0;
+  objEl.addEventListener("pointerdown", function (e) {
+    if (e.button !== 0) return;
+    touch();
+    dragging = true; moved = 0;
+    start = last = { x: e.clientX, y: e.clientY, t: performance.now() };
+    view.tYaw = null; view.tPitch = null; view.vYaw = 0;
+    objEl.setPointerCapture(e.pointerId);
+    objEl.classList.add("dragging");
+  });
+  objEl.addEventListener("pointermove", function (e) {
+    if (!dragging) return;
+    var now = performance.now();
+    var dx = e.clientX - last.x, dy = e.clientY - last.y;
+    moved += Math.abs(dx) + Math.abs(dy);
+    var k = 300 / Math.max(260, Math.min(W, H));
+    view.yaw += dx * k;
+    view.pitch = Math.max(-90, Math.min(90, view.pitch + dy * k));
+    var dt = Math.max(1, now - last.t);
+    view.vYaw = 0.7 * view.vYaw + 0.3 * (dx * k / dt);
+    last = { x: e.clientX, y: e.clientY, t: now };
+    lastKey = "";
+    requestFrame();
+  });
+  function endDrag(e) {
+    if (!dragging) return;
+    dragging = false;
+    objEl.classList.remove("dragging");
+    if (moved < 6 && e && e.type === "pointerup") { tapAt(e); }
+    var idle = performance.now() - last.t > 80;
+    var fling = idle ? 0 : view.vYaw * 260;
+    view.tYaw = Math.round((view.yaw + fling) / 60) * 60;
+    if (view.pitch > 68) view.tPitch = 90;
+    else if (view.pitch < -62) view.tPitch = -90;
+    else if (Math.abs(view.pitch) < 4) view.tPitch = 0;
+    requestFrame();
+  }
+  objEl.addEventListener("pointerup", endDrag);
+  objEl.addEventListener("pointercancel", endDrag);
+
+  function tapAt(e) {
+    var r = objEl.getBoundingClientRect();
+    var x = e.clientX - r.left, y = e.clientY - r.top, best = 28, pick = -1;
+    layerNodes.forEach(function (n, i) {
+      n.samples.forEach(function (p) {
+        var d = Math.hypot(p.x - x, p.y - y);
+        if (d < best) { best = d; pick = i; }
+      });
+    });
+    if (pick >= 0) setLayer(pick);
+  }
+
+  // ---- keyboard and buttons
+  objEl.addEventListener("keydown", function (e) {
+    var handled = true;
+    switch (e.key) {
+      case "ArrowLeft": turn(-1); break;
+      case "ArrowRight": turn(1); break;
+      case "ArrowUp": touch(); setLayer(state.layer + 1); break;
+      case "ArrowDown": touch(); setLayer(state.layer - 1); break;
+      case "PageUp": look("above"); break;
+      case "PageDown": look("below"); break;
+      case "Home": look("side"); break;
+      default: handled = false;
+    }
+    if (handled) e.preventDefault();
+  });
+  document.getElementById("spin-left").addEventListener("click", function () { turn(-1); });
+  document.getElementById("spin-right").addEventListener("click", function () { turn(1); });
+  document.querySelectorAll("[data-view]").forEach(function (b) {
+    b.addEventListener("click", function () { look(b.dataset.view); });
+  });
+  document.getElementById("reset").addEventListener("click", function () {
+    state = fresh();
+    view.tPitch = 20;
+    lastKey = "";
+    renderFound(); renderRail();
+    requestFrame();
+  });
+
+  if (window.ResizeObserver) new ResizeObserver(resize).observe(objEl);
+  window.addEventListener("resize", resize);
+
+  state = fresh();
+  renderFound();
+  renderRail();
+  resize();
+})();
+</script>
+</body>
+</html>

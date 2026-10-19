@@ -27,6 +27,10 @@ The loop is: publish, add it to `archive/`, re-mine, and see what it changes. A 
 
 Notes here are deliberately blunt and provisional. Prose written to essay standard turns a note into a draft, and the wiki into a backlog of unfinished essays.
 
+## Prototypes
+
+**[prototypes/](prototypes/)** holds interactive companions to published pieces, served on GitHub Pages. They are made from the writing rather than being part of the wiki, and only that folder is published. The first is [Experimentation as navigation](https://strachcity.github.io/civicworks/navigation/), for *Tasting the organisational treacle*.
+
 ## What stays out
 
 **Notion stays in Notion.** It holds every paper read and annotated, MPA essays, a reading list. That is the raw source layer, and the wiki is a distillate that sits between the writing and it. Migrating it would import hundreds of sources to serve the eighteen that are actually load-bearing, and would turn a working file into an archive.
