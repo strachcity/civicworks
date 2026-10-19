@@ -6,7 +6,7 @@ Only this folder is published, by `.github/workflows/pages.yml`, on any push to 
 
 ## What is here
 
-**[navigation/](navigation/)** goes with *Tasting the organisational treacle*. It lets a reader move an experiment across value, legitimacy and capacity and through five layers of an institution, with depth building up as they go. One self-contained HTML file.
+**[navigation/](navigation/)** goes with *Tasting the organisational treacle*. A 3D sketch the reader spins like a globe. It settles on one of six faces (value, legitimacy, capacity and the edges between them), tilts to look from above (across) or below (through), and picks a layer from the rail. A note card points at whatever is facing you, and depth builds up as they go. One self-contained HTML file, no libraries.
 
 ## Rules
 
