@@ -1,0 +1,980 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Experimentation as navigation v0.4.0</title>
+<meta name="description" content="A working sketch you can spin. An experiment moves across value, legitimacy and capacity and through the layers of an institution, and what it learns can reshape both. A companion to Tasting the organisational treacle on CIVICWORKS.">
+<meta property="og:title" content="Experimentation as navigation">
+<meta property="og:description" content="Spin an experiment across value, legitimacy and capacity, and through the layers of an institution.">
+<meta property="og:image" content="https://strachcity.github.io/civicworks/navigation/og.png">
+<meta property="og:url" content="https://strachcity.github.io/civicworks/navigation/">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@300;400;500&display=swap">
+<style>
+  /* One screen, one object. The model sits in the middle at about 60% of the shorter side;
+     everything else is small type pinned to the corners. Two tones, one ink on paper.
+     Line weights: 0.5 structure, 0.75 form, 1.25 emphasis. */
+  :root {
+    --paper: #efeeeb;
+    --ink: #d63c23;          /* lines and marks */
+    --ink-text: #a92c17;     /* running text, 6.5:1 on paper */
+    --muted: #93402f;        /* secondary text, 6:1 on paper */
+    --tint: #f6c6b8;
+    --tint-faint: rgba(246, 198, 184, 0.28);
+    --focus: #1f3fd6;
+    --font: "Hanken Grotesk", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper: #120d0c;
+      --ink: #ff7457;
+      --ink-text: #ffa48f;
+      --muted: #d88f7f;
+      --tint: #4e241c;
+      --tint-faint: rgba(110, 48, 36, 0.3);
+      --focus: #9db4ff;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper: #120d0c;
+    --ink: #ff7457;
+    --ink-text: #ffa48f;
+    --muted: #d88f7f;
+    --tint: #4e241c;
+    --tint-faint: rgba(110, 48, 36, 0.3);
+    --focus: #9db4ff;
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink-text);
+    font-family: var(--font);
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 1.45;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .screen {
+    position: relative;
+    height: 100svh;
+    min-height: 600px;
+    overflow: hidden;
+  }
+
+  /* The model fills the screen as a drawing surface; the overlays sit on top */
+  .stage {
+    position: absolute; inset: 0;
+    touch-action: none;
+    cursor: grab;
+    outline: none;
+  }
+  .stage.dragging, .stage.dragging * { cursor: grabbing !important; }
+  .stage.over-ring { cursor: pointer; }
+  .meta, .ctrl, #layers { pointer-events: none; }
+  .meta > *, .ctrl > button, .layer-btn { pointer-events: auto; }
+  .stage:focus-visible .frame-circle { stroke: var(--focus); stroke-width: 1.5; stroke-opacity: 1; }
+  .stage svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+
+  .frame-circle { fill: none; stroke: var(--ink); stroke-width: .5; stroke-opacity: .35; }
+  .axis { stroke: var(--ink); stroke-width: .5; stroke-dasharray: 1 4; stroke-linecap: round; }
+  .top-disc { fill: none; stroke: var(--ink); stroke-width: .5; stroke-dasharray: 1 5; stroke-linecap: round; opacity: .5; }
+  .edge-ext { stroke: var(--ink); stroke-width: .5; stroke-dasharray: 1 3; stroke-linecap: round; }
+  .ring-back { fill: none; stroke: var(--ink); stroke-width: .5; stroke-dasharray: 1 3; stroke-linecap: round; }
+  .ring-front { fill: none; stroke: var(--ink); stroke-width: .75; }
+  .ring-disc { fill: none; }
+  .layer.unreached .ring-front { stroke-dasharray: 2 3; opacity: .45; }
+  .layer.unreached .ring-back { opacity: .3; }
+  .layer.active .ring-front { stroke-width: 1.25; }
+  .layer.active .ring-disc { fill: url(#hatch); }
+  .layer.hit .ring-front { animation: hit 1.2s ease-out; }
+  @keyframes hit { 0% { stroke-width: 4; } 100% { stroke-width: 1.25; } }
+  .face { fill: var(--tint-faint); }
+  .face.facing { fill: url(#stipple); }
+  .edge { fill: none; stroke: var(--ink); stroke-width: .75; stroke-linejoin: round; }
+  .edge.facing { stroke-width: 1.25; }
+  .tri { fill: var(--tint); fill-opacity: .4; stroke: var(--ink); stroke-width: .75; }
+  .vertex { fill: var(--ink); }
+  .trail { fill: none; stroke: var(--ink); stroke-width: .75; stroke-dasharray: 1 2.5; stroke-linecap: round; }
+  .trail-dot { fill: var(--paper); stroke: var(--ink); stroke-width: .75; }
+  .trail-dot.last { fill: var(--ink); }
+  .hint { position: absolute; left: 0; top: 0; width: 46px; height: 46px; pointer-events: none; transition: opacity .8s; }
+  .hint path { fill: none; stroke: var(--ink); stroke-width: .75; stroke-dasharray: 1 3; stroke-linecap: round; }
+  .hint .head { fill: var(--ink); stroke: none; }
+  .hint svg { width: 100%; height: 100%; overflow: visible; animation: turnhint 6s linear infinite; }
+  @keyframes turnhint { to { transform: rotate(360deg); } }
+  .hint.gone { opacity: 0; }
+  .sphere-base { fill: var(--tint); stroke: var(--ink); stroke-width: .75; }
+  .sphere-dots { fill: url(#stipple-dense); }
+
+  /* Labels drawn over the model */
+  .lbl {
+    position: absolute; left: 0; top: 0;
+    pointer-events: none;
+    text-align: center;
+    color: var(--ink-text);
+    transition: opacity .4s;
+    will-change: transform;
+  }
+  .corner { width: 180px; }
+  .corner b {
+    font-weight: 500; font-size: 12px; letter-spacing: .14em; text-transform: uppercase;
+    padding: 1px 6px;
+    background: var(--paper);
+  }
+  .corner.behind b { color: var(--muted); font-weight: 400; }
+  .corner.facing b { box-shadow: inset 0 -1px 0 var(--ink); }
+  .corner small {
+    display: block; margin-top: 4px;
+    font-size: 12px; font-weight: 400; line-height: 1.35; color: var(--muted);
+    opacity: 0; transition: opacity .4s;
+  }
+  .corner.facing small { opacity: 1; }
+  .depth-lbl { font-size: 11px; font-weight: 500; letter-spacing: .16em; text-transform: uppercase; white-space: nowrap; }
+
+  .layer-btn {
+    position: absolute; left: 0; top: 0;
+    width: 112px;
+    padding: 4px 2px;
+    border: 0; background: transparent;
+    font: inherit; font-size: 11.5px; line-height: 1.25; font-weight: 400;
+    color: var(--muted);
+    text-align: center;
+    cursor: pointer;
+    will-change: transform;
+  }
+  .layer-btn::before {
+    content: ""; display: block; width: 5px; height: 5px; margin: 0 auto 4px;
+    border: .75px solid var(--ink); border-radius: 50%;
+  }
+  .layer-btn.reached::before { background: var(--ink); }
+  .layer-btn[aria-pressed="true"] { color: var(--ink-text); font-weight: 500; }
+  .layer-btn[aria-pressed="true"]::before { width: 7px; height: 7px; box-shadow: 0 0 0 3px var(--paper), 0 0 0 3.75px var(--ink); }
+  .layer-btn:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+
+  /* Corner furniture */
+  .title {
+    position: absolute;
+    top: max(24px, env(safe-area-inset-top, 0px));
+    left: max(24px, env(safe-area-inset-left, 0px));
+    max-width: 300px;
+    pointer-events: none;
+  }
+  .title h1 { font-size: 20px; font-weight: 400; letter-spacing: -.005em; line-height: 1.2; margin: 0; }
+  .title p { font-size: 13px; color: var(--muted); margin: 6px 0 0; }
+
+  .meta {
+    position: absolute;
+    top: max(20px, env(safe-area-inset-top, 0px));
+    right: max(20px, env(safe-area-inset-right, 0px));
+    display: flex; gap: 12px; align-items: center;
+    font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted);
+  }
+
+  .note {
+    position: absolute;
+    left: max(24px, env(safe-area-inset-left, 0px));
+    bottom: calc(max(24px, env(safe-area-inset-bottom, 0px)) + 56px);
+    width: min(340px, calc(100% - 48px));
+    pointer-events: none;
+  }
+  .where { font-size: 11px; font-weight: 500; letter-spacing: .14em; text-transform: uppercase; margin: 0 0 8px; }
+  .newlayer { display: inline-block; font-size: 11px; color: var(--muted); border: .75px dashed var(--ink); border-radius: 999px; padding: 0 9px; margin: 0 0 8px; }
+  .question { font-size: 21px; font-weight: 300; line-height: 1.32; margin: 0; letter-spacing: -.005em; }
+  .turned { margin: 12px 0 0; padding-top: 10px; border-top: .5px solid var(--ink); font-size: 13px; color: var(--muted); }
+  .turned b { font-weight: 500; font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-text); margin-right: 6px; }
+
+  .ctrl {
+    position: absolute;
+    left: 50%; transform: translateX(-50%);
+    bottom: max(20px, env(safe-area-inset-bottom, 0px));
+    display: flex; gap: 2px; align-items: center; flex-wrap: wrap; justify-content: center;
+    width: max-content; max-width: calc(100% - 32px);
+  }
+  button.t {
+    font: inherit; font-size: 12.5px; font-weight: 400;
+    color: var(--ink-text);
+    background: transparent;
+    border: 0; border-radius: 999px;
+    padding: 6px 12px; min-height: 36px;
+    cursor: pointer;
+  }
+  button.t:hover { background: var(--tint-faint); }
+  button.t[aria-pressed="true"] { box-shadow: inset 0 0 0 .75px var(--ink); }
+  button.t:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; }
+  .sep { width: .5px; height: 16px; background: var(--ink); opacity: .6; margin: 0 6px; }
+
+  .about {
+    position: absolute;
+    right: max(24px, env(safe-area-inset-right, 0px));
+    bottom: max(20px, env(safe-area-inset-bottom, 0px));
+    max-width: min(360px, calc(100% - 48px));
+    text-align: right;
+  }
+  .about summary {
+    list-style: none; cursor: pointer;
+    font-size: 12.5px; padding: 8px 4px; min-height: 36px;
+    color: var(--ink-text);
+  }
+  .about summary::-webkit-details-marker { display: none; }
+  .about summary:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; border-radius: 4px; }
+  .about[open] .panel { display: block; }
+  .about .panel {
+    position: absolute; right: 0; bottom: 44px;
+    width: min(340px, calc(100vw - 48px));
+    text-align: left;
+    background: var(--paper);
+    border: .75px solid var(--ink);
+    padding: 14px 16px;
+    font-size: 12.5px; color: var(--muted);
+  }
+  .about .panel p { margin: 0 0 8px; }
+  .about .panel p:last-child { margin: 0; }
+  .about a { color: var(--ink-text); }
+
+  svg.leader { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; }
+  .leader path { fill: none; stroke: var(--ink); stroke-width: .5; }
+  .leader .pin { fill: var(--ink); }
+  .leader .ring { fill: none; stroke: var(--ink); stroke-width: .5; }
+
+  @media (max-width: 720px) {
+    .title { left: 16px; top: max(18px, env(safe-area-inset-top, 0px)); max-width: 220px; }
+    .title h1 { font-size: 17px; }
+    .title p { display: none; }
+    .meta { right: 12px; top: max(12px, env(safe-area-inset-top, 0px)); }
+    .meta .v { display: none; }
+    .note { left: 16px; width: calc(100% - 32px); bottom: calc(max(16px, env(safe-area-inset-bottom, 0px)) + 52px); }
+    .question { font-size: 17px; }
+    .turned { display: none; }
+    .corner small { display: none; }
+    .layer-btn span { display: none; }
+    .layer-btn[aria-pressed="true"] span { display: inline; }
+    .about { right: 8px; bottom: max(14px, env(safe-area-inset-bottom, 0px)); }
+    .ctrl { left: 8px; transform: none; justify-content: flex-start; max-width: calc(100% - 80px); bottom: max(14px, env(safe-area-inset-bottom, 0px)); }
+    .ctrl .wide { display: none; }
+  }
+
+  .sr-only {
+    position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+    overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+  }
+  [hidden] { display: none !important; }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+  }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <pattern id="hatch" width="3" height="3" patternUnits="userSpaceOnUse" patternTransform="rotate(-45)">
+      <line x1="0" y1="0" x2="0" y2="3" style="stroke:var(--ink)" stroke-width=".4" opacity=".6"/>
+    </pattern>
+    <pattern id="hatch-h" width="6" height="3" patternUnits="userSpaceOnUse">
+      <line x1="0" y1="0" x2="6" y2="0" style="stroke:var(--ink)" stroke-width=".4" opacity=".7"/>
+    </pattern>
+    <pattern id="stipple" width="5" height="5" patternUnits="userSpaceOnUse">
+      <circle cx="1.25" cy="1.25" r=".45" style="fill:var(--ink)"/>
+      <circle cx="3.75" cy="3.75" r=".45" style="fill:var(--ink)"/>
+    </pattern>
+    <pattern id="stipple-dense" width="2.4" height="2.4" patternUnits="userSpaceOnUse">
+      <circle cx=".6" cy=".6" r=".42" style="fill:var(--ink)"/>
+      <circle cx="1.8" cy="1.8" r=".42" style="fill:var(--ink)"/>
+    </pattern>
+  </defs>
+</svg>
+
+<main class="screen" id="screen">
+  <div class="sr-only" id="model-desc">
+    <p>The model has three dimensions, drawn as one object lying on its side. Across are three questions that never line up neatly. Value asks whether people will use what we've made and what value it might create. Legitimacy asks whether we have the support and permission to pursue it. Capacity asks whether the organisation can actually deliver it.</p>
+    <p>Through are five layers of an institution, from the narrow end on the left to the wide end on the right. Citizen interaction, service processes and technology, organisational priorities, cross-institutional arrangements, and political and strategic support. They are drawn as rings on a cone that widens and fades, because you rarely know which layers matter until you hit them.</p>
+    <p>Depth is the learning that comes from moving across and through, drawn as a sphere that grows as the experiment reveals dependencies, starts new conversations and challenges assumptions.</p>
+    <p>Focus the drawing to use the keyboard. Up and down arrows turn it to face the next question. Left and right arrows move between layers. Page up looks end on, page down looks from the citizen end, and home looks side on. It turns slowly by itself when left alone.</p>
+  </div>
+
+  <div class="stage" id="stage" tabindex="0" role="application" aria-roledescription="model you can turn" aria-label="Experimentation as navigation" aria-describedby="model-desc">
+    <svg id="scene" aria-hidden="true">
+      <circle class="frame-circle" id="frame-circle"/>
+      <g id="g-back"></g>
+      <g id="g-mid"></g>
+      <g id="g-front"></g>
+    </svg>
+    <span class="lbl corner" id="lbl-value"><b>Value</b><small>Will people use what we've made, and what value might it create?</small></span>
+    <span class="lbl corner" id="lbl-legitimacy"><b>Legitimacy</b><small>Do we have the support and permission to pursue it?</small></span>
+    <span class="lbl corner" id="lbl-capacity"><b>Capacity</b><small>Can the organisation actually deliver it?</small></span>
+    <span class="lbl depth-lbl" id="lbl-depth">Depth</span>
+    <span class="hint" id="hint" aria-hidden="true"><svg viewBox="-23 -23 46 46"><path d="M 0 -18 A 18 18 0 1 1 -17 -6"/><path class="head" d="M -20 -10 L -13 -8 L -18 -2 Z"/><path d="M 0 -8 A 8 8 0 1 0 7 4"/><path class="head" d="M 9 0 L 9 7 L 3 5 Z"/></svg></span>
+    <svg class="leader" aria-hidden="true">
+      <path id="leader-path"/>
+      <circle class="ring" id="leader-ring" r="4.5"/>
+      <circle class="pin" id="leader-pin" r="1.8"/>
+    </svg>
+  </div>
+
+  <div id="layers" role="group" aria-label="Layers of the institution"></div>
+
+  <header class="title">
+    <h1>Experimentation as navigation</h1>
+    <p>Experiments move across value, legitimacy and capacity and through the layers of an institution, and what they learn can reshape both.</p>
+  </header>
+
+  <div class="meta">
+    <span class="v">v0.4.0</span>
+    <button type="button" class="t" id="theme">Dark</button>
+  </div>
+
+  <section class="note" id="note" aria-live="polite" aria-atomic="true">
+    <p class="where" id="where">Start here</p>
+    <p class="newlayer" id="newlayer" hidden>A layer you hadn't hit yet</p>
+    <p class="question" id="question">Start with a question.</p>
+    <p class="turned" id="turned" hidden></p>
+  </section>
+
+  <div class="ctrl" role="group" aria-label="Turn the model">
+    <button type="button" class="t" id="spin-up" aria-label="Turn to the next question">&#8593;</button>
+    <button type="button" class="t" id="spin-down" aria-label="Turn to the previous question">&#8595;</button>
+    <span class="sep" aria-hidden="true"></span>
+    <button type="button" class="t" data-view="side" aria-pressed="false">Side on</button>
+    <button type="button" class="t" data-view="end" aria-pressed="false">End on</button>
+    <button type="button" class="t wide" data-view="citizen" aria-pressed="false">Citizen end</button>
+    <span class="sep wide" aria-hidden="true"></span>
+    <button type="button" class="t wide" id="reset">Start again</button>
+  </div>
+
+  <details class="about">
+    <summary>About</summary>
+    <div class="panel">
+      <p>A working sketch from <a href="https://www.civicworks.co/">CIVICWORKS</a>, to sit alongside <a href="https://www.civicworks.co/">Tasting the organisational treacle</a>. Drag to turn it, up and down to spin and sideways to tumble. Left alone, it drifts. What it turns up bends the drawing.</p>
+      <p>Strategic triangle after Mark Moore. Scales of a system diagram after Dan Hill. Prototyping across scales from Dan Hill, <cite>Designing Missions</cite> (Vinnova, 2022). Nested cultures of decision-making from Hill and Melander, <cite>Strategic Design for Public Purpose</cite> (2025). Dark matter from Bryan Boyer.</p>
+      <p>v0.4.0</p>
+    </div>
+  </details>
+</main>
+
+<script>
+(function () {
+  "use strict";
+
+  // ---- content
+  var LAYERS = [
+    "Citizen interaction",
+    "Service processes and technology",
+    "Organisational priorities",
+    "Cross-institutional arrangements",
+    "Political and strategic support"
+  ];
+
+  var CORNERS = [
+    { id: "value", name: "Value", deg: 90 },
+    { id: "legitimacy", name: "Legitimacy", deg: 210 },
+    { id: "capacity", name: "Capacity", deg: 330 }
+  ];
+
+  // Six faces, one every 60 degrees of turn. Corners face you on even turns, edges on odd.
+  var FACES = ["value", "legitimacy|value", "legitimacy", "capacity|legitimacy", "capacity", "capacity|value"];
+
+  // What the question sounds like at each layer, and what an experiment might turn up there.
+  var CELLS = {
+    value: [
+      { q: "Will someone use this, and does it make the thing they came to do any easier?", kind: "assumption", f: "The option everyone said people wouldn't want, some people chose." },
+      { q: "Does the change survive the systems behind it, or does the value leak out somewhere in the process?", kind: "dependency", f: "The improvement at the front stops at a step the team can't see." },
+      { q: "Does the organisation think this problem is worth solving this year?", kind: "assumption", f: "What the team took for a priority sits nowhere on the organisation's list." },
+      { q: "Does the value land here, or in somebody else's service?", kind: "assumption", f: "The benefit turns up in another organisation's numbers." },
+      { q: "Can anyone at the top say why this matters beyond one service?", kind: "conversation", f: "Someone senior asks what this would look like everywhere. It's the first time the question has been asked." }
+    ],
+    legitimacy: [
+      { q: "Who says this interaction has to work the way it does now? Sometimes the rule is real and sometimes it's a habit.", kind: "assumption", f: "A rule everyone treated as fixed had more room in it than anyone had checked." },
+      { q: "Who owns the process, and do they know you're testing it?", kind: "conversation", f: "The process owner hears about the test for the first time, and has a view." },
+      { q: "Who has to put this on their list, and what comes off to make room?", kind: "conversation", f: "Two teams who each thought it was the other's job finally talk about it." },
+      { q: "Whose agreement do you need that you don't yet know you need?", kind: "conversation", f: "A partner you'd never needed before turns out to hold a veto." },
+      { q: "Who has the authority to change any of it, and would they want to?", kind: "dependency", f: "The rule that shaped the form was decided up here, for a different reason, a long time ago." }
+    ],
+    capacity: [
+      { q: "Can the team run it for a few real people without it falling over?", kind: "dependency", f: "It only worked because someone was quietly doing the bit the system couldn't." },
+      { q: "Can you do this with what already exists, or does it need integration that isn't resourced?", kind: "dependency", f: "The workaround runs on automations built for something else. Useful, and fragile." },
+      { q: "Who would pay for it, staff it and look after it once the test ends?", kind: "dependency", f: "No budget covers the thing after the test. It doesn't belong to anyone yet." },
+      { q: "Does the change depend on another organisation's systems, data or timetable?", kind: "dependency", f: "Your change is waiting on someone else's release, contract or timetable." },
+      { q: "Is there money, mandate and patience for more than a test?", kind: "assumption", f: "What looked impossible had mostly never been asked for." }
+    ]
+  };
+
+  var BETWEEN = {
+    "legitimacy|value": "Between value and legitimacy. What people would use and what you're allowed to try rarely line up.",
+    "capacity|legitimacy": "Between legitimacy and capacity. Permission to do it and the means to do it tend to arrive at different times.",
+    "capacity|value": "Between capacity and value. What the organisation can deliver pulls against what would be worth delivering."
+  };
+
+  var VIEWS = {
+    intro: { where: "Start here", q: "Start with a question. Turn it to face value, legitimacy or capacity, and pick a layer to see how far along it goes." },
+    end: { where: "End on · Across", q: "End on, the layers collapse and three questions are left. They never line up neatly, and learning about one changes how you approach the others. What stays open is which scale each one applies at." },
+    citizen: { where: "From the citizen end · Through", q: "From where someone fills in the form, every layer is stacked behind the next, and you can't see where any of them stops. You rarely know which layers matter until you hit them." }
+  };
+
+  var KIND_LABEL = { dependency: "Dependency", conversation: "Conversation", assumption: "Assumption" };
+
+  // ---- theme toggle, remembered per viewer where storage allows
+  var root = document.documentElement;
+  var themeBtn = document.getElementById("theme");
+  function isDark() {
+    var t = root.getAttribute("data-theme");
+    if (t) return t === "dark";
+    return !!(window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches);
+  }
+  function labelTheme() {
+    themeBtn.textContent = isDark() ? "Light" : "Dark";
+    themeBtn.setAttribute("aria-label", isDark() ? "Switch to light mode" : "Switch to dark mode");
+  }
+  try { var saved = localStorage.getItem("nav-theme"); if (saved) root.setAttribute("data-theme", saved); } catch (e) {}
+  labelTheme();
+  themeBtn.addEventListener("click", function () {
+    var next = isDark() ? "light" : "dark";
+    root.setAttribute("data-theme", next);
+    try { localStorage.setItem("nav-theme", next); } catch (e) {}
+    labelTheme();
+  });
+
+  // ---- geometry, in world units. The cone's axis is y; it's drawn lying on its side.
+  var LAYER_Y = [-1.6, -0.8, 0, 0.8, 1.6];
+  var APEX = -2.25, TOP = 2.3, K = 0.5, D = 11, MID = (APEX + TOP) / 2;
+  function radius(y) { return K * (y - APEX); }
+
+  // What the experiment turns up bends the drawing. Each layer can swell and each question can
+  // pull its corner outward; both ease towards their targets so the shape changes slowly.
+  var warp = { ring: [0, 0, 0, 0, 0], ringT: [0, 0, 0, 0, 0], corner: { value: 0, legitimacy: 0, capacity: 0 }, cornerT: { value: 0, legitimacy: 0, capacity: 0 } };
+  function ringGrow(y) {
+    if (y <= LAYER_Y[0]) return warp.ring[0] * Math.max(0, (y - APEX) / (LAYER_Y[0] - APEX));
+    if (y >= LAYER_Y[4]) return warp.ring[4];
+    var i = Math.min(3, Math.floor((y - LAYER_Y[0]) / 0.8)), t = (y - LAYER_Y[i]) / 0.8;
+    return warp.ring[i] * (1 - t) + warp.ring[i + 1] * t;
+  }
+  function cornerGrow(deg) {
+    var g = 0;
+    CORNERS.forEach(function (c) { g += warp.corner[c.id] * Math.pow(Math.max(0, Math.cos((deg - c.deg) * Math.PI / 180)), 6); });
+    return g;
+  }
+  function ringPoint(y, deg) {
+    var a = deg * Math.PI / 180, r = radius(y) * (1 + ringGrow(y)) * (1 + cornerGrow(deg));
+    return [r * Math.cos(a), y, r * Math.sin(a)];
+  }
+  function nearest(p, base) { return base + 360 * Math.round((p - base) / 360); }
+
+  // ---- view state
+  var reduced = !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+  var IDLE_MS = 3500, DRIFT = 0.011; // degrees per ms when left alone
+  var view = { yaw: -24, pitch: 18, tYaw: null, tPitch: null, vYaw: 0, vPitch: 0 };
+  var lastInput = -Infinity;
+  var state;
+  function fresh() {
+    return { layer: 0, reached: { 0: true }, visited: {}, found: [], trail: [], touched: false, lastHit: -1, hitAnim: -1, sphereY: LAYER_Y[0] };
+  }
+
+  var stageEl = document.getElementById("stage");
+  var scene = document.getElementById("scene");
+  var gBack = document.getElementById("g-back");
+  var gMid = document.getElementById("g-mid");
+  var gFront = document.getElementById("g-front");
+  var note = document.getElementById("note");
+  var frameCircle = document.getElementById("frame-circle");
+  var W = 0, H = 0, SC = 1, CX = 0, CY = 0;
+
+  function resize() {
+    W = stageEl.clientWidth; H = stageEl.clientHeight;
+    scene.setAttribute("viewBox", "0 0 " + W + " " + H);
+    var narrow = W < 720;
+    // about 60% of the shorter side, a little larger on a phone where width is scarce
+    SC = Math.min(W, H) * (narrow ? 0.82 : 0.6) / 4.7;
+    CX = W / 2;
+    CY = narrow ? H * 0.42 : H * 0.47;
+    frameCircle.setAttribute("cx", CX); frameCircle.setAttribute("cy", CY); frameCircle.setAttribute("r", SC * 2.75);
+    requestFrame();
+  }
+
+  // Rotate in 3D, then lay the picture on its side so the narrow end points left.
+  function project(p) {
+    var ya = view.yaw * Math.PI / 180, pa = view.pitch * Math.PI / 180;
+    var x1 = p[0] * Math.cos(ya) + p[2] * Math.sin(ya);
+    var z1 = -p[0] * Math.sin(ya) + p[2] * Math.cos(ya);
+    var y = p[1] - MID;
+    var y2 = y * Math.cos(pa) - z1 * Math.sin(pa);
+    var z2 = y * Math.sin(pa) + z1 * Math.cos(pa);
+    var f = D / (D - z2);
+    return { x: CX + SC * y2 * f, y: CY + SC * x1 * f, z: z2, f: f };
+  }
+
+  // ---- svg helpers
+  var NS = "http://www.w3.org/2000/svg";
+  function el(name, attrs, parent) {
+    var n = document.createElementNS(NS, name);
+    for (var k in attrs) n.setAttribute(k, attrs[k]);
+    if (parent) parent.appendChild(n);
+    return n;
+  }
+  function poly(pts) {
+    return pts.map(function (p, i) { return (i ? "L" : "M") + p.x.toFixed(1) + " " + p.y.toFixed(1); }).join(" ") + " Z";
+  }
+  function setLine(n, a, b) {
+    n.setAttribute("x1", a.x); n.setAttribute("y1", a.y);
+    n.setAttribute("x2", b.x); n.setAttribute("y2", b.y);
+  }
+  function place(node, x, y) { node.style.transform = "translate(" + x.toFixed(1) + "px," + y.toFixed(1) + "px)"; }
+
+  // Build persistent nodes once, update their geometry every frame.
+  var layerNodes = [], faceNodes = [], edgeNodes = [], extNodes = [], vertexNodes = [];
+  var topDisc = el("path", { "class": "top-disc" }, gBack);
+  var axis = el("line", { "class": "axis" }, gBack);
+  LAYER_Y.forEach(function () {
+    var g = el("g", { "class": "layer" });
+    var disc = el("path", { "class": "ring-disc" }, g);
+    var back = el("path", { "class": "ring-back" }, g);
+    var front = el("path", { "class": "ring-front" }, g);
+    layerNodes.push({ g: g, disc: disc, back: back, front: front, samples: [] });
+  });
+  CORNERS.forEach(function () {
+    faceNodes.push(el("path", { "class": "face" }));
+    edgeNodes.push(el("path", { "class": "edge" }));
+    extNodes.push(el("line", { "class": "edge-ext" }, gBack));
+    vertexNodes.push(el("circle", { "class": "vertex", r: 2.2 }));
+  });
+  var tri = el("path", { "class": "tri" });
+  var trailPath = el("path", { "class": "trail" }, gFront);
+  var trailDots = el("g", {}, gFront);
+  var hint = document.getElementById("hint");
+  var sphere = el("g", {});
+  var clip = el("clipPath", { id: "sphere-clip" }, scene);
+  var clipCircle = el("circle", {}, clip);
+  var sphereBase = el("circle", { "class": "sphere-base" }, sphere);
+  var sphereDots = el("circle", { "class": "sphere-dots", "clip-path": "url(#sphere-clip)" }, sphere);
+  var sphereRim = el("circle", { "class": "sphere-base", style: "fill:none" }, sphere);
+  var lbls = {
+    value: document.getElementById("lbl-value"),
+    legitimacy: document.getElementById("lbl-legitimacy"),
+    capacity: document.getElementById("lbl-capacity"),
+    depth: document.getElementById("lbl-depth")
+  };
+
+  // Layer buttons ride along under each ring
+  var layersEl = document.getElementById("layers");
+  var layerBtns = LAYERS.map(function (name, i) {
+    var b = document.createElement("button");
+    b.type = "button";
+    b.className = "layer-btn";
+    b.setAttribute("aria-label", name);
+    b.innerHTML = "<span></span>";
+    b.querySelector("span").textContent = name;
+    b.addEventListener("click", function () { input(); touch(); setLayer(i); });
+    layersEl.appendChild(b);
+    return b;
+  });
+
+  function sphereRadius() { return state.found.length ? 0.16 + state.found.length * 0.042 : 0.1; }
+
+  function draw() {
+    var centreZ = project([0, MID, 0]).z;
+    var face = currentFace(), r = regime();
+    var facingSide = state.touched && r === "side";
+
+    setLine(axis, project([0, APEX, 0]), project([0, TOP, 0]));
+    var topPts = [];
+    for (var t = 0; t < 72; t++) topPts.push(project(ringPoint(TOP, t * 5)));
+    topDisc.setAttribute("d", poly(topPts));
+
+    var apex = project([0, APEX, 0]);
+    var tops = CORNERS.map(function (c) { return project(ringPoint(TOP, c.deg)); });
+    var upper = CORNERS.map(function (c) { return project(ringPoint(LAYER_Y[4], c.deg)); });
+    var spines = CORNERS.map(function (c) {
+      return [apex].concat(LAYER_Y.map(function (y) { return project(ringPoint(y, c.deg)); }));
+    });
+    CORNERS.forEach(function (c, i) {
+      setLine(extNodes[i], upper[i], tops[i]);
+      edgeNodes[i].setAttribute("d", spines[i].map(function (p, k) { return (k ? "L" : "M") + p.x.toFixed(1) + " " + p.y.toFixed(1); }).join(" "));
+      edgeNodes[i].setAttribute("class", "edge" + (facingSide && face === c.id ? " facing" : ""));
+    });
+
+    // Rings, split into the half facing you and the half behind
+    LAYER_Y.forEach(function (y, i) {
+      var n = layerNodes[i], pts = [], back = "", front = "", prevBack = null;
+      var cz = project([0, y, 0]).z;
+      for (var s = 0; s <= 72; s++) {
+        var p = project(ringPoint(y, s * 5));
+        pts.push(p);
+        var isBack = p.z < cz - 1e-4;
+        var cmd = (prevBack === isBack) ? "L" : "M";
+        if (prevBack !== null && prevBack !== isBack) {
+          var q = pts[pts.length - 2];
+          if (isBack) back += "M" + q.x.toFixed(1) + " " + q.y.toFixed(1);
+          else front += "M" + q.x.toFixed(1) + " " + q.y.toFixed(1);
+          cmd = "L";
+        }
+        var seg = cmd + p.x.toFixed(1) + " " + p.y.toFixed(1);
+        if (isBack) back += seg; else front += seg;
+        prevBack = isBack;
+      }
+      n.samples = pts;
+      n.back.setAttribute("d", back);
+      n.front.setAttribute("d", front);
+      n.disc.setAttribute("d", poly(pts.slice(0, 72)));
+      var cls = i === state.layer ? "active" : state.reached[i] ? "reached" : "unreached";
+      n.g.setAttribute("class", "layer " + cls + (state.hitAnim === i ? " hit" : ""));
+
+      // the layer's button sits just below the lowest point of its ring
+      var low = pts[0];
+      for (var k = 1; k < pts.length; k++) if (pts[k].y > low.y) low = pts[k];
+      var b = layerBtns[i];
+      place(b, low.x - b.offsetWidth / 2, low.y + 8);
+      b.setAttribute("aria-pressed", String(i === state.layer));
+      b.classList.toggle("reached", !!state.reached[i]);
+    });
+
+    // Faces, edges, the sphere and the active triangle, painted back to front
+    var items = [];
+    CORNERS.forEach(function (c, i) {
+      var j = (i + 1) % 3;
+      faceNodes[i].setAttribute("d", poly(spines[i].concat(spines[j].slice(1).reverse())));
+      var pairKey = [c.id, CORNERS[j].id].sort().join("|");
+      faceNodes[i].setAttribute("class", "face" + (facingSide && face === pairKey ? " facing" : ""));
+      items.push({ z: (apex.z + upper[i].z + upper[j].z) / 3, node: faceNodes[i] });
+      items.push({ z: (apex.z + upper[i].z) / 2, node: edgeNodes[i] });
+    });
+    var sc = project([0, state.sphereY, 0]);
+    var sr = sphereRadius() * SC * sc.f;
+    [sphereBase, sphereDots, sphereRim].forEach(function (n) {
+      n.setAttribute("cx", sc.x); n.setAttribute("cy", sc.y); n.setAttribute("r", sr);
+    });
+    clipCircle.setAttribute("cx", sc.x + sr * 0.42); clipCircle.setAttribute("cy", sc.y + sr * 0.42); clipCircle.setAttribute("r", sr * 1.02);
+    items.push({ z: sc.z, node: sphere });
+
+    var ly = LAYER_Y[state.layer];
+    tri.setAttribute("d", poly(CORNERS.map(function (c) { return project(ringPoint(ly, c.deg)); })));
+    items.push({ z: sc.z + 0.001, node: tri });
+
+    items.sort(function (a, b) { return a.z - b.z; });
+    while (gMid.firstChild) gMid.removeChild(gMid.firstChild);
+    LAYER_Y.forEach(function (y, i) { gBack.appendChild(layerNodes[i].g); });
+    items.forEach(function (it) { gMid.appendChild(it.node); });
+    CORNERS.forEach(function (c, i) {
+      vertexNodes[i].setAttribute("cx", tops[i].x); vertexNodes[i].setAttribute("cy", tops[i].y);
+      gFront.appendChild(vertexNodes[i]);
+    });
+    gFront.appendChild(layerNodes[state.layer].g);
+
+    // The trail of where the experiment has settled, drawn on the model so it turns with it
+    var tp = state.trail.map(function (t) { return project(ringPoint(t.y, t.deg)); });
+    trailPath.setAttribute("d", tp.length > 1 ? tp.map(function (p, k) { return (k ? "L" : "M") + p.x.toFixed(1) + " " + p.y.toFixed(1); }).join(" ") : "");
+    while (trailDots.childNodes.length < tp.length) el("circle", { "class": "trail-dot", r: 2.2 }, trailDots);
+    for (var d = 0; d < trailDots.childNodes.length; d++) {
+      var dot = trailDots.childNodes[d];
+      if (d < tp.length) {
+        dot.setAttribute("cx", tp[d].x); dot.setAttribute("cy", tp[d].y);
+        dot.setAttribute("class", "trail-dot" + (d === tp.length - 1 ? " last" : ""));
+        dot.style.display = "";
+      } else dot.style.display = "none";
+    }
+    gFront.appendChild(trailPath); gFront.appendChild(trailDots);
+    place(hint, CX + SC * 1.98 - 23, CY + SC * 1.98 - 23);
+
+    // Corner labels sit just beyond each far vertex, kept on screen
+    CORNERS.forEach(function (c) {
+      var p = project(ringPoint(TOP + 0.12, c.deg).map(function (v, k) { return k === 1 ? v : v * 1.1; }));
+      var l = lbls[c.id];
+      var w = l.offsetWidth, half = w / 2 + 8;
+      var lx = Math.max(half, Math.min(W - half, p.x));
+      place(l, lx - w / 2, p.y - l.firstChild.offsetHeight / 2);
+      l.classList.toggle("behind", p.z < centreZ - 0.6);
+      l.classList.toggle("facing", facingSide && face === c.id);
+    });
+    var dl = lbls.depth;
+    dl.textContent = state.found.length ? "Depth · " + state.found.length : "Depth";
+    place(dl, sc.x - dl.offsetWidth / 2, sc.y - sr - dl.offsetHeight - 4);
+
+    drawLeader();
+  }
+
+  // ---- what the view means
+  function mod(n, m) { return ((n % m) + m) % m; }
+  function currentFace() { return FACES[mod(Math.round(view.yaw / 60), 6)]; }
+  function regime() {
+    var s = Math.sin(view.pitch * Math.PI / 180);
+    if (s > 0.85) return "end";
+    if (s < -0.85) return "citizen";
+    return "side";
+  }
+  function corner(id) { return CORNERS.filter(function (c) { return c.id === id; })[0]; }
+
+  function focusPoint() {
+    var r = regime();
+    if (!state.touched) return project([0, state.sphereY, 0]);
+    if (r === "end") return project([0, LAYER_Y[state.layer], 0]);
+    if (r === "citizen") return project([0, APEX, 0]);
+    var face = currentFace(), y = LAYER_Y[state.layer];
+    if (face.indexOf("|") < 0) return project(ringPoint(y, corner(face).deg));
+    var pair = face.split("|").map(corner);
+    var p1 = ringPoint(y, pair[0].deg), p2 = ringPoint(y, pair[1].deg);
+    return project([(p1[0] + p2[0]) / 2, y, (p1[2] + p2[2]) / 2]);
+  }
+
+  var leaderPath = document.getElementById("leader-path");
+  var leaderDots = [document.getElementById("leader-pin"), document.getElementById("leader-ring")];
+  function drawLeader() {
+    var sr = stageEl.getBoundingClientRect(), nr = note.getBoundingClientRect();
+    var fp = focusPoint();
+    // leave the note from its top edge, step up, then run to the point
+    var ax = nr.left - sr.left + Math.min(nr.width - 12, Math.max(12, fp.x - (nr.left - sr.left)));
+    var ay = nr.top - sr.top - 10;
+    var bend = Math.min(ay - 16, fp.y + (ay - fp.y) * 0.5);
+    var d = "M" + ax.toFixed(1) + " " + ay.toFixed(1) + " V" + bend.toFixed(1) + " L" + fp.x.toFixed(1) + " " + fp.y.toFixed(1);
+    leaderPath.setAttribute("d", d);
+    leaderDots.forEach(function (n) { n.setAttribute("cx", fp.x); n.setAttribute("cy", fp.y); });
+  }
+
+  var lastKey = "";
+  function annotate() {
+    var r = regime(), where, text, key;
+    if (!state.touched) { where = VIEWS.intro.where; text = VIEWS.intro.q; key = "intro"; }
+    else if (r !== "side") { where = VIEWS[r].where; text = VIEWS[r].q; key = r; }
+    else {
+      var face = currentFace();
+      if (face.indexOf("|") < 0) {
+        where = LAYERS[state.layer] + " · " + corner(face).name;
+        text = CELLS[face][state.layer].q;
+      } else {
+        where = LAYERS[state.layer];
+        text = BETWEEN[face];
+      }
+      key = face + state.layer;
+    }
+    if (key === lastKey) return;
+    lastKey = key;
+    document.getElementById("where").textContent = where;
+    document.getElementById("question").textContent = text;
+    document.getElementById("newlayer").hidden = !(state.touched && r === "side" && state.lastHit === state.layer && state.layer > 0);
+    document.querySelectorAll("[data-view]").forEach(function (b) {
+      b.setAttribute("aria-pressed", String(state.touched && b.dataset.view === r));
+    });
+  }
+
+  // Record what this experiment turned up once the view comes to rest on a question.
+  function settle() {
+    if (!state.touched || regime() !== "side") return;
+    var k = mod(Math.round(view.yaw / 60), 6), face = FACES[k];
+    var here = { y: LAYER_Y[state.layer], deg: 90 + 60 * k }, prev = state.trail[state.trail.length - 1];
+    if (!prev || prev.y !== here.y || prev.deg !== here.deg) {
+      state.trail.push(here);
+      if (state.trail.length > 40) state.trail.shift();
+      requestFrame();
+    }
+    if (face.indexOf("|") >= 0) return;
+    var key = face + state.layer;
+    if (state.visited[key]) return;
+    state.visited[key] = true;
+    warp.ringT[state.layer] = Math.min(0.32, warp.ringT[state.layer] + 0.08);
+    warp.cornerT[face] = Math.min(0.36, warp.cornerT[face] + 0.07);
+    var cell = CELLS[face][state.layer];
+    state.found.push(cell);
+    var turned = document.getElementById("turned");
+    turned.innerHTML = "<b></b><span></span>";
+    turned.querySelector("b").textContent = "Turned up · " + KIND_LABEL[cell.kind];
+    turned.querySelector("span").textContent = cell.f;
+    turned.hidden = false;
+    requestFrame();
+  }
+
+  function setLayer(layer) {
+    layer = Math.max(0, Math.min(4, layer));
+    if (layer === state.layer) return;
+    var hit = false;
+    var lo = Math.min(layer, state.layer), hi = Math.max(layer, state.layer);
+    for (var i = lo; i <= hi; i++) if (!state.reached[i]) { state.reached[i] = true; hit = true; }
+    state.lastHit = hit ? layer : -1;
+    state.hitAnim = hit ? layer : -1;
+    state.layer = layer;
+    lastKey = "";
+    if (view.tYaw === null && !dragging) settle();
+    requestFrame();
+  }
+
+  // ---- motion
+  var frameReq = null, lastT = 0;
+  function requestFrame() { if (!frameReq) frameReq = requestAnimationFrame(tick); }
+  function idle(now) { return !reduced && !dragging && now - lastInput > IDLE_MS && !document.hidden; }
+  function tick(t) {
+    frameReq = null;
+    var dt = lastT ? Math.min(50, t - lastT) : 16;
+    lastT = t;
+    var moving = false;
+    var now = performance.now();
+
+    if (idle(now) && view.tYaw === null && view.tPitch === null) {
+      // drift when nobody is touching it, easing in so it never jerks into motion
+      var since = now - lastInput - IDLE_MS;
+      var ramp = state.touched ? Math.min(1, since / 2000) : 1;
+      view.yaw += dt * DRIFT * ramp;
+      moving = true;
+    }
+
+    var ease = reduced ? 1 : 1 - Math.pow(0.86, dt / 16);
+    if (view.tYaw !== null) {
+      var dy = view.tYaw - view.yaw;
+      if (Math.abs(dy) < 0.05) { view.yaw = view.tYaw; view.tYaw = null; settle(); }
+      else { view.yaw += dy * ease; moving = true; }
+    }
+    if (view.tPitch !== null) {
+      var dp = view.tPitch - view.pitch;
+      if (Math.abs(dp) < 0.05) { view.pitch = view.tPitch; view.tPitch = null; settle(); }
+      else { view.pitch += dp * ease; moving = true; }
+    }
+    for (var w = 0; w < 5; w++) {
+      var dw = warp.ringT[w] - warp.ring[w];
+      if (Math.abs(dw) > 0.0005) { warp.ring[w] += dw * ease * 0.35; moving = true; } else warp.ring[w] = warp.ringT[w];
+    }
+    CORNERS.forEach(function (c) {
+      var dc = warp.cornerT[c.id] - warp.corner[c.id];
+      if (Math.abs(dc) > 0.0005) { warp.corner[c.id] += dc * ease * 0.35; moving = true; } else warp.corner[c.id] = warp.cornerT[c.id];
+    });
+    var ds = LAYER_Y[state.layer] - state.sphereY;
+    if (Math.abs(ds) > 0.002) { state.sphereY += ds * ease; moving = true; }
+    else state.sphereY = LAYER_Y[state.layer];
+
+    draw();
+    annotate();
+    if (moving) requestFrame(); else lastT = 0;
+  }
+
+  var idleTimer = null;
+  function input() {
+    lastInput = performance.now();
+    clearTimeout(idleTimer);
+    if (!reduced) idleTimer = setTimeout(requestFrame, IDLE_MS + 20);
+  }
+  function touch() {
+    if (!state.touched) {
+      state.touched = true;
+      view.tYaw = Math.round(view.yaw / 60) * 60;
+      lastKey = "";
+    }
+  }
+  function turn(steps) {
+    input(); touch();
+    hint.classList.add("gone");
+    var base = view.tYaw !== null ? view.tYaw : Math.round(view.yaw / 60) * 60;
+    view.tYaw = base + steps * 60;
+    requestFrame();
+  }
+  function look(which) {
+    input(); touch();
+    view.tPitch = nearest(view.pitch, which === "end" ? 90 : which === "citizen" ? -90 : 14);
+    if (view.tYaw === null) view.tYaw = Math.round(view.yaw / 60) * 60;
+    requestFrame();
+  }
+
+  // ---- pointer. On its side, dragging up and down spins it; left and right tips it.
+  var dragging = false, last = null, start = null, lock = null, moved = 0;
+  function nearRing(e, best) {
+    var r = stageEl.getBoundingClientRect();
+    var x = e.clientX - r.left, y = e.clientY - r.top, pick = -1;
+    layerNodes.forEach(function (n, i) {
+      n.samples.forEach(function (p) {
+        var d = Math.hypot(p.x - x, p.y - y);
+        if (d < best) { best = d; pick = i; }
+      });
+    });
+    return pick;
+  }
+  stageEl.addEventListener("pointerdown", function (e) {
+    if (e.button !== 0) return;
+    input(); touch();
+    dragging = true; moved = 0;
+    last = { x: e.clientX, y: e.clientY, t: performance.now() };
+    start = { x: e.clientX, y: e.clientY }; lock = null;
+    view.tYaw = null; view.tPitch = null; view.vYaw = 0; view.vPitch = 0;
+    stageEl.setPointerCapture(e.pointerId);
+    stageEl.classList.add("dragging");
+  });
+  stageEl.addEventListener("pointermove", function (e) {
+    if (!dragging) {
+      if (e.pointerType === "mouse") stageEl.classList.toggle("over-ring", nearRing(e, 14) >= 0);
+      return;
+    }
+    input();
+    var now = performance.now();
+    var dx = e.clientX - last.x, dy = e.clientY - last.y;
+    moved += Math.abs(dx) + Math.abs(dy);
+    // each drag picks one direction once it has moved a little, so a spin never turns into a tumble by accident
+    if (!lock && Math.hypot(e.clientX - start.x, e.clientY - start.y) > 8) {
+      lock = Math.abs(e.clientY - start.y) >= Math.abs(e.clientX - start.x) ? "spin" : "tumble";
+      hint.classList.add("gone");
+    }
+    var k = 300 / Math.max(300, SC * 4.7);
+    var dt = Math.max(1, now - last.t);
+    if (lock === "spin") { view.yaw += dy * k; view.vYaw = 0.7 * view.vYaw + 0.3 * (dy * k / dt); }
+    if (lock === "tumble") { view.pitch -= dx * k; view.vPitch = 0.7 * view.vPitch + 0.3 * (-dx * k / dt); }
+    last = { x: e.clientX, y: e.clientY, t: now };
+    requestFrame();
+  });
+  function endDrag(e) {
+    if (!dragging) return;
+    dragging = false;
+    input();
+    stageEl.classList.remove("dragging");
+    if (moved < 6 && e.type === "pointerup") { var pick = nearRing(e, 26); if (pick >= 0) setLayer(pick); }
+    var live = performance.now() - last.t <= 80;
+    view.tYaw = Math.round((view.yaw + (live ? view.vYaw * 260 : 0)) / 60) * 60;
+    var pt = view.pitch + (live ? view.vPitch * 320 : 0), sp = Math.sin(pt * Math.PI / 180);
+    if (Math.abs(sp) > 0.94) pt = nearest(pt, sp > 0 ? 90 : -90);
+    view.tPitch = pt;
+    requestFrame();
+  }
+  stageEl.addEventListener("pointerup", endDrag);
+  stageEl.addEventListener("pointercancel", endDrag);
+  stageEl.addEventListener("pointerleave", function () { stageEl.classList.remove("over-ring"); });
+
+  // ---- keyboard and buttons
+  stageEl.addEventListener("keydown", function (e) {
+    var handled = true;
+    switch (e.key) {
+      case "ArrowUp": turn(-1); break;
+      case "ArrowDown": turn(1); break;
+      case "ArrowRight": input(); touch(); setLayer(state.layer + 1); break;
+      case "ArrowLeft": input(); touch(); setLayer(state.layer - 1); break;
+      case "PageUp": look("end"); break;
+      case "PageDown": look("citizen"); break;
+      case "Home": look("side"); break;
+      default: handled = false;
+    }
+    if (handled) e.preventDefault();
+  });
+  document.getElementById("spin-up").addEventListener("click", function () { turn(-1); });
+  document.getElementById("spin-down").addEventListener("click", function () { turn(1); });
+  document.querySelectorAll("[data-view]").forEach(function (b) {
+    b.addEventListener("click", function () { look(b.dataset.view); });
+  });
+  document.getElementById("reset").addEventListener("click", function () {
+    state = fresh();
+    view.tPitch = nearest(view.pitch, 18);
+    lastKey = "";
+    warp.ringT = [0, 0, 0, 0, 0];
+    warp.cornerT = { value: 0, legitimacy: 0, capacity: 0 };
+    document.getElementById("turned").hidden = true;
+    lastInput = -Infinity;
+    requestFrame();
+  });
+  document.addEventListener("visibilitychange", requestFrame);
+
+  if (window.ResizeObserver) new ResizeObserver(resize).observe(stageEl);
+  window.addEventListener("resize", resize);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(requestFrame);
+
+  state = fresh();
+  resize();
+})();
+</script>
+</body>
+</html>
