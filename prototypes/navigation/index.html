@@ -5,6 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Experimentation as navigation</title>
 <meta name="description" content="A working sketch you can spin. An experiment moves across value, legitimacy and capacity and through the layers of an institution, and what it learns can reshape both. A companion to Tasting the organisational treacle on CIVICWORKS.">
+<meta property="og:title" content="Experimentation as navigation">
+<meta property="og:description" content="Spin an experiment across value, legitimacy and capacity, and through the layers of an institution.">
+<meta property="og:image" content="https://strachcity.github.io/civicworks/navigation/og.png">
+<meta property="og:url" content="https://strachcity.github.io/civicworks/navigation/">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@300;400;500&display=swap">
@@ -73,7 +78,10 @@
     cursor: grab;
     outline: none;
   }
-  .stage.dragging { cursor: grabbing; }
+  .stage.dragging, .stage.dragging * { cursor: grabbing !important; }
+  .stage.over-ring { cursor: pointer; }
+  .meta, .ctrl, #layers { pointer-events: none; }
+  .meta > *, .ctrl > button, .layer-btn { pointer-events: auto; }
   .stage:focus-visible .frame-circle { stroke: var(--focus); stroke-width: 1.5; stroke-opacity: 1; }
   .stage svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
 
@@ -92,10 +100,19 @@
   @keyframes hit { 0% { stroke-width: 4; } 100% { stroke-width: 1.25; } }
   .face { fill: var(--tint-faint); }
   .face.facing { fill: url(#stipple); }
-  .edge { stroke: var(--ink); stroke-width: .75; }
+  .edge { fill: none; stroke: var(--ink); stroke-width: .75; stroke-linejoin: round; }
   .edge.facing { stroke-width: 1.25; }
   .tri { fill: var(--tint); fill-opacity: .4; stroke: var(--ink); stroke-width: .75; }
   .vertex { fill: var(--ink); }
+  .trail { fill: none; stroke: var(--ink); stroke-width: .75; stroke-dasharray: 1 2.5; stroke-linecap: round; }
+  .trail-dot { fill: var(--paper); stroke: var(--ink); stroke-width: .75; }
+  .trail-dot.last { fill: var(--ink); }
+  .hint { position: absolute; left: 0; top: 0; width: 46px; height: 46px; pointer-events: none; transition: opacity .8s; }
+  .hint path { fill: none; stroke: var(--ink); stroke-width: .75; stroke-dasharray: 1 3; stroke-linecap: round; }
+  .hint .head { fill: var(--ink); stroke: none; }
+  .hint svg { width: 100%; height: 100%; overflow: visible; animation: turnhint 6s linear infinite; }
+  @keyframes turnhint { to { transform: rotate(360deg); } }
+  .hint.gone { opacity: 0; }
   .sphere-base { fill: var(--tint); stroke: var(--ink); stroke-width: .75; }
   .sphere-dots { fill: url(#stipple-dense); }
 
@@ -295,6 +312,7 @@
     <span class="lbl corner" id="lbl-legitimacy"><b>Legitimacy</b><small>Do we have the support and permission to pursue it?</small></span>
     <span class="lbl corner" id="lbl-capacity"><b>Capacity</b><small>Can the organisation actually deliver it?</small></span>
     <span class="lbl depth-lbl" id="lbl-depth">Depth</span>
+    <span class="hint" id="hint" aria-hidden="true"><svg viewBox="-23 -23 46 46"><path d="M 0 -18 A 18 18 0 1 1 -17 -6"/><path class="head" d="M -20 -10 L -13 -8 L -18 -2 Z"/><path d="M 0 -8 A 8 8 0 1 0 7 4"/><path class="head" d="M 9 0 L 9 7 L 3 5 Z"/></svg></span>
     <svg class="leader" aria-hidden="true">
       <path id="leader-path"/>
       <circle class="ring" id="leader-ring" r="4.5"/>
@@ -310,7 +328,7 @@
   </header>
 
   <div class="meta">
-    <span class="v">v0.3.0</span>
+    <span class="v">v0.4.0</span>
     <button type="button" class="t" id="theme">Dark</button>
   </div>
 
@@ -335,9 +353,9 @@
   <details class="about">
     <summary>About</summary>
     <div class="panel">
-      <p>A working sketch from <a href="https://www.civicworks.co/">CIVICWORKS</a>, to sit alongside <a href="https://www.civicworks.co/">Tasting the organisational treacle</a>. Drag to turn it. Left alone, it drifts.</p>
+      <p>A working sketch from <a href="https://www.civicworks.co/">CIVICWORKS</a>, to sit alongside <a href="https://www.civicworks.co/">Tasting the organisational treacle</a>. Drag to turn it, up and down to spin and sideways to tumble. Left alone, it drifts. What it turns up bends the drawing.</p>
       <p>Strategic triangle after Mark Moore. Scales of a system diagram after Dan Hill. Prototyping across scales from Dan Hill, <cite>Designing Missions</cite> (Vinnova, 2022). Nested cultures of decision-making from Hill and Melander, <cite>Strategic Design for Public Purpose</cite> (2025). Dark matter from Bryan Boyer.</p>
-      <p>v0.3.0</p>
+      <p>v0.4.0</p>
     </div>
   </details>
 </main>
@@ -367,25 +385,25 @@
   // What the question sounds like at each layer, and what an experiment might turn up there.
   var CELLS = {
     value: [
-      { q: "Will someone actually use this, and does it make the thing they came to do any easier?", kind: "assumption", f: "The thing everyone said people wouldn't use, some people used." },
-      { q: "Does the change survive contact with the systems behind it, or does the value leak out somewhere in the process?", kind: "dependency", f: "The improvement at the front stops at a step nobody on the team can see." },
-      { q: "Is this a problem the organisation thinks is worth solving this year?", kind: "assumption", f: "What the team thought was a priority sits nowhere on the organisation's list." },
-      { q: "Does the value land here, or somewhere else entirely?", kind: "assumption", f: "The benefit shows up in another organisation's numbers, not yours." },
-      { q: "Can this be described as something that matters beyond the service?", kind: "conversation", f: "Someone senior asks what this would look like everywhere. Nobody has asked that before." }
+      { q: "Will someone use this, and does it make the thing they came to do any easier?", kind: "assumption", f: "The option everyone said people wouldn't want, some people chose." },
+      { q: "Does the change survive the systems behind it, or does the value leak out somewhere in the process?", kind: "dependency", f: "The improvement at the front stops at a step the team can't see." },
+      { q: "Does the organisation think this problem is worth solving this year?", kind: "assumption", f: "What the team took for a priority sits nowhere on the organisation's list." },
+      { q: "Does the value land here, or in somebody else's service?", kind: "assumption", f: "The benefit turns up in another organisation's numbers." },
+      { q: "Can anyone at the top say why this matters beyond one service?", kind: "conversation", f: "Someone senior asks what this would look like everywhere. It's the first time the question has been asked." }
     ],
     legitimacy: [
       { q: "Who says this interaction has to work the way it does now? Sometimes the rule is real and sometimes it's a habit.", kind: "assumption", f: "A rule everyone treated as fixed had more room in it than anyone had checked." },
-      { q: "Who owns the process, and do they know you're testing it?", kind: "conversation", f: "The person who owns the process hears about the test for the first time, and has a view." },
-      { q: "Who has to put it on their list, and what comes off to make room?", kind: "conversation", f: "Two teams who both thought it was the other's job finally talk about it." },
+      { q: "Who owns the process, and do they know you're testing it?", kind: "conversation", f: "The process owner hears about the test for the first time, and has a view." },
+      { q: "Who has to put this on their list, and what comes off to make room?", kind: "conversation", f: "Two teams who each thought it was the other's job finally talk about it." },
       { q: "Whose agreement do you need that you don't yet know you need?", kind: "conversation", f: "A partner you'd never needed before turns out to hold a veto." },
       { q: "Who has the authority to change any of it, and would they want to?", kind: "dependency", f: "The rule that shaped the form was decided up here, for a different reason, a long time ago." }
     ],
     capacity: [
-      { q: "Can the team run it for a small number of real people without it falling over?", kind: "dependency", f: "It only worked because someone was quietly doing the bit the system couldn't." },
-      { q: "Can you do this with what already exists, or does it need integration nobody has resourced?", kind: "dependency", f: "The workaround runs on automations built for something else. Useful, and fragile." },
-      { q: "Who would pay for it, staff it and look after it once the test ends?", kind: "dependency", f: "Nobody's budget covers the thing after the test. It belongs to no one yet." },
-      { q: "Does the change depend on another organisation's systems, data or timetable?", kind: "dependency", f: "Your change waits on someone else's release, contract or timetable." },
-      { q: "Is there money, mandate and patience for more than a test?", kind: "assumption", f: "What looked impossible was mostly unasked." }
+      { q: "Can the team run it for a few real people without it falling over?", kind: "dependency", f: "It only worked because someone was quietly doing the bit the system couldn't." },
+      { q: "Can you do this with what already exists, or does it need integration that isn't resourced?", kind: "dependency", f: "The workaround runs on automations built for something else. Useful, and fragile." },
+      { q: "Who would pay for it, staff it and look after it once the test ends?", kind: "dependency", f: "No budget covers the thing after the test. It doesn't belong to anyone yet." },
+      { q: "Does the change depend on another organisation's systems, data or timetable?", kind: "dependency", f: "Your change is waiting on someone else's release, contract or timetable." },
+      { q: "Is there money, mandate and patience for more than a test?", kind: "assumption", f: "What looked impossible had mostly never been asked for." }
     ]
   };
 
@@ -397,7 +415,7 @@
 
   var VIEWS = {
     intro: { where: "Start here", q: "Start with a question. Turn it to face value, legitimacy or capacity, and pick a layer to see how far along it goes." },
-    end: { where: "End on · Across", q: "End on, the layers collapse and three questions are left. They never line up neatly, and learning about one changes how you approach the others. The open part is at which scale each one applies." },
+    end: { where: "End on · Across", q: "End on, the layers collapse and three questions are left. They never line up neatly, and learning about one changes how you approach the others. What stays open is which scale each one applies at." },
     citizen: { where: "From the citizen end · Through", q: "From where someone fills in the form, every layer is stacked behind the next, and you can't see where any of them stops. You rarely know which layers matter until you hit them." }
   };
 
@@ -428,19 +446,35 @@
   var LAYER_Y = [-1.6, -0.8, 0, 0.8, 1.6];
   var APEX = -2.25, TOP = 2.3, K = 0.5, D = 11, MID = (APEX + TOP) / 2;
   function radius(y) { return K * (y - APEX); }
+
+  // What the experiment turns up bends the drawing. Each layer can swell and each question can
+  // pull its corner outward; both ease towards their targets so the shape changes slowly.
+  var warp = { ring: [0, 0, 0, 0, 0], ringT: [0, 0, 0, 0, 0], corner: { value: 0, legitimacy: 0, capacity: 0 }, cornerT: { value: 0, legitimacy: 0, capacity: 0 } };
+  function ringGrow(y) {
+    if (y <= LAYER_Y[0]) return warp.ring[0] * Math.max(0, (y - APEX) / (LAYER_Y[0] - APEX));
+    if (y >= LAYER_Y[4]) return warp.ring[4];
+    var i = Math.min(3, Math.floor((y - LAYER_Y[0]) / 0.8)), t = (y - LAYER_Y[i]) / 0.8;
+    return warp.ring[i] * (1 - t) + warp.ring[i + 1] * t;
+  }
+  function cornerGrow(deg) {
+    var g = 0;
+    CORNERS.forEach(function (c) { g += warp.corner[c.id] * Math.pow(Math.max(0, Math.cos((deg - c.deg) * Math.PI / 180)), 6); });
+    return g;
+  }
   function ringPoint(y, deg) {
-    var a = deg * Math.PI / 180, r = radius(y);
+    var a = deg * Math.PI / 180, r = radius(y) * (1 + ringGrow(y)) * (1 + cornerGrow(deg));
     return [r * Math.cos(a), y, r * Math.sin(a)];
   }
+  function nearest(p, base) { return base + 360 * Math.round((p - base) / 360); }
 
   // ---- view state
   var reduced = !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
   var IDLE_MS = 3500, DRIFT = 0.011; // degrees per ms when left alone
-  var view = { yaw: -24, pitch: 18, tYaw: null, tPitch: null, vYaw: 0 };
+  var view = { yaw: -24, pitch: 18, tYaw: null, tPitch: null, vYaw: 0, vPitch: 0 };
   var lastInput = -Infinity;
   var state;
   function fresh() {
-    return { layer: 0, reached: { 0: true }, visited: {}, found: [], touched: false, lastHit: -1, hitAnim: -1, sphereY: LAYER_Y[0] };
+    return { layer: 0, reached: { 0: true }, visited: {}, found: [], trail: [], touched: false, lastHit: -1, hitAnim: -1, sphereY: LAYER_Y[0] };
   }
 
   var stageEl = document.getElementById("stage");
@@ -506,11 +540,14 @@
   });
   CORNERS.forEach(function () {
     faceNodes.push(el("path", { "class": "face" }));
-    edgeNodes.push(el("line", { "class": "edge" }));
+    edgeNodes.push(el("path", { "class": "edge" }));
     extNodes.push(el("line", { "class": "edge-ext" }, gBack));
     vertexNodes.push(el("circle", { "class": "vertex", r: 2.2 }));
   });
   var tri = el("path", { "class": "tri" });
+  var trailPath = el("path", { "class": "trail" }, gFront);
+  var trailDots = el("g", {}, gFront);
+  var hint = document.getElementById("hint");
   var sphere = el("g", {});
   var clip = el("clipPath", { id: "sphere-clip" }, scene);
   var clipCircle = el("circle", {}, clip);
@@ -553,9 +590,12 @@
     var apex = project([0, APEX, 0]);
     var tops = CORNERS.map(function (c) { return project(ringPoint(TOP, c.deg)); });
     var upper = CORNERS.map(function (c) { return project(ringPoint(LAYER_Y[4], c.deg)); });
+    var spines = CORNERS.map(function (c) {
+      return [apex].concat(LAYER_Y.map(function (y) { return project(ringPoint(y, c.deg)); }));
+    });
     CORNERS.forEach(function (c, i) {
       setLine(extNodes[i], upper[i], tops[i]);
-      setLine(edgeNodes[i], apex, upper[i]);
+      edgeNodes[i].setAttribute("d", spines[i].map(function (p, k) { return (k ? "L" : "M") + p.x.toFixed(1) + " " + p.y.toFixed(1); }).join(" "));
       edgeNodes[i].setAttribute("class", "edge" + (facingSide && face === c.id ? " facing" : ""));
     });
 
@@ -598,7 +638,7 @@
     var items = [];
     CORNERS.forEach(function (c, i) {
       var j = (i + 1) % 3;
-      faceNodes[i].setAttribute("d", poly([apex, upper[i], upper[j]]));
+      faceNodes[i].setAttribute("d", poly(spines[i].concat(spines[j].slice(1).reverse())));
       var pairKey = [c.id, CORNERS[j].id].sort().join("|");
       faceNodes[i].setAttribute("class", "face" + (facingSide && face === pairKey ? " facing" : ""));
       items.push({ z: (apex.z + upper[i].z + upper[j].z) / 3, node: faceNodes[i] });
@@ -626,6 +666,21 @@
     });
     gFront.appendChild(layerNodes[state.layer].g);
 
+    // The trail of where the experiment has settled, drawn on the model so it turns with it
+    var tp = state.trail.map(function (t) { return project(ringPoint(t.y, t.deg)); });
+    trailPath.setAttribute("d", tp.length > 1 ? tp.map(function (p, k) { return (k ? "L" : "M") + p.x.toFixed(1) + " " + p.y.toFixed(1); }).join(" ") : "");
+    while (trailDots.childNodes.length < tp.length) el("circle", { "class": "trail-dot", r: 2.2 }, trailDots);
+    for (var d = 0; d < trailDots.childNodes.length; d++) {
+      var dot = trailDots.childNodes[d];
+      if (d < tp.length) {
+        dot.setAttribute("cx", tp[d].x); dot.setAttribute("cy", tp[d].y);
+        dot.setAttribute("class", "trail-dot" + (d === tp.length - 1 ? " last" : ""));
+        dot.style.display = "";
+      } else dot.style.display = "none";
+    }
+    gFront.appendChild(trailPath); gFront.appendChild(trailDots);
+    place(hint, CX + SC * 1.98 - 23, CY + SC * 1.98 - 23);
+
     // Corner labels sit just beyond each far vertex, kept on screen
     CORNERS.forEach(function (c) {
       var p = project(ringPoint(TOP + 0.12, c.deg).map(function (v, k) { return k === 1 ? v : v * 1.1; }));
@@ -647,8 +702,9 @@
   function mod(n, m) { return ((n % m) + m) % m; }
   function currentFace() { return FACES[mod(Math.round(view.yaw / 60), 6)]; }
   function regime() {
-    if (view.pitch > 60) return "end";
-    if (view.pitch < -48) return "citizen";
+    var s = Math.sin(view.pitch * Math.PI / 180);
+    if (s > 0.85) return "end";
+    if (s < -0.85) return "citizen";
     return "side";
   }
   function corner(id) { return CORNERS.filter(function (c) { return c.id === id; })[0]; }
@@ -708,11 +764,19 @@
   // Record what this experiment turned up once the view comes to rest on a question.
   function settle() {
     if (!state.touched || regime() !== "side") return;
-    var face = currentFace();
+    var k = mod(Math.round(view.yaw / 60), 6), face = FACES[k];
+    var here = { y: LAYER_Y[state.layer], deg: 90 + 60 * k }, prev = state.trail[state.trail.length - 1];
+    if (!prev || prev.y !== here.y || prev.deg !== here.deg) {
+      state.trail.push(here);
+      if (state.trail.length > 40) state.trail.shift();
+      requestFrame();
+    }
     if (face.indexOf("|") >= 0) return;
     var key = face + state.layer;
     if (state.visited[key]) return;
     state.visited[key] = true;
+    warp.ringT[state.layer] = Math.min(0.32, warp.ringT[state.layer] + 0.08);
+    warp.cornerT[face] = Math.min(0.36, warp.cornerT[face] + 0.07);
     var cell = CELLS[face][state.layer];
     state.found.push(cell);
     var turned = document.getElementById("turned");
@@ -767,6 +831,14 @@
       if (Math.abs(dp) < 0.05) { view.pitch = view.tPitch; view.tPitch = null; settle(); }
       else { view.pitch += dp * ease; moving = true; }
     }
+    for (var w = 0; w < 5; w++) {
+      var dw = warp.ringT[w] - warp.ring[w];
+      if (Math.abs(dw) > 0.0005) { warp.ring[w] += dw * ease * 0.35; moving = true; } else warp.ring[w] = warp.ringT[w];
+    }
+    CORNERS.forEach(function (c) {
+      var dc = warp.cornerT[c.id] - warp.corner[c.id];
+      if (Math.abs(dc) > 0.0005) { warp.corner[c.id] += dc * ease * 0.35; moving = true; } else warp.corner[c.id] = warp.cornerT[c.id];
+    });
     var ds = LAYER_Y[state.layer] - state.sphereY;
     if (Math.abs(ds) > 0.002) { state.sphereY += ds * ease; moving = true; }
     else state.sphereY = LAYER_Y[state.layer];
@@ -791,39 +863,59 @@
   }
   function turn(steps) {
     input(); touch();
+    hint.classList.add("gone");
     var base = view.tYaw !== null ? view.tYaw : Math.round(view.yaw / 60) * 60;
     view.tYaw = base + steps * 60;
     requestFrame();
   }
   function look(which) {
     input(); touch();
-    view.tPitch = which === "end" ? 90 : which === "citizen" ? -90 : 14;
+    view.tPitch = nearest(view.pitch, which === "end" ? 90 : which === "citizen" ? -90 : 14);
     if (view.tYaw === null) view.tYaw = Math.round(view.yaw / 60) * 60;
     requestFrame();
   }
 
   // ---- pointer. On its side, dragging up and down spins it; left and right tips it.
-  var dragging = false, last = null, moved = 0;
+  var dragging = false, last = null, start = null, lock = null, moved = 0;
+  function nearRing(e, best) {
+    var r = stageEl.getBoundingClientRect();
+    var x = e.clientX - r.left, y = e.clientY - r.top, pick = -1;
+    layerNodes.forEach(function (n, i) {
+      n.samples.forEach(function (p) {
+        var d = Math.hypot(p.x - x, p.y - y);
+        if (d < best) { best = d; pick = i; }
+      });
+    });
+    return pick;
+  }
   stageEl.addEventListener("pointerdown", function (e) {
     if (e.button !== 0) return;
     input(); touch();
     dragging = true; moved = 0;
     last = { x: e.clientX, y: e.clientY, t: performance.now() };
-    view.tYaw = null; view.tPitch = null; view.vYaw = 0;
+    start = { x: e.clientX, y: e.clientY }; lock = null;
+    view.tYaw = null; view.tPitch = null; view.vYaw = 0; view.vPitch = 0;
     stageEl.setPointerCapture(e.pointerId);
     stageEl.classList.add("dragging");
   });
   stageEl.addEventListener("pointermove", function (e) {
-    if (!dragging) return;
+    if (!dragging) {
+      if (e.pointerType === "mouse") stageEl.classList.toggle("over-ring", nearRing(e, 14) >= 0);
+      return;
+    }
     input();
     var now = performance.now();
     var dx = e.clientX - last.x, dy = e.clientY - last.y;
     moved += Math.abs(dx) + Math.abs(dy);
+    // each drag picks one direction once it has moved a little, so a spin never turns into a tumble by accident
+    if (!lock && Math.hypot(e.clientX - start.x, e.clientY - start.y) > 8) {
+      lock = Math.abs(e.clientY - start.y) >= Math.abs(e.clientX - start.x) ? "spin" : "tumble";
+      hint.classList.add("gone");
+    }
     var k = 300 / Math.max(300, SC * 4.7);
-    view.yaw += dy * k;
-    view.pitch = Math.max(-90, Math.min(90, view.pitch - dx * k));
     var dt = Math.max(1, now - last.t);
-    view.vYaw = 0.7 * view.vYaw + 0.3 * (dy * k / dt);
+    if (lock === "spin") { view.yaw += dy * k; view.vYaw = 0.7 * view.vYaw + 0.3 * (dy * k / dt); }
+    if (lock === "tumble") { view.pitch -= dx * k; view.vPitch = 0.7 * view.vPitch + 0.3 * (-dx * k / dt); }
     last = { x: e.clientX, y: e.clientY, t: now };
     requestFrame();
   });
@@ -832,27 +924,17 @@
     dragging = false;
     input();
     stageEl.classList.remove("dragging");
-    if (moved < 6 && e.type === "pointerup") tapAt(e);
-    var fling = performance.now() - last.t > 80 ? 0 : view.vYaw * 260;
-    view.tYaw = Math.round((view.yaw + fling) / 60) * 60;
-    if (view.pitch > 68) view.tPitch = 90;
-    else if (view.pitch < -62) view.tPitch = -90;
+    if (moved < 6 && e.type === "pointerup") { var pick = nearRing(e, 26); if (pick >= 0) setLayer(pick); }
+    var live = performance.now() - last.t <= 80;
+    view.tYaw = Math.round((view.yaw + (live ? view.vYaw * 260 : 0)) / 60) * 60;
+    var pt = view.pitch + (live ? view.vPitch * 320 : 0), sp = Math.sin(pt * Math.PI / 180);
+    if (Math.abs(sp) > 0.94) pt = nearest(pt, sp > 0 ? 90 : -90);
+    view.tPitch = pt;
     requestFrame();
   }
   stageEl.addEventListener("pointerup", endDrag);
   stageEl.addEventListener("pointercancel", endDrag);
-
-  function tapAt(e) {
-    var r = stageEl.getBoundingClientRect();
-    var x = e.clientX - r.left, y = e.clientY - r.top, best = 26, pick = -1;
-    layerNodes.forEach(function (n, i) {
-      n.samples.forEach(function (p) {
-        var d = Math.hypot(p.x - x, p.y - y);
-        if (d < best) { best = d; pick = i; }
-      });
-    });
-    if (pick >= 0) setLayer(pick);
-  }
+  stageEl.addEventListener("pointerleave", function () { stageEl.classList.remove("over-ring"); });
 
   // ---- keyboard and buttons
   stageEl.addEventListener("keydown", function (e) {
@@ -876,8 +958,10 @@
   });
   document.getElementById("reset").addEventListener("click", function () {
     state = fresh();
-    view.tPitch = 18;
+    view.tPitch = nearest(view.pitch, 18);
     lastKey = "";
+    warp.ringT = [0, 0, 0, 0, 0];
+    warp.cornerT = { value: 0, legitimacy: 0, capacity: 0 };
     document.getElementById("turned").hidden = true;
     lastInput = -Infinity;
     requestFrame();
