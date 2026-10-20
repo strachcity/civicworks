@@ -98,11 +98,15 @@
   .layer.active .ring-disc { fill: url(#hatch); }
   .layer.hit .ring-front { animation: hit 1.2s ease-out; }
   @keyframes hit { 0% { stroke-width: 4; } 100% { stroke-width: 1.25; } }
-  .face { fill: var(--tint-faint); }
+  .face { fill: var(--tint-faint); stroke: var(--ink); stroke-width: .5; stroke-opacity: .5; stroke-linejoin: round; }
   .face.facing { fill: url(#stipple); }
   .edge { fill: none; stroke: var(--ink); stroke-width: .75; stroke-linejoin: round; }
   .edge.facing { stroke-width: 1.25; }
-  .tri { fill: var(--tint); fill-opacity: .4; stroke: var(--ink); stroke-width: .75; }
+  .tri { fill: var(--tint); fill-opacity: .4; stroke: var(--ink); stroke-width: 1; stroke-linejoin: round; }
+  .tri-dot { fill: var(--ink); }
+  .section { fill: none; stroke: var(--ink); stroke-width: .5; stroke-dasharray: 1 3; stroke-linecap: round; stroke-linejoin: round; opacity: .35; }
+  .section.reached { opacity: .7; }
+  .far-tri { fill: none; stroke: var(--ink); stroke-width: .5; stroke-dasharray: 1 4; stroke-linecap: round; opacity: .6; }
   .vertex { fill: var(--ink); }
   .trail { fill: none; stroke: var(--ink); stroke-width: .75; stroke-dasharray: 1 2.5; stroke-linecap: round; }
   .trail-dot { fill: var(--paper); stroke: var(--ink); stroke-width: .75; }
@@ -298,7 +302,7 @@
     <p>The model has three dimensions, drawn as one object lying on its side. Across are three questions that never line up neatly. Value asks whether people will use what we've made and what value it might create. Legitimacy asks whether we have the support and permission to pursue it. Capacity asks whether the organisation can actually deliver it.</p>
     <p>Through are five layers of an institution, from the narrow end on the left to the wide end on the right. Citizen interaction, service processes and technology, organisational priorities, cross-institutional arrangements, and political and strategic support. They are drawn as rings on a cone that widens and fades, because you rarely know which layers matter until you hit them.</p>
     <p>Depth is the learning that comes from moving across and through, drawn as a sphere that grows as the experiment reveals dependencies, starts new conversations and challenges assumptions.</p>
-    <p>Focus the drawing to use the keyboard. Up and down arrows turn it to face the next question. Left and right arrows move between layers. Page up looks end on, page down looks from the citizen end, and home looks side on. It turns slowly by itself when left alone.</p>
+    <p>Drag in any direction to turn it. Focus the drawing to use the keyboard. Up and down arrows turn it to face the next question. Left and right arrows move between layers. Page up looks end on, page down looks from the citizen end, and home looks side on. It turns slowly by itself when left alone.</p>
   </div>
 
   <div class="stage" id="stage" tabindex="0" role="application" aria-roledescription="model you can turn" aria-label="Experimentation as navigation" aria-describedby="model-desc">
@@ -328,7 +332,7 @@
   </header>
 
   <div class="meta">
-    <span class="v">v0.4.0</span>
+    <span class="v">v0.5.0</span>
     <button type="button" class="t" id="theme">Dark</button>
   </div>
 
@@ -353,9 +357,9 @@
   <details class="about">
     <summary>About</summary>
     <div class="panel">
-      <p>A working sketch from <a href="https://www.civicworks.co/">CIVICWORKS</a>, to sit alongside <a href="https://www.civicworks.co/">Tasting the organisational treacle</a>. Drag to turn it, up and down to spin and sideways to tumble. Left alone, it drifts. What it turns up bends the drawing.</p>
+      <p>A working sketch from <a href="https://www.civicworks.co/">CIVICWORKS</a>, to sit alongside <a href="https://www.civicworks.co/">Tasting the organisational treacle</a>. Drag it any way to turn it, or flick it to set it tumbling. Left alone, it drifts. What it turns up reshapes the drawing.</p>
       <p>Strategic triangle after Mark Moore. Scales of a system diagram after Dan Hill. Prototyping across scales from Dan Hill, <cite>Designing Missions</cite> (Vinnova, 2022). Nested cultures of decision-making from Hill and Melander, <cite>Strategic Design for Public Purpose</cite> (2025). Dark matter from Bryan Boyer.</p>
-      <p>v0.4.0</p>
+      <p>v0.5.0</p>
     </div>
   </details>
 </main>
@@ -456,21 +460,75 @@
     var i = Math.min(3, Math.floor((y - LAYER_Y[0]) / 0.8)), t = (y - LAYER_Y[i]) / 0.8;
     return warp.ring[i] * (1 - t) + warp.ring[i + 1] * t;
   }
-  function cornerGrow(deg) {
-    var g = 0;
-    CORNERS.forEach(function (c) { g += warp.corner[c.id] * Math.pow(Math.max(0, Math.cos((deg - c.deg) * Math.PI / 180)), 6); });
-    return g;
-  }
   function ringPoint(y, deg) {
-    var a = deg * Math.PI / 180, r = radius(y) * (1 + ringGrow(y)) * (1 + cornerGrow(deg));
+    var a = deg * Math.PI / 180, r = radius(y) * (1 + ringGrow(y));
     return [r * Math.cos(a), y, r * Math.sin(a)];
   }
-  function nearest(p, base) { return base + 360 * Math.round((p - base) / 360); }
+  // The triangle runs in straight lines from the apex. Learning stretches a corner, never bends an edge.
+  function pyrPoint(y, id) {
+    var c = corner(id), a = c.deg * Math.PI / 180, r = radius(y) * (1 + warp.corner[id]);
+    return [r * Math.cos(a), y, r * Math.sin(a)];
+  }
+  // A face of the six: corners on even turns, the middle of a triangle edge on odd ones
+  function facePoint(y, k) {
+    var face = FACES[k];
+    if (face.indexOf("|") < 0) return pyrPoint(y, face);
+    var pair = face.split("|"), p1 = pyrPoint(y, pair[0]), p2 = pyrPoint(y, pair[1]);
+    return [(p1[0] + p2[0]) / 2, y, (p1[2] + p2[2]) / 2];
+  }
 
   // ---- view state
   var reduced = !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
   var IDLE_MS = 3500, DRIFT = 0.011; // degrees per ms when left alone
-  var view = { yaw: -24, pitch: 18, tYaw: null, tPitch: null, vYaw: 0, vPitch: 0 };
+  // view.M takes a point (relative to the model's centre) to screen right, screen down and towards the viewer.
+  var view = { M: null, spin: 0, align: null, vx: 0, vy: 0, coasting: false };
+  function fromAngles(yawDeg, pitchDeg) {
+    var ya = yawDeg * Math.PI / 180, pa = pitchDeg * Math.PI / 180;
+    function map(p) {
+      var x1 = p[0] * Math.cos(ya) + p[2] * Math.sin(ya), z1 = -p[0] * Math.sin(ya) + p[2] * Math.cos(ya);
+      return [p[1] * Math.cos(pa) - z1 * Math.sin(pa), x1, p[1] * Math.sin(pa) + z1 * Math.cos(pa)];
+    }
+    var c0 = map([1, 0, 0]), c1 = map([0, 1, 0]), c2 = map([0, 0, 1]);
+    return [[c0[0], c1[0], c2[0]], [c0[1], c1[1], c2[1]], [c0[2], c1[2], c2[2]]];
+  }
+  function mul(A, B) {
+    var C = [[0, 0, 0], [0, 0, 0], [0, 0, 0]];
+    for (var i = 0; i < 3; i++) for (var j = 0; j < 3; j++) C[i][j] = A[i][0] * B[0][j] + A[i][1] * B[1][j] + A[i][2] * B[2][j];
+    return C;
+  }
+  function rot(ax, deg) {
+    var t = deg * Math.PI / 180, c = Math.cos(t), s = Math.sin(t), v = 1 - c, x = ax[0], y = ax[1], z = ax[2];
+    return [[c + x * x * v, x * y * v - z * s, x * z * v + y * s], [y * x * v + z * s, c + y * y * v, y * z * v - x * s], [z * x * v - y * s, z * y * v + x * s, c + z * z * v]];
+  }
+  function dot(a, b) { return a[0] * b[0] + a[1] * b[1] + a[2] * b[2]; }
+  function cross(a, b) { return [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]]; }
+  function unit(a) { var l = Math.hypot(a[0], a[1], a[2]) || 1; return [a[0] / l, a[1] / l, a[2] / l]; }
+  function apply(m, p) { return [dot(m[0], p), dot(m[1], p), dot(m[2], p)]; }
+  function turnBy(axisView, deg) { view.M = mul(rot(unit(axisView), deg), view.M); }
+  // keep M a clean rotation after many small multiplications
+  function tidy() {
+    var M = view.M, c0 = unit([M[0][0], M[1][0], M[2][0]]), c1 = [M[0][1], M[1][1], M[2][1]];
+    var d = dot(c0, c1); c1 = unit([c1[0] - d * c0[0], c1[1] - d * c0[1], c1[2] - d * c0[2]]);
+    var c2 = [M[0][2], M[1][2], M[2][2]], s = dot(cross(c0, c1), c2) < 0 ? -1 : 1, x = cross(c0, c1);
+    c2 = [x[0] * s, x[1] * s, x[2] * s];
+    view.M = [[c0[0], c1[0], c2[0]], [c0[1], c1[1], c2[1]], [c0[2], c1[2], c2[2]]];
+  }
+  function axisView() { return [view.M[0][1], view.M[1][1], view.M[2][1]]; }
+  function faceDir(k) { var a = (90 + 60 * k) * Math.PI / 180; return apply(view.M, [Math.cos(a), 0, Math.sin(a)]); }
+  function faceIndexNow() {
+    var best = 0, bz = -Infinity;
+    for (var k = 0; k < 6; k++) { var z = faceDir(k)[2]; if (z > bz) { bz = z; best = k; } }
+    return best;
+  }
+  // degrees to turn about the model's own axis so the nearest face looks straight at you
+  function snapAngle() {
+    var a = axisView(), c = [0, 0, 1], ca = dot(c, a);
+    var cp = [c[0] - ca * a[0], c[1] - ca * a[1], c[2] - ca * a[2]];
+    if (Math.hypot(cp[0], cp[1], cp[2]) < 0.2) return 0;
+    var f = faceDir(faceIndexNow());
+    return Math.atan2(dot(cross(f, cp), a), dot(f, cp)) * 180 / Math.PI;
+  }
+  view.M = fromAngles(-24, 18);
   var lastInput = -Infinity;
   var state;
   function fresh() {
@@ -500,16 +558,10 @@
 
   // Rotate in 3D, then lay the picture on its side so the narrow end points left.
   function project(p) {
-    var ya = view.yaw * Math.PI / 180, pa = view.pitch * Math.PI / 180;
-    var x1 = p[0] * Math.cos(ya) + p[2] * Math.sin(ya);
-    var z1 = -p[0] * Math.sin(ya) + p[2] * Math.cos(ya);
-    var y = p[1] - MID;
-    var y2 = y * Math.cos(pa) - z1 * Math.sin(pa);
-    var z2 = y * Math.sin(pa) + z1 * Math.cos(pa);
-    var f = D / (D - z2);
-    return { x: CX + SC * y2 * f, y: CY + SC * x1 * f, z: z2, f: f };
+    var v = apply(view.M, [p[0], p[1] - MID, p[2]]);
+    var f = D / (D - v[2]);
+    return { x: CX + SC * v[0] * f, y: CY + SC * v[1] * f, z: v[2], f: f };
   }
-
   // ---- svg helpers
   var NS = "http://www.w3.org/2000/svg";
   function el(name, attrs, parent) {
@@ -545,6 +597,9 @@
     vertexNodes.push(el("circle", { "class": "vertex", r: 2.2 }));
   });
   var tri = el("path", { "class": "tri" });
+  var farTri = el("path", { "class": "far-tri" }, gBack);
+  var sections = LAYER_Y.map(function () { return el("path", { "class": "section" }, gBack); });
+  var triDots = CORNERS.map(function () { return el("circle", { "class": "tri-dot", r: 1.8 }); });
   var trailPath = el("path", { "class": "trail" }, gFront);
   var trailDots = el("g", {}, gFront);
   var hint = document.getElementById("hint");
@@ -588,10 +643,13 @@
     topDisc.setAttribute("d", poly(topPts));
 
     var apex = project([0, APEX, 0]);
-    var tops = CORNERS.map(function (c) { return project(ringPoint(TOP, c.deg)); });
-    var upper = CORNERS.map(function (c) { return project(ringPoint(LAYER_Y[4], c.deg)); });
-    var spines = CORNERS.map(function (c) {
-      return [apex].concat(LAYER_Y.map(function (y) { return project(ringPoint(y, c.deg)); }));
+    var tops = CORNERS.map(function (c) { return project(pyrPoint(TOP, c.id)); });
+    var upper = CORNERS.map(function (c) { return project(pyrPoint(LAYER_Y[4], c.id)); });
+    var spines = CORNERS.map(function (c, i) { return [apex, upper[i]]; });
+    farTri.setAttribute("d", poly(tops));
+    LAYER_Y.forEach(function (y, i) {
+      sections[i].setAttribute("d", poly(CORNERS.map(function (c) { return project(pyrPoint(y, c.id)); })));
+      sections[i].setAttribute("class", "section" + (state.reached[i] ? " reached" : ""));
     });
     CORNERS.forEach(function (c, i) {
       setLine(extNodes[i], upper[i], tops[i]);
@@ -638,7 +696,7 @@
     var items = [];
     CORNERS.forEach(function (c, i) {
       var j = (i + 1) % 3;
-      faceNodes[i].setAttribute("d", poly(spines[i].concat(spines[j].slice(1).reverse())));
+      faceNodes[i].setAttribute("d", poly([apex, upper[i], upper[j]]));
       var pairKey = [c.id, CORNERS[j].id].sort().join("|");
       faceNodes[i].setAttribute("class", "face" + (facingSide && face === pairKey ? " facing" : ""));
       items.push({ z: (apex.z + upper[i].z + upper[j].z) / 3, node: faceNodes[i] });
@@ -653,7 +711,9 @@
     items.push({ z: sc.z, node: sphere });
 
     var ly = LAYER_Y[state.layer];
-    tri.setAttribute("d", poly(CORNERS.map(function (c) { return project(ringPoint(ly, c.deg)); })));
+    var triPts = CORNERS.map(function (c) { return project(pyrPoint(ly, c.id)); });
+    tri.setAttribute("d", poly(triPts));
+    triPts.forEach(function (p, i) { triDots[i].setAttribute("cx", p.x); triDots[i].setAttribute("cy", p.y); });
     items.push({ z: sc.z + 0.001, node: tri });
 
     items.sort(function (a, b) { return a.z - b.z; });
@@ -665,9 +725,10 @@
       gFront.appendChild(vertexNodes[i]);
     });
     gFront.appendChild(layerNodes[state.layer].g);
+    triDots.forEach(function (n) { gFront.appendChild(n); });
 
     // The trail of where the experiment has settled, drawn on the model so it turns with it
-    var tp = state.trail.map(function (t) { return project(ringPoint(t.y, t.deg)); });
+    var tp = state.trail.map(function (t) { return project(facePoint(t.y, t.k)); });
     trailPath.setAttribute("d", tp.length > 1 ? tp.map(function (p, k) { return (k ? "L" : "M") + p.x.toFixed(1) + " " + p.y.toFixed(1); }).join(" ") : "");
     while (trailDots.childNodes.length < tp.length) el("circle", { "class": "trail-dot", r: 2.2 }, trailDots);
     for (var d = 0; d < trailDots.childNodes.length; d++) {
@@ -683,7 +744,7 @@
 
     // Corner labels sit just beyond each far vertex, kept on screen
     CORNERS.forEach(function (c) {
-      var p = project(ringPoint(TOP + 0.12, c.deg).map(function (v, k) { return k === 1 ? v : v * 1.1; }));
+      var p = project(pyrPoint(TOP + 0.12, c.id).map(function (v, k) { return k === 1 ? v : v * 1.1; }));
       var l = lbls[c.id];
       var w = l.offsetWidth, half = w / 2 + 8;
       var lx = Math.max(half, Math.min(W - half, p.x));
@@ -700,11 +761,11 @@
 
   // ---- what the view means
   function mod(n, m) { return ((n % m) + m) % m; }
-  function currentFace() { return FACES[mod(Math.round(view.yaw / 60), 6)]; }
+  function currentFace() { return FACES[faceIndexNow()]; }
   function regime() {
-    var s = Math.sin(view.pitch * Math.PI / 180);
-    if (s > 0.85) return "end";
-    if (s < -0.85) return "citizen";
+    var z = axisView()[2];
+    if (z > 0.85) return "end";
+    if (z < -0.85) return "citizen";
     return "side";
   }
   function corner(id) { return CORNERS.filter(function (c) { return c.id === id; })[0]; }
@@ -714,11 +775,7 @@
     if (!state.touched) return project([0, state.sphereY, 0]);
     if (r === "end") return project([0, LAYER_Y[state.layer], 0]);
     if (r === "citizen") return project([0, APEX, 0]);
-    var face = currentFace(), y = LAYER_Y[state.layer];
-    if (face.indexOf("|") < 0) return project(ringPoint(y, corner(face).deg));
-    var pair = face.split("|").map(corner);
-    var p1 = ringPoint(y, pair[0].deg), p2 = ringPoint(y, pair[1].deg);
-    return project([(p1[0] + p2[0]) / 2, y, (p1[2] + p2[2]) / 2]);
+    return project(facePoint(LAYER_Y[state.layer], faceIndexNow()));
   }
 
   var leaderPath = document.getElementById("leader-path");
@@ -764,9 +821,9 @@
   // Record what this experiment turned up once the view comes to rest on a question.
   function settle() {
     if (!state.touched || regime() !== "side") return;
-    var k = mod(Math.round(view.yaw / 60), 6), face = FACES[k];
-    var here = { y: LAYER_Y[state.layer], deg: 90 + 60 * k }, prev = state.trail[state.trail.length - 1];
-    if (!prev || prev.y !== here.y || prev.deg !== here.deg) {
+    var k = faceIndexNow(), face = FACES[k];
+    var here = { y: LAYER_Y[state.layer], k: k }, prev = state.trail[state.trail.length - 1];
+    if (!prev || prev.y !== here.y || prev.k !== here.k) {
       state.trail.push(here);
       if (state.trail.length > 40) state.trail.shift();
       requestFrame();
@@ -776,7 +833,7 @@
     if (state.visited[key]) return;
     state.visited[key] = true;
     warp.ringT[state.layer] = Math.min(0.32, warp.ringT[state.layer] + 0.08);
-    warp.cornerT[face] = Math.min(0.36, warp.cornerT[face] + 0.07);
+    warp.cornerT[face] = Math.min(0.2, warp.cornerT[face] + 0.05);
     var cell = CELLS[face][state.layer];
     state.found.push(cell);
     var turned = document.getElementById("turned");
@@ -797,7 +854,7 @@
     state.hitAnim = hit ? layer : -1;
     state.layer = layer;
     lastKey = "";
-    if (view.tYaw === null && !dragging) settle();
+    if (!busy() && !dragging) settle();
     requestFrame();
   }
 
@@ -812,25 +869,42 @@
     var moving = false;
     var now = performance.now();
 
-    if (idle(now) && view.tYaw === null && view.tPitch === null) {
-      // drift when nobody is touching it, easing in so it never jerks into motion
-      var since = now - lastInput - IDLE_MS;
-      var ramp = state.touched ? Math.min(1, since / 2000) : 1;
-      view.yaw += dt * DRIFT * ramp;
+    var ease = reduced ? 1 : 1 - Math.pow(0.86, dt / 16);
+
+    if (view.coasting && !dragging) {
+      // a flick keeps tumbling and slows down, then the nearest face comes round
+      dragRotate(view.vx * dt, view.vy * dt);
+      var decay = Math.pow(0.93, dt / 16);
+      view.vx *= decay; view.vy *= decay;
+      moving = true;
+      if (Math.hypot(view.vx, view.vy) < 0.03) { view.coasting = false; land(); }
+    }
+    if (view.align) {
+      var a = axisView(), ang = Math.acos(Math.max(-1, Math.min(1, dot(a, view.align)))) * 180 / Math.PI;
+      if (ang < 0.1) { view.align = null; view.spin = snapAngle(); }
+      else {
+        var ax = cross(a, view.align);
+        if (Math.hypot(ax[0], ax[1], ax[2]) < 1e-4) ax = [0, 1, 0];
+        turnBy(ax, ang * ease);
+      }
       moving = true;
     }
+    if (!view.align && Math.abs(view.spin) > 0.05) {
+      var step = view.spin * ease;
+      turnBy(axisView(), step);
+      view.spin -= step;
+      moving = true;
+      if (Math.abs(view.spin) <= 0.05) { turnBy(axisView(), view.spin); view.spin = 0; settle(); }
+    }
+    if (idle(now) && !busy()) {
+      // drift about its own axis when nobody is touching it, easing in so it never jerks into motion
+      var since = now - lastInput - IDLE_MS;
+      var ramp = state.touched ? Math.min(1, since / 2000) : 1;
+      turnBy(axisView(), dt * DRIFT * ramp);
+      moving = true;
+    }
+    tidy();
 
-    var ease = reduced ? 1 : 1 - Math.pow(0.86, dt / 16);
-    if (view.tYaw !== null) {
-      var dy = view.tYaw - view.yaw;
-      if (Math.abs(dy) < 0.05) { view.yaw = view.tYaw; view.tYaw = null; settle(); }
-      else { view.yaw += dy * ease; moving = true; }
-    }
-    if (view.tPitch !== null) {
-      var dp = view.tPitch - view.pitch;
-      if (Math.abs(dp) < 0.05) { view.pitch = view.tPitch; view.tPitch = null; settle(); }
-      else { view.pitch += dp * ease; moving = true; }
-    }
     for (var w = 0; w < 5; w++) {
       var dw = warp.ringT[w] - warp.ring[w];
       if (Math.abs(dw) > 0.0005) { warp.ring[w] += dw * ease * 0.35; moving = true; } else warp.ring[w] = warp.ringT[w];
@@ -854,29 +928,44 @@
     clearTimeout(idleTimer);
     if (!reduced) idleTimer = setTimeout(requestFrame, IDLE_MS + 20);
   }
+  function busy() { return view.coasting || !!view.align || Math.abs(view.spin) > 0.05; }
   function touch() {
     if (!state.touched) {
       state.touched = true;
-      view.tYaw = Math.round(view.yaw / 60) * 60;
+      view.spin = snapAngle();
       lastKey = "";
     }
+  }
+  // after a drag or a flick: square up to an end view if it's close, otherwise bring a face round
+  function land() {
+    var z = axisView()[2];
+    if (Math.abs(z) > 0.94) view.align = [0, 0, z > 0 ? 1 : -1];
+    else view.spin = snapAngle();
+    requestFrame();
   }
   function turn(steps) {
     input(); touch();
     hint.classList.add("gone");
-    var base = view.tYaw !== null ? view.tYaw : Math.round(view.yaw / 60) * 60;
-    view.tYaw = base + steps * 60;
+    view.coasting = false;
+    view.spin = (busy() ? view.spin : snapAngle()) + steps * 60;
     requestFrame();
   }
+  var SIDE = unit([Math.cos(14 * Math.PI / 180), 0, Math.sin(14 * Math.PI / 180)]);
   function look(which) {
     input(); touch();
-    view.tPitch = nearest(view.pitch, which === "end" ? 90 : which === "citizen" ? -90 : 14);
-    if (view.tYaw === null) view.tYaw = Math.round(view.yaw / 60) * 60;
+    view.coasting = false; view.spin = 0;
+    view.align = which === "end" ? [0, 0, 1] : which === "citizen" ? [0, 0, -1] : SIDE;
     requestFrame();
   }
 
-  // ---- pointer. On its side, dragging up and down spins it; left and right tips it.
-  var dragging = false, last = null, start = null, lock = null, moved = 0;
+  // ---- pointer. A trackball: the model turns whichever way you drag it, all the way round.
+  var dragging = false, last = null, moved = 0;
+  function dragRotate(dx, dy) {
+    var len = Math.hypot(dx, dy);
+    if (len < 1e-6) return;
+    var k = 300 / Math.max(300, SC * 4.7);
+    turnBy([-dy, dx, 0], len * k);
+  }
   function nearRing(e, best) {
     var r = stageEl.getBoundingClientRect();
     var x = e.clientX - r.left, y = e.clientY - r.top, pick = -1;
@@ -893,8 +982,7 @@
     input(); touch();
     dragging = true; moved = 0;
     last = { x: e.clientX, y: e.clientY, t: performance.now() };
-    start = { x: e.clientX, y: e.clientY }; lock = null;
-    view.tYaw = null; view.tPitch = null; view.vYaw = 0; view.vPitch = 0;
+    view.coasting = false; view.align = null; view.spin = 0; view.vx = 0; view.vy = 0;
     stageEl.setPointerCapture(e.pointerId);
     stageEl.classList.add("dragging");
   });
@@ -907,15 +995,11 @@
     var now = performance.now();
     var dx = e.clientX - last.x, dy = e.clientY - last.y;
     moved += Math.abs(dx) + Math.abs(dy);
-    // each drag picks one direction once it has moved a little, so a spin never turns into a tumble by accident
-    if (!lock && Math.hypot(e.clientX - start.x, e.clientY - start.y) > 8) {
-      lock = Math.abs(e.clientY - start.y) >= Math.abs(e.clientX - start.x) ? "spin" : "tumble";
-      hint.classList.add("gone");
-    }
-    var k = 300 / Math.max(300, SC * 4.7);
+    if (moved > 8) hint.classList.add("gone");
     var dt = Math.max(1, now - last.t);
-    if (lock === "spin") { view.yaw += dy * k; view.vYaw = 0.7 * view.vYaw + 0.3 * (dy * k / dt); }
-    if (lock === "tumble") { view.pitch -= dx * k; view.vPitch = 0.7 * view.vPitch + 0.3 * (-dx * k / dt); }
+    dragRotate(dx, dy);
+    view.vx = 0.7 * view.vx + 0.3 * (dx / dt);
+    view.vy = 0.7 * view.vy + 0.3 * (dy / dt);
     last = { x: e.clientX, y: e.clientY, t: now };
     requestFrame();
   });
@@ -925,11 +1009,8 @@
     input();
     stageEl.classList.remove("dragging");
     if (moved < 6 && e.type === "pointerup") { var pick = nearRing(e, 26); if (pick >= 0) setLayer(pick); }
-    var live = performance.now() - last.t <= 80;
-    view.tYaw = Math.round((view.yaw + (live ? view.vYaw * 260 : 0)) / 60) * 60;
-    var pt = view.pitch + (live ? view.vPitch * 320 : 0), sp = Math.sin(pt * Math.PI / 180);
-    if (Math.abs(sp) > 0.94) pt = nearest(pt, sp > 0 ? 90 : -90);
-    view.tPitch = pt;
+    var live = performance.now() - last.t <= 80 && Math.hypot(view.vx, view.vy) > 0.15;
+    if (live && !reduced) view.coasting = true; else land();
     requestFrame();
   }
   stageEl.addEventListener("pointerup", endDrag);
@@ -958,7 +1039,7 @@
   });
   document.getElementById("reset").addEventListener("click", function () {
     state = fresh();
-    view.tPitch = nearest(view.pitch, 18);
+    view.coasting = false; view.spin = 0; view.align = unit([Math.cos(18 * Math.PI / 180), 0, Math.sin(18 * Math.PI / 180)]);
     lastKey = "";
     warp.ringT = [0, 0, 0, 0, 0];
     warp.cornerT = { value: 0, legitimacy: 0, capacity: 0 };
