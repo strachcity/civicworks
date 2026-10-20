@@ -6,7 +6,7 @@ Only this folder is published, by `.github/workflows/pages.yml`, on any push to 
 
 ## What is here
 
-**[navigation/](navigation/)** goes with *Tasting the organisational treacle*. A 3D sketch the reader spins like a globe. It settles on one of six faces (value, legitimacy, capacity and the edges between them), tilts to look from above (across) or below (through), and picks a layer from the rail. A note card points at whatever is facing you, and depth builds up as they go. One self-contained HTML file, no libraries. Earlier versions are kept as snapshots, e.g. [navigation/v0.1.0/](navigation/v0.1.0/).
+**[navigation/](navigation/)** goes with *Tasting the organisational treacle*. A 3D sketch on one screen. The cone lies on its side, narrow citizen end on the left, and drifts on its own when left alone. Drag up and down to spin it onto one of six faces (value, legitimacy, capacity and the edges between them), and sideways to tumble it all the way round. A note points at whatever is facing you. A dotted trail records where the experiment has settled, and each thing it turns up swells that layer and pulls that corner outward, so the drawing ends up a different shape from the one it started as. `og.png` is the share image. One self-contained HTML file, no libraries. Earlier versions are kept as snapshots, [v0.1.0](navigation/v0.1.0/), [v0.2.0](navigation/v0.2.0/) and [v0.3.0](navigation/v0.3.0/).
 
 ## Rules
 
