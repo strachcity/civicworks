@@ -23,7 +23,7 @@
     --ink-text: #a92c17;     /* running text, 6.5:1 on paper */
     --muted: #93402f;        /* secondary text, 6:1 on paper */
     --tint: #f6c6b8;
-    --tint-faint: rgba(246, 198, 184, 0.32);
+    --tint-faint: rgba(246, 198, 184, 0.2);
     --focus: #1f3fd6;
     --font: "Hanken Grotesk", "Helvetica Neue", Helvetica, Arial, sans-serif;
     color-scheme: light;
@@ -86,24 +86,24 @@
   .stage:focus-visible .frame-circle { stroke: var(--focus); stroke-width: 1.5; stroke-opacity: 1; }
   .stage svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
 
-  .frame-circle { fill: none; stroke: var(--ink); stroke-width: .5; stroke-opacity: .35; }
+  .frame-circle { fill: none; stroke: var(--ink); stroke-width: .5; stroke-opacity: .22; }
   .axis { stroke: var(--ink); stroke-width: .5; stroke-dasharray: 1 4; stroke-linecap: round; }
-  .top-disc { fill: none; stroke: var(--ink); stroke-width: .5; stroke-dasharray: 1 5; stroke-linecap: round; opacity: .5; }
+  .top-disc { fill: none; stroke: var(--ink); stroke-width: .5; stroke-dasharray: 1 5; stroke-linecap: round; opacity: .35; }
   .edge-ext { stroke: var(--ink); stroke-width: .5; stroke-dasharray: 1 3; stroke-linecap: round; }
   .ring-back { fill: none; stroke: var(--ink); stroke-width: .5; stroke-dasharray: 1 3; stroke-linecap: round; }
   .ring-front { fill: none; stroke: var(--ink); stroke-width: .75; }
   .ring-disc { fill: none; }
   .layer.unreached .ring-front { stroke-dasharray: 2 3; opacity: .45; }
   .layer.unreached .ring-back { opacity: .3; }
-  .layer.active .ring-front { stroke-width: 1.25; }
+  .layer.active .ring-front { stroke-width: 1.1; }
   .layer.active .ring-disc { fill: url(#hatch); }
   .layer.hit .ring-front { animation: hit 1.2s ease-out; }
-  @keyframes hit { 0% { stroke-width: 4; } 100% { stroke-width: 1.25; } }
-  .face { fill: var(--tint-faint); stroke: var(--ink); stroke-width: .5; stroke-opacity: .5; stroke-linejoin: round; }
+  @keyframes hit { 0% { stroke-width: 3.5; } 100% { stroke-width: 1.1; } }
+  .face { fill: var(--tint-faint); stroke: var(--ink); stroke-width: .5; stroke-opacity: .35; stroke-linejoin: round; }
   .face.facing { fill: url(#stipple); }
   .edge { fill: none; stroke: var(--ink); stroke-width: .75; stroke-linejoin: round; }
-  .edge.facing { stroke-width: 1.25; }
-  .tri { fill: var(--tint); fill-opacity: .4; stroke: var(--ink); stroke-width: 1; stroke-linejoin: round; }
+  .edge.facing { stroke-width: 1.1; }
+  .tri { fill: var(--tint); fill-opacity: .3; stroke: var(--ink); stroke-width: 1; stroke-linejoin: round; }
   .tri-dot { fill: var(--ink); }
   .section { fill: none; stroke: var(--ink); stroke-width: .5; stroke-dasharray: 1 3; stroke-linecap: round; stroke-linejoin: round; opacity: .35; }
   .section.reached { opacity: .7; }
@@ -144,7 +144,7 @@
     opacity: 0; transition: opacity .4s;
   }
   .corner.facing small, .corner.asked small { opacity: 1; }
-  .depth-lbl { font-size: 11px; font-weight: 500; letter-spacing: .16em; text-transform: uppercase; white-space: nowrap; }
+  .depth-lbl { font-size: 11px; font-weight: 500; letter-spacing: .16em; text-transform: uppercase; white-space: nowrap; text-shadow: 0 0 3px var(--paper), 0 0 2px var(--paper), 0 0 1px var(--paper); }
 
   .layer-btn {
     position: absolute; left: 0; top: 0;
@@ -163,9 +163,9 @@
   .layer-btn[aria-pressed="true"] span { color: var(--ink-text); font-weight: 500; }
 
   /* The pace scale under the drawing */
-  .scale-line { stroke: var(--ink); stroke-width: .75; fill: none; }
+  .scale-line { stroke: var(--ink); stroke-width: .5; fill: none; }
   .scale-head { fill: var(--ink); }
-  .scale-tick { stroke: var(--ink); stroke-width: .75; }
+  .scale-tick { stroke: var(--ink); stroke-width: .5; }
   .scale-dot { fill: var(--paper); stroke: var(--ink); stroke-width: .75; }
   .scale-dot.reached { fill: var(--ink); }
   .scale-word { fill: var(--ink-text); font-family: var(--font); font-size: 10.5px; font-weight: 500; letter-spacing: .16em; }
@@ -252,7 +252,7 @@
   .about a { color: var(--ink-text); }
 
   svg.leader { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; }
-  .leader path { fill: none; stroke: var(--ink); stroke-width: .5; }
+  .leader path { fill: none; stroke: var(--ink); stroke-width: .5; stroke-opacity: .7; }
   .leader .pin { fill: var(--ink); }
   .leader .ring { fill: none; stroke: var(--ink); stroke-width: .5; }
 
@@ -459,6 +459,7 @@
   // ---- geometry, in world units. The cone's axis is y; it's drawn lying on its side.
   var LAYER_Y = [-1.6, -0.8, 0, 0.8, 1.6];
   var APEX = -2.25, TOP = 2.3, K = 0.5, D = 11, MID = (APEX + TOP) / 2;
+  var SCALE_AT = 2.95; // the pace scale's height below centre, just outside the frame circle
   function radius(y) { return K * (y - APEX); }
 
   // What the experiment turns up bends the drawing. Each layer can swell and each question can
@@ -561,8 +562,8 @@
     // about 60% of the shorter side, a little larger on a phone where width is scarce
     SC = Math.min(W, H) * (narrow ? 0.82 : 0.6) / 4.7;
     CX = W / 2;
-    CY = narrow ? H * 0.42 : H * 0.47;
-    frameCircle.setAttribute("cx", CX); frameCircle.setAttribute("cy", CY); frameCircle.setAttribute("r", SC * 2.75);
+    CY = narrow ? H * 0.41 : H * 0.45;
+    frameCircle.setAttribute("cx", CX); frameCircle.setAttribute("cy", CY); frameCircle.setAttribute("r", SC * 2.7);
     requestFrame();
   }
 
@@ -712,7 +713,7 @@
     // The pace scale: a ruler just below the drawing, a little wider than the cone, read from the
     // citizen end towards the slow end. It stays still while the model turns, and fades once the
     // layers stack up end on. The gaps widen a little towards the slow end.
-    var baseY = CY + SC * 2.6;
+    var baseY = CY + SC * SCALE_AT;
     var vis = Math.max(0, Math.min(1, ((lows[4].x - lows[0].x) / (SC * 2.4) - 0.3) / 0.35));
     gScale.style.opacity = vis;
     var start = Math.max(64, CX - SC * 2.45), end = Math.min(W - 64, CX + SC * 2.45);
@@ -793,7 +794,7 @@
       var w = l.offsetWidth, half = w / 2 + 8;
       var lx = Math.max(half, Math.min(W - half, p.x));
       // never let a corner label sit on the pace scale
-      var ly = Math.min(p.y - l.firstChild.offsetHeight / 2, CY + SC * 2.6 - l.offsetHeight - 26);
+      var ly = Math.min(p.y - l.firstChild.offsetHeight / 2, CY + SC * SCALE_AT - l.offsetHeight - 26);
       // end on, the questions show too, so the label steps clear of its corner
       if (state.touched && r === "end") {
         var v = tops[CORNERS.indexOf(c)];
