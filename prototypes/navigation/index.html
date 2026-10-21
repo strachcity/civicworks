@@ -148,7 +148,7 @@
 
   .layer-btn {
     position: absolute; left: 0; top: 0;
-    width: 128px;
+    width: 120px;
     padding: 4px 2px;
     border: 0; background: transparent;
     font: inherit; font-size: 12px; line-height: 1.3; font-weight: 400;
@@ -165,7 +165,6 @@
   /* The pace scale under the drawing */
   .scale-line { stroke: var(--ink); stroke-width: .75; fill: none; }
   .scale-head { fill: var(--ink); }
-  .scale-drop { fill: none; stroke: var(--ink); stroke-width: .5; stroke-dasharray: 1 3; stroke-linecap: round; stroke-linejoin: round; }
   .scale-tick { stroke: var(--ink); stroke-width: .75; }
   .scale-dot { fill: var(--paper); stroke: var(--ink); stroke-width: .75; }
   .scale-dot.reached { fill: var(--ink); }
@@ -648,7 +647,6 @@
   var scaleHead = el("path", { "class": "scale-head" }, gScale);
   var scaleWord = el("text", { "class": "scale-word", "text-anchor": "middle" }, gScale);
   scaleWord.textContent = "SLOWER";
-  var scaleDrops = LAYER_Y.map(function () { return el("polyline", { "class": "scale-drop" }, gScale); });
   var scaleTicks = LAYER_Y.map(function () { return el("line", { "class": "scale-tick" }, gScale); });
   var scaleDots = LAYER_Y.map(function () { return el("circle", { "class": "scale-dot", r: 2.4 }, gScale); });
 
@@ -711,31 +709,27 @@
       lows[i] = low;
     });
 
-    // The pace scale: a dotted drop from each ring to a tick on one line under the drawing,
-    // read from the citizen end towards the slow end. It fades out when the layers stack up end on.
-    // The gaps between ticks grow towards the slow end, so the spacing itself says slower.
-    var baseY = CY + SC * 2.9;
-    var x0 = lows[0].x, x4 = lows[4].x;
-    var vis = Math.max(0, Math.min(1, ((x4 - x0) / (SC * 2.4) - 0.3) / 0.35));
+    // The pace scale: a ruler just below the drawing, a little wider than the cone, read from the
+    // citizen end towards the slow end. It stays still while the model turns, and fades once the
+    // layers stack up end on. The gaps widen a little towards the slow end.
+    var baseY = CY + SC * 2.6;
+    var vis = Math.max(0, Math.min(1, ((lows[4].x - lows[0].x) / (SC * 2.4) - 0.3) / 0.35));
     gScale.style.opacity = vis;
-    var start = Math.max(Math.min(x0, CX - SC * 2.4), 72), end = Math.max(start + 120, Math.min(W - 96, CX + SC * 3.6));
-    var GAPS = [1.3, 1.45, 1.75, 2.1], total = 6.6, tx = [start];
+    var start = Math.max(64, CX - SC * 2.45), end = Math.min(W - 64, CX + SC * 2.45);
+    var GAPS = [1, 1.1, 1.25, 1.4], total = 4.75, tx = [start];
     GAPS.forEach(function (g) { tx.push(tx[tx.length - 1] + (end - start) * g / total); });
-    scaleLine.setAttribute("x1", start - 4); scaleLine.setAttribute("y1", baseY);
-    scaleLine.setAttribute("x2", end + 40); scaleLine.setAttribute("y2", baseY);
-    scaleHead.setAttribute("d", "M" + (end + 40) + " " + baseY + " l-8 -3.5 l0 7 Z");
+    scaleLine.setAttribute("x1", start - 10); scaleLine.setAttribute("y1", baseY);
+    scaleLine.setAttribute("x2", end + 28); scaleLine.setAttribute("y2", baseY);
+    scaleHead.setAttribute("d", "M" + (end + 28) + " " + baseY + " l-8 -3.5 l0 7 Z");
     scaleWord.setAttribute("x", (tx[3] + tx[4]) / 2); scaleWord.setAttribute("y", baseY - 10);
-    lows.forEach(function (low, i) {
-      // straight down from the ring, then across to its tick
-      var knee = Math.max(low.y + 10, baseY - 26);
-      scaleDrops[i].setAttribute("points", low.x + "," + (low.y + 4) + " " + low.x + "," + knee + " " + tx[i] + "," + (baseY - 5));
-      scaleTicks[i].setAttribute("x1", tx[i]); scaleTicks[i].setAttribute("y1", baseY - 4);
-      scaleTicks[i].setAttribute("x2", tx[i]); scaleTicks[i].setAttribute("y2", baseY + 4);
-      scaleDots[i].setAttribute("cx", tx[i]); scaleDots[i].setAttribute("cy", baseY);
+    tx.forEach(function (x, i) {
+      scaleTicks[i].setAttribute("x1", x); scaleTicks[i].setAttribute("y1", baseY - 4);
+      scaleTicks[i].setAttribute("x2", x); scaleTicks[i].setAttribute("y2", baseY + 4);
+      scaleDots[i].setAttribute("cx", x); scaleDots[i].setAttribute("cy", baseY);
       scaleDots[i].setAttribute("r", i === state.layer ? 3.6 : 2.4);
       scaleDots[i].setAttribute("class", "scale-dot" + (state.reached[i] ? " reached" : ""));
       var b = layerBtns[i];
-      place(b, tx[i] - b.offsetWidth / 2, baseY + 10);
+      place(b, x - b.offsetWidth / 2, baseY + 10);
       b.style.opacity = vis;
       b.style.pointerEvents = vis < 0.3 ? "none" : "";
       b.tabIndex = vis < 0.3 ? -1 : 0;
@@ -799,7 +793,7 @@
       var w = l.offsetWidth, half = w / 2 + 8;
       var lx = Math.max(half, Math.min(W - half, p.x));
       // never let a corner label sit on the pace scale
-      var ly = Math.min(p.y - l.firstChild.offsetHeight / 2, CY + SC * 2.9 - l.offsetHeight - 14);
+      var ly = Math.min(p.y - l.firstChild.offsetHeight / 2, CY + SC * 2.6 - l.offsetHeight - 26);
       // end on, the questions show too, so the label steps clear of its corner
       if (state.touched && r === "end") {
         var v = tops[CORNERS.indexOf(c)];
