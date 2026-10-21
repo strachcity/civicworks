@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>An organisation is a place too v0.1.0</title>
+<meta name="description" content="The same layers, different material. A neighbourhood and an organisation drawn as the same five layers, from Tasting the organisational treacle on CIVICWORKS.">
+<meta property="og:title" content="An organisation is a place too">
+<meta property="og:description" content="The same layers, different material.">
+<meta property="og:image" content="https://strachcity.github.io/civicworks/place/place-diagram.png">
+<meta property="og:url" content="https://strachcity.github.io/civicworks/place/">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@300;400;500&display=swap">
+<style>
+  /* Same family as the navigation prototype: one drawing in the middle, small type at the edges.
+     The drawing is a white print, so the page stays on white in every theme. */
+  :root {
+    --paper: #ffffff;
+    --ink: #d63c23;
+    --ink-text: #a92c17;
+    --text: #1d1d1b;
+    --muted: #55524e;
+    --focus: #1f3fd6;
+    --font: "Hanken Grotesk", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    color-scheme: light;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--text);
+    font-family: var(--font);
+    font-size: 14px;
+    line-height: 1.45;
+    -webkit-font-smoothing: antialiased;
+  }
+  .page {
+    min-height: 100svh;
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    gap: 16px;
+    padding-block: max(24px, env(safe-area-inset-top, 0px)) max(20px, env(safe-area-inset-bottom, 0px));
+    padding-left: max(24px, env(safe-area-inset-left, 0px));
+    padding-right: max(24px, env(safe-area-inset-right, 0px));
+  }
+  header { display: flex; justify-content: space-between; gap: 16px; align-items: flex-start; }
+  h1 { font-size: 20px; font-weight: 400; letter-spacing: -.005em; line-height: 1.2; margin: 0; color: var(--ink-text); }
+  header p { font-size: 13px; color: var(--muted); margin: 6px 0 0; }
+  .meta { font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); white-space: nowrap; }
+  figure { margin: 0; display: grid; place-items: center; min-width: 0; }
+  figure img { display: block; width: 100%; max-width: min(1200px, calc((100svh - 140px) * 1456 / 1080)); height: auto; }
+  footer { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; font-size: 12.5px; color: var(--muted); }
+  footer a { color: var(--ink-text); }
+  .about summary { list-style: none; cursor: pointer; padding: 8px 4px; color: var(--ink-text); }
+  .about summary::-webkit-details-marker { display: none; }
+  .about summary:focus-visible, a:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; border-radius: 4px; }
+  .about { position: relative; }
+  .about .panel {
+    position: absolute; right: 0; bottom: 40px;
+    width: min(340px, calc(100vw - 48px));
+    background: var(--paper); border: .75px solid var(--ink);
+    padding: 14px 16px;
+  }
+  .about .panel p { margin: 0 0 8px; }
+  .about .panel p:last-child { margin: 0; }
+  @media (max-width: 720px) {
+    .page { padding-left: 16px; padding-right: 16px; }
+    figure img { max-width: 100%; }
+  }
+</style>
+</head>
+<body>
+<main class="page">
+  <header>
+    <div>
+      <h1>An organisation is a place too</h1>
+      <p>The same layers, different material.</p>
+    </div>
+    <span class="meta">v0.1.0</span>
+  </header>
+
+  <figure>
+    <picture>
+      <source media="(max-width: 720px)" srcset="place-diagram-mobile.png">
+      <img src="place-diagram.png" width="1456" height="1080"
+           alt="Two stacked diagrams side by side. On the left, a neighbourhood drawn as five layers: social infrastructure, governance, physical infrastructure, nature, and the neighbourhood scale at the base. On the right, an organisation drawn with the same layers: social infrastructure, governance and physical infrastructure stay the same, nature becomes culture, and the neighbourhood scale becomes the place of work. Dotted lines join each matching pair.">
+    </picture>
+  </figure>
+
+  <footer>
+    <a href="../../navigation/">Experimentation as navigation</a>
+    <details class="about">
+      <summary>About</summary>
+      <div class="panel">
+        <p>A working drawing from <a href="https://www.civicworks.co/">CIVICWORKS</a>, to sit alongside <a href="https://www.civicworks.co/">Tasting the organisational treacle</a>.</p>
+        <p>The neighbourhood is adapted from Pagh and Cook (2023), illustrated by the author for an MPA thesis. The organisation is the author's.</p>
+      </div>
+    </details>
+  </footer>
+</main>
+</body>
+</html>
