@@ -4,7 +4,8 @@ The neighbourhood stack is the thesis figure (after Pagh & Cook 2023); the organ
 stack uses the same geometry with different material. Labels and descriptions live in
 LAYERS so they're easy to swap.
 
-    python3 make_diagram.py            writes place-diagram.svg and place-diagram-mobile.svg
+    python3 make_diagram.py    writes place-diagram-single.svg (the organisation alone),
+                               place-diagram.svg (side by side) and place-diagram-mobile.svg (stacked)
 """
 from html import escape
 
@@ -25,13 +26,16 @@ LAYERS = [
 HEAD_LEFT, HEAD_RIGHT = "A NEIGHBOURHOOD", "AN ORGANISATION"
 CREDIT = "Left adapted from Pagh & Cook (2023), illustrated by the author. Right, the author."
 CREDIT_STACKED = "Top adapted from Pagh & Cook (2023), illustrated by the author. Bottom, the author."
+CREDIT_SINGLE = "Adapted from the author's thesis, after Pagh & Cook (2023)."
+# On its own, the organisation keeps one accent, on the layer where the work is lived
+SINGLE_ACCENT = {4}
 
 # ---- look, shared with the navigation prototype
 FONT = '"Hanken Grotesk", "Helvetica Neue", Helvetica, Arial, sans-serif'
 LINE, TEXT, SOFT = "#1d1d1b", "#1d1d1b", "#55524e"
 INK, INK_TEXT, TINT = "#d63c23", "#a92c17", "#f6c6b8"
 MUTED = 0.45   # ink opacity for the neighbourhood stack
-ISO = 0.5      # diamond height to width
+ISO = 0.44     # diamond height to width, a little flatter than true isometric so it reads wide
 DOT = 'stroke-dasharray="1.2 3.2" stroke-linecap="round"'
 
 
@@ -69,8 +73,13 @@ def defs(k):
                                arrow("arrow", LINE), arrow("arrow-acc", INK)]) + "</defs>"
 
 
+def shifts():
+    return {i for i, layer in enumerate(LAYERS) if layer[3]}
+
+
 def stack(cx, ys, S, k, accent):
-    """Five layers: four nested rings growing downward, then the base where they meet."""
+    """Five layers: four nested rings growing downward, then the base where they meet.
+    accent is the set of layer indices drawn in the accent colour."""
     out = []
     for s in S:
         for x in (cx - s, cx + s):
@@ -80,13 +89,13 @@ def stack(cx, ys, S, k, accent):
         out.append(f'<path d="{diamond(cx, ys[0], s)}" fill="none" stroke="{LINE}" stroke-width="{.7 * k}" {DOT} opacity=".7"/>')
     rings = [(None, S[0], "stipple"), (S[0], S[1], "hatch"), (S[1], S[2], "hatch"), (S[2], S[3], "stipple")]
     for i, (inner, outer, fill) in enumerate(rings):
-        acc = accent and LAYERS[i][3]
+        acc = i in accent
         d = diamond(cx, ys[i], outer) + (" " + diamond(cx, ys[i], inner) if inner else "")
         if acc:
             out.append(f'<path d="{d}" fill="{TINT}" fill-opacity=".45" fill-rule="evenodd"/>')
         out.append(f'<path d="{d}" fill="url(#{fill}{"-acc" if acc else ""})" fill-rule="evenodd" '
                    f'stroke="{INK if acc else LINE}" stroke-width="{.9 * k}" stroke-linejoin="round"/>')
-    acc = accent and LAYERS[4][3]
+    acc = 4 in accent
     c = INK if acc else LINE
     if acc:
         out.append(f'<path d="{diamond(cx, ys[4], S[3])}" fill="{TINT}" fill-opacity=".25"/>')
@@ -114,9 +123,9 @@ def svg_open(W, H, k):
 def diptych():
     """Side by side, for desktop and the Substack column."""
     W, H, k = 1456, 1080, 1
-    S = [30, 62, 94, 124]
+    S = [34, 70, 104, 138]
     ys = [210 + i * 175 for i in range(5)]
-    CX_L, CX_R, LABEL_L, LABEL_R = 541, 880, 48, 1028
+    CX_L, CX_R, LABEL_L, LABEL_R = 540, 876, 48, 1040
     LAB, DESC = 21, 21
     head = f'font-size="15" font-weight="600" letter-spacing="2.4" fill="{TEXT}"'
     p = svg_open(W, H, k)
@@ -124,7 +133,7 @@ def diptych():
     p.append(f'<text x="{CX_R}" y="78" text-anchor="middle" {head}>{HEAD_RIGHT}</text>')
 
     p.append(f'<g opacity="{MUTED}">')
-    p += stack(CX_L, ys, S, k, False)
+    p += stack(CX_L, ys, S, k, set())
     for i, layer in enumerate(LAYERS):
         x = CX_L - outer(S, i)
         p.append(leader(LABEL_L + 330, x + 4, ys[i], x + 9, LINE, k))
@@ -138,13 +147,13 @@ def diptych():
                  f'stroke-width="{1 if acc else .75}" stroke-dasharray="1.2 3.6" stroke-linecap="round" opacity="{1 if acc else .7}" '
                  f'marker-end="url(#arrow{"-acc" if acc else ""})"/>')
 
-    p += stack(CX_R, ys, S, k, True)
+    p += stack(CX_R, ys, S, k, shifts())
     for i, (_, lab, desc, acc) in enumerate(LAYERS):
         x = CX_R + outer(S, i)
         c = INK if acc else LINE
         p.append(leader(x - 4, LABEL_R - 14, ys[i], x - 9, c, k))
         p.append(f'<text x="{LABEL_R}" y="{ys[i] + 7}" font-size="{LAB}" font-weight="600" letter-spacing=".8" fill="{INK_TEXT if acc else TEXT}">{escape(lab)}</text>')
-        for n, line in enumerate(wrap(desc, DESC, 380)):
+        for n, line in enumerate(wrap(desc, DESC, 370)):
             p.append(f'<text x="{LABEL_R}" y="{ys[i] + 38 + n * 28}" font-size="{DESC}" fill="{SOFT}">{escape(line)}</text>')
     p.append(f'<text x="48" y="{H - 34}" font-size="14" fill="{SOFT}">{escape(CREDIT)}</text>')
     return "\n".join(p + ["</svg>"])
@@ -165,7 +174,7 @@ def stacked():
 
     p.append(f'<g opacity="{MUTED}">')
     p.append(f'<text x="{CX}" y="96" text-anchor="middle" {head}>{HEAD_LEFT}</text>')
-    p += stack(CX, ys_a, S, k, False)
+    p += stack(CX, ys_a, S, k, set())
     for i, layer in enumerate(LAYERS):
         x = CX + outer(S, i)
         p.append(leader(x - 4, LABEL - 20, ys_a[i], x - 12, LINE, k))
@@ -177,7 +186,7 @@ def stacked():
     p.append(f'<line x1="{CX}" y1="{y1:.1f}" x2="{CX}" y2="{y2:.1f}" stroke="{LINE}" stroke-width="{1.2}" stroke-dasharray="2 6" stroke-linecap="round" marker-end="url(#arrow)"/>')
     p.append(f'<text x="{CX}" y="{y2 + 90:.1f}" text-anchor="middle" {head}>{HEAD_RIGHT}</text>')
 
-    p += stack(CX, ys_b, S, k, True)
+    p += stack(CX, ys_b, S, k, shifts())
     for i, (_, lab, desc, acc) in enumerate(LAYERS):
         x = CX + outer(S, i)
         c = INK if acc else LINE
@@ -189,6 +198,31 @@ def stacked():
     return "\n".join(p + ["</svg>"])
 
 
+def single():
+    """The organisation on its own: labels on the left as in the thesis original, larger type,
+    one accent on the place of work, no panel heading. The caption goes in Substack."""
+    # the drawing grows 2.2 times, the line weight only 1.4 times, so it stays a fine drawing
+    W, k, kl = 1456, 2.2, 1.4
+    S = [s * k for s in (34, 70, 104, 134)]
+    CX, LABEL, LAB, DESC, LH, G = 1052, 64, 36, 31, 41, 225
+    top = 96 + S[3] * ISO
+    ys = [top + i * G for i in range(5)]
+    H = int(ys[4] + S[3] * ISO + 150)
+    p = svg_open(W, H, kl)
+    p += stack(CX, ys, S, kl, SINGLE_ACCENT)
+    for i, (_, lab, desc, _) in enumerate(LAYERS):
+        acc = i in SINGLE_ACCENT
+        x = CX - outer(S, i)
+        c = INK if acc else LINE
+        p.append(leader(LABEL + 560, x + 6, ys[i], x + 12, c, kl))
+        p.append(f'<text x="{LABEL}" y="{ys[i] + 12:.1f}" font-size="{LAB}" font-weight="600" letter-spacing="1.2" fill="{INK_TEXT if acc else TEXT}">{escape(lab)}</text>')
+        for n, line in enumerate(wrap(desc, DESC, 560)):
+            p.append(f'<text x="{LABEL}" y="{ys[i] + 12 + LH + 4 + n * LH:.1f}" font-size="{DESC}" fill="{SOFT}">{escape(line)}</text>')
+    p.append(f'<text x="{LABEL}" y="{H - 52}" font-size="22" fill="{SOFT}">{escape(CREDIT_SINGLE)}</text>')
+    return "\n".join(p + ["</svg>"])
+
+
 if __name__ == "__main__":
+    open("place-diagram-single.svg", "w").write(single())
     open("place-diagram.svg", "w").write(diptych())
     open("place-diagram-mobile.svg", "w").write(stacked())
