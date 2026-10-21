@@ -18,12 +18,12 @@
      everything else is small type pinned to the corners. Two tones, one ink on paper.
      Line weights: 0.5 structure, 0.75 form, 1.25 emphasis. */
   :root {
-    --paper: #efeeeb;
+    --paper: #ffffff;
     --ink: #d63c23;          /* lines and marks */
     --ink-text: #a92c17;     /* running text, 6.5:1 on paper */
     --muted: #93402f;        /* secondary text, 6:1 on paper */
     --tint: #f6c6b8;
-    --tint-faint: rgba(246, 198, 184, 0.28);
+    --tint-faint: rgba(246, 198, 184, 0.2);
     --focus: #1f3fd6;
     --font: "Hanken Grotesk", "Helvetica Neue", Helvetica, Arial, sans-serif;
     color-scheme: light;
@@ -74,6 +74,7 @@
   /* The model fills the screen as a drawing surface; the overlays sit on top */
   .stage {
     position: absolute; inset: 0;
+    -webkit-user-select: none; user-select: none;
     touch-action: none;
     cursor: grab;
     outline: none;
@@ -85,24 +86,24 @@
   .stage:focus-visible .frame-circle { stroke: var(--focus); stroke-width: 1.5; stroke-opacity: 1; }
   .stage svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
 
-  .frame-circle { fill: none; stroke: var(--ink); stroke-width: .5; stroke-opacity: .35; }
+  .frame-circle { fill: none; stroke: var(--ink); stroke-width: .5; stroke-opacity: .22; }
   .axis { stroke: var(--ink); stroke-width: .5; stroke-dasharray: 1 4; stroke-linecap: round; }
-  .top-disc { fill: none; stroke: var(--ink); stroke-width: .5; stroke-dasharray: 1 5; stroke-linecap: round; opacity: .5; }
+  .top-disc { fill: none; stroke: var(--ink); stroke-width: .5; stroke-dasharray: 1 5; stroke-linecap: round; opacity: .35; }
   .edge-ext { stroke: var(--ink); stroke-width: .5; stroke-dasharray: 1 3; stroke-linecap: round; }
   .ring-back { fill: none; stroke: var(--ink); stroke-width: .5; stroke-dasharray: 1 3; stroke-linecap: round; }
   .ring-front { fill: none; stroke: var(--ink); stroke-width: .75; }
   .ring-disc { fill: none; }
   .layer.unreached .ring-front { stroke-dasharray: 2 3; opacity: .45; }
   .layer.unreached .ring-back { opacity: .3; }
-  .layer.active .ring-front { stroke-width: 1.25; }
+  .layer.active .ring-front { stroke-width: 1.1; }
   .layer.active .ring-disc { fill: url(#hatch); }
   .layer.hit .ring-front { animation: hit 1.2s ease-out; }
-  @keyframes hit { 0% { stroke-width: 4; } 100% { stroke-width: 1.25; } }
-  .face { fill: var(--tint-faint); stroke: var(--ink); stroke-width: .5; stroke-opacity: .5; stroke-linejoin: round; }
+  @keyframes hit { 0% { stroke-width: 3.5; } 100% { stroke-width: 1.1; } }
+  .face { fill: var(--tint-faint); stroke: var(--ink); stroke-width: .5; stroke-opacity: .35; stroke-linejoin: round; }
   .face.facing { fill: url(#stipple); }
   .edge { fill: none; stroke: var(--ink); stroke-width: .75; stroke-linejoin: round; }
-  .edge.facing { stroke-width: 1.25; }
-  .tri { fill: var(--tint); fill-opacity: .4; stroke: var(--ink); stroke-width: 1; stroke-linejoin: round; }
+  .edge.facing { stroke-width: 1.1; }
+  .tri { fill: var(--tint); fill-opacity: .3; stroke: var(--ink); stroke-width: 1; stroke-linejoin: round; }
   .tri-dot { fill: var(--ink); }
   .section { fill: none; stroke: var(--ink); stroke-width: .5; stroke-dasharray: 1 3; stroke-linecap: round; stroke-linejoin: round; opacity: .35; }
   .section.reached { opacity: .7; }
@@ -142,27 +143,32 @@
     font-size: 12px; font-weight: 400; line-height: 1.35; color: var(--muted);
     opacity: 0; transition: opacity .4s;
   }
-  .corner.facing small { opacity: 1; }
-  .depth-lbl { font-size: 11px; font-weight: 500; letter-spacing: .16em; text-transform: uppercase; white-space: nowrap; }
+  .corner.facing small, .corner.asked small { opacity: 1; }
+  .depth-lbl { font-size: 11px; font-weight: 500; letter-spacing: .16em; text-transform: uppercase; white-space: nowrap; text-shadow: 0 0 3px var(--paper), 0 0 2px var(--paper), 0 0 1px var(--paper); }
 
   .layer-btn {
     position: absolute; left: 0; top: 0;
-    width: 112px;
+    width: 120px;
     padding: 4px 2px;
     border: 0; background: transparent;
-    font: inherit; font-size: 11.5px; line-height: 1.25; font-weight: 400;
+    font: inherit; font-size: 12px; line-height: 1.3; font-weight: 400;
     color: var(--muted);
     text-align: center;
     cursor: pointer;
     will-change: transform;
+    transition: opacity .3s;
   }
-  .layer-btn::before {
-    content: ""; display: block; width: 5px; height: 5px; margin: 0 auto 4px;
-    border: .75px solid var(--ink); border-radius: 50%;
-  }
-  .layer-btn.reached::before { background: var(--ink); }
-  .layer-btn[aria-pressed="true"] { color: var(--ink-text); font-weight: 500; }
-  .layer-btn[aria-pressed="true"]::before { width: 7px; height: 7px; box-shadow: 0 0 0 3px var(--paper), 0 0 0 3.75px var(--ink); }
+  .layer-btn b { display: block; margin-bottom: 3px; font-size: 10.5px; font-weight: 500; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-text); white-space: nowrap; }
+  .layer-btn span { display: block; }
+  .layer-btn[aria-pressed="true"] span { color: var(--ink-text); font-weight: 500; }
+
+  /* The pace scale under the drawing */
+  .scale-line { stroke: var(--ink); stroke-width: .5; fill: none; }
+  .scale-head { fill: var(--ink); }
+  .scale-tick { stroke: var(--ink); stroke-width: .5; }
+  .scale-dot { fill: var(--paper); stroke: var(--ink); stroke-width: .75; }
+  .scale-dot.reached { fill: var(--ink); }
+  .scale-word { fill: var(--ink-text); font-family: var(--font); font-size: 10.5px; font-weight: 500; letter-spacing: .16em; }
   .layer-btn:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
 
   /* Corner furniture */
@@ -246,7 +252,7 @@
   .about a { color: var(--ink-text); }
 
   svg.leader { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; }
-  .leader path { fill: none; stroke: var(--ink); stroke-width: .5; }
+  .leader path { fill: none; stroke: var(--ink); stroke-width: .5; stroke-opacity: .7; }
   .leader .pin { fill: var(--ink); }
   .leader .ring { fill: none; stroke: var(--ink); stroke-width: .5; }
 
@@ -260,8 +266,8 @@
     .question { font-size: 17px; }
     .turned { display: none; }
     .corner small { display: none; }
-    .layer-btn span { display: none; }
-    .layer-btn[aria-pressed="true"] span { display: inline; }
+    .layer-btn span, .layer-btn b { display: none; }
+    .layer-btn[aria-pressed="true"] span, .layer-btn[aria-pressed="true"] b { display: block; }
     .about { right: 8px; bottom: max(14px, env(safe-area-inset-bottom, 0px)); }
     .ctrl { left: 8px; transform: none; justify-content: flex-start; max-width: calc(100% - 80px); bottom: max(14px, env(safe-area-inset-bottom, 0px)); }
     .ctrl .wide { display: none; }
@@ -308,6 +314,7 @@
   <div class="stage" id="stage" tabindex="0" role="application" aria-roledescription="model you can turn" aria-label="Experimentation as navigation" aria-describedby="model-desc">
     <svg id="scene" aria-hidden="true">
       <circle class="frame-circle" id="frame-circle"/>
+      <g id="g-scale"></g>
       <g id="g-back"></g>
       <g id="g-mid"></g>
       <g id="g-front"></g>
@@ -332,7 +339,7 @@
   </header>
 
   <div class="meta">
-    <span class="v">v0.5.0</span>
+    <span class="v">v0.6.0</span>
     <button type="button" class="t" id="theme">Dark</button>
   </div>
 
@@ -358,8 +365,8 @@
     <summary>About</summary>
     <div class="panel">
       <p>A working sketch from <a href="https://www.civicworks.co/">CIVICWORKS</a>, to sit alongside <a href="https://www.civicworks.co/">Tasting the organisational treacle</a>. Drag it any way to turn it, or flick it to set it tumbling. Left alone, it drifts. What it turns up reshapes the drawing.</p>
-      <p>Strategic triangle after Mark Moore. Scales of a system diagram after Dan Hill. Prototyping across scales from Dan Hill, <cite>Designing Missions</cite> (Vinnova, 2022). Nested cultures of decision-making from Hill and Melander, <cite>Strategic Design for Public Purpose</cite> (2025). Dark matter from Bryan Boyer.</p>
-      <p>v0.5.0</p>
+      <p>Value, legitimacy and capacity after <a href="https://www.hks.harvard.edu/publications/creating-public-value-core-idea-strategic-management-government">Mark Moore</a>. Pace layers after <a href="https://longnow.org/ideas/pace-layers/">Stewart Brand</a>. Scales of a system after <a href="https://link.springer.com/chapter/10.1007/978-3-031-78357-9_2">Hill and Melander</a>. Dark matter from Bryan Boyer.</p>
+      <p>v0.6.0</p>
     </div>
   </details>
 </main>
@@ -376,6 +383,9 @@
     "Cross-institutional arrangements",
     "Political and strategic support"
   ];
+
+  // How fast each layer moves, from an afternoon at the citizen end to a parliament or more
+  var PACE = ["An afternoon", "Months", "A budget year", "Years", "A parliament or more"];
 
   var CORNERS = [
     { id: "value", name: "Value", deg: 90 },
@@ -449,6 +459,7 @@
   // ---- geometry, in world units. The cone's axis is y; it's drawn lying on its side.
   var LAYER_Y = [-1.6, -0.8, 0, 0.8, 1.6];
   var APEX = -2.25, TOP = 2.3, K = 0.5, D = 11, MID = (APEX + TOP) / 2;
+  var SCALE_AT = 2.95; // the pace scale's height below centre, just outside the frame circle
   function radius(y) { return K * (y - APEX); }
 
   // What the experiment turns up bends the drawing. Each layer can swell and each question can
@@ -551,8 +562,8 @@
     // about 60% of the shorter side, a little larger on a phone where width is scarce
     SC = Math.min(W, H) * (narrow ? 0.82 : 0.6) / 4.7;
     CX = W / 2;
-    CY = narrow ? H * 0.42 : H * 0.47;
-    frameCircle.setAttribute("cx", CX); frameCircle.setAttribute("cy", CY); frameCircle.setAttribute("r", SC * 2.75);
+    CY = narrow ? H * 0.41 : H * 0.45;
+    frameCircle.setAttribute("cx", CX); frameCircle.setAttribute("cy", CY); frameCircle.setAttribute("r", SC * 2.7);
     requestFrame();
   }
 
@@ -623,12 +634,22 @@
     b.type = "button";
     b.className = "layer-btn";
     b.setAttribute("aria-label", name);
-    b.innerHTML = "<span></span>";
+    b.setAttribute("aria-label", name + ", " + PACE[i].toLowerCase());
+    b.innerHTML = "<b></b><span></span>";
+    b.querySelector("b").textContent = PACE[i];
     b.querySelector("span").textContent = name;
     b.addEventListener("click", function () { input(); touch(); setLayer(i); });
     layersEl.appendChild(b);
     return b;
   });
+
+  var gScale = document.getElementById("g-scale");
+  var scaleLine = el("line", { "class": "scale-line" }, gScale);
+  var scaleHead = el("path", { "class": "scale-head" }, gScale);
+  var scaleWord = el("text", { "class": "scale-word", "text-anchor": "middle" }, gScale);
+  scaleWord.textContent = "SLOWER";
+  var scaleTicks = LAYER_Y.map(function () { return el("line", { "class": "scale-tick" }, gScale); });
+  var scaleDots = LAYER_Y.map(function () { return el("circle", { "class": "scale-dot", r: 2.4 }, gScale); });
 
   function sphereRadius() { return state.found.length ? 0.16 + state.found.length * 0.042 : 0.1; }
 
@@ -636,6 +657,7 @@
     var centreZ = project([0, MID, 0]).z;
     var face = currentFace(), r = regime();
     var facingSide = state.touched && r === "side";
+    var lows = [];
 
     setLine(axis, project([0, APEX, 0]), project([0, TOP, 0]));
     var topPts = [];
@@ -683,13 +705,36 @@
       var cls = i === state.layer ? "active" : state.reached[i] ? "reached" : "unreached";
       n.g.setAttribute("class", "layer " + cls + (state.hitAnim === i ? " hit" : ""));
 
-      // the layer's button sits just below the lowest point of its ring
       var low = pts[0];
       for (var k = 1; k < pts.length; k++) if (pts[k].y > low.y) low = pts[k];
+      lows[i] = low;
+    });
+
+    // The pace scale: a ruler just below the drawing, a little wider than the cone, read from the
+    // citizen end towards the slow end. It stays still while the model turns, and fades once the
+    // layers stack up end on. The gaps widen a little towards the slow end.
+    var baseY = CY + SC * SCALE_AT;
+    var vis = Math.max(0, Math.min(1, ((lows[4].x - lows[0].x) / (SC * 2.4) - 0.3) / 0.35));
+    gScale.style.opacity = vis;
+    var start = Math.max(64, CX - SC * 2.45), end = Math.min(W - 64, CX + SC * 2.45);
+    var GAPS = [1, 1.1, 1.25, 1.4], total = 4.75, tx = [start];
+    GAPS.forEach(function (g) { tx.push(tx[tx.length - 1] + (end - start) * g / total); });
+    scaleLine.setAttribute("x1", start - 10); scaleLine.setAttribute("y1", baseY);
+    scaleLine.setAttribute("x2", end + 28); scaleLine.setAttribute("y2", baseY);
+    scaleHead.setAttribute("d", "M" + (end + 28) + " " + baseY + " l-8 -3.5 l0 7 Z");
+    scaleWord.setAttribute("x", (tx[3] + tx[4]) / 2); scaleWord.setAttribute("y", baseY - 10);
+    tx.forEach(function (x, i) {
+      scaleTicks[i].setAttribute("x1", x); scaleTicks[i].setAttribute("y1", baseY - 4);
+      scaleTicks[i].setAttribute("x2", x); scaleTicks[i].setAttribute("y2", baseY + 4);
+      scaleDots[i].setAttribute("cx", x); scaleDots[i].setAttribute("cy", baseY);
+      scaleDots[i].setAttribute("r", i === state.layer ? 3.6 : 2.4);
+      scaleDots[i].setAttribute("class", "scale-dot" + (state.reached[i] ? " reached" : ""));
       var b = layerBtns[i];
-      place(b, low.x - b.offsetWidth / 2, low.y + 8);
+      place(b, x - b.offsetWidth / 2, baseY + 10);
+      b.style.opacity = vis;
+      b.style.pointerEvents = vis < 0.3 ? "none" : "";
+      b.tabIndex = vis < 0.3 ? -1 : 0;
       b.setAttribute("aria-pressed", String(i === state.layer));
-      b.classList.toggle("reached", !!state.reached[i]);
     });
 
     // Faces, edges, the sphere and the active triangle, painted back to front
@@ -748,9 +793,18 @@
       var l = lbls[c.id];
       var w = l.offsetWidth, half = w / 2 + 8;
       var lx = Math.max(half, Math.min(W - half, p.x));
-      place(l, lx - w / 2, p.y - l.firstChild.offsetHeight / 2);
+      // never let a corner label sit on the pace scale
+      var ly = Math.min(p.y - l.firstChild.offsetHeight / 2, CY + SC * SCALE_AT - l.offsetHeight - 26);
+      // end on, the questions show too, so the label steps clear of its corner
+      if (state.touched && r === "end") {
+        var v = tops[CORNERS.indexOf(c)];
+        lx = Math.max(half, Math.min(W - half, v.x));
+        ly = v.y > CY ? v.y + 10 : v.y - l.offsetHeight - 8;
+      }
+      place(l, lx - w / 2, ly);
       l.classList.toggle("behind", p.z < centreZ - 0.6);
       l.classList.toggle("facing", facingSide && face === c.id);
+      l.classList.toggle("asked", state.touched && r === "end");
     });
     var dl = lbls.depth;
     dl.textContent = state.found.length ? "Depth · " + state.found.length : "Depth";
