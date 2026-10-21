@@ -1,0 +1,5 @@
+Two stacked diagrams side by side. On the left, a neighbourhood drawn as five layers: social infrastructure, governance, physical infrastructure, nature, and the neighbourhood scale at the base. On the right, an organisation drawn with the same layers: social infrastructure, governance and physical infrastructure stay the same, nature becomes culture, and the neighbourhood scale becomes the place of work. Dotted lines join each matching pair.
+
+Mobile version: the same two diagrams stacked, the neighbourhood above and the organisation below, joined by a dotted arrow.
+
+Single panel: an organisation drawn as five stacked layers, labelled on the left. Social infrastructure, governance, physical infrastructure and culture sit above the place of work at the base, where each of these comes together and becomes lived experience for the people doing the work.

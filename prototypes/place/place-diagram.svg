@@ -1,0 +1,92 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1456" height="1080" viewBox="0 0 1456 1080" font-family='"Hanken Grotesk", "Helvetica Neue", Helvetica, Arial, sans-serif'>
+<style>@import url("https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&amp;display=swap");</style>
+<defs><pattern id="stipple" width="4" height="4" patternUnits="userSpaceOnUse"><circle cx="1.0" cy="1.0" r="0.6" fill="#1d1d1b"/><circle cx="3.0" cy="3.0" r="0.6" fill="#1d1d1b"/></pattern><pattern id="hatch" width="3.2" height="3.2" patternUnits="userSpaceOnUse" patternTransform="rotate(-45)"><line x1="0" y1="0" x2="0" y2="3.2" stroke="#1d1d1b" stroke-width="0.55"/></pattern><pattern id="stipple-acc" width="4" height="4" patternUnits="userSpaceOnUse"><circle cx="1.0" cy="1.0" r="0.6" fill="#d63c23"/><circle cx="3.0" cy="3.0" r="0.6" fill="#d63c23"/></pattern><pattern id="hatch-acc" width="3.2" height="3.2" patternUnits="userSpaceOnUse" patternTransform="rotate(-45)"><line x1="0" y1="0" x2="0" y2="3.2" stroke="#d63c23" stroke-width="0.55"/></pattern><marker id="arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto"><path d="M0 0.8 L7 4 L0 7.2 Z" fill="#1d1d1b"/></marker><marker id="arrow-acc" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto"><path d="M0 0.8 L7 4 L0 7.2 Z" fill="#d63c23"/></marker></defs>
+<rect width="1456" height="1080" fill="#ffffff"/>
+<text x="540" y="78" text-anchor="middle" font-size="15" font-weight="600" letter-spacing="2.4" fill="#1d1d1b" opacity="0.45">A NEIGHBOURHOOD</text>
+<text x="876" y="78" text-anchor="middle" font-size="15" font-weight="600" letter-spacing="2.4" fill="#1d1d1b">AN ORGANISATION</text>
+<g opacity="0.45">
+<line x1="506.0" y1="210.0" x2="506.0" y2="910.0" stroke="#1d1d1b" stroke-width="0.6" stroke-dasharray="1.2 3.2" stroke-linecap="round" opacity=".55"/>
+<line x1="574.0" y1="210.0" x2="574.0" y2="910.0" stroke="#1d1d1b" stroke-width="0.6" stroke-dasharray="1.2 3.2" stroke-linecap="round" opacity=".55"/>
+<line x1="470.0" y1="210.0" x2="470.0" y2="910.0" stroke="#1d1d1b" stroke-width="0.6" stroke-dasharray="1.2 3.2" stroke-linecap="round" opacity=".55"/>
+<line x1="610.0" y1="210.0" x2="610.0" y2="910.0" stroke="#1d1d1b" stroke-width="0.6" stroke-dasharray="1.2 3.2" stroke-linecap="round" opacity=".55"/>
+<line x1="436.0" y1="210.0" x2="436.0" y2="910.0" stroke="#1d1d1b" stroke-width="0.6" stroke-dasharray="1.2 3.2" stroke-linecap="round" opacity=".55"/>
+<line x1="644.0" y1="210.0" x2="644.0" y2="910.0" stroke="#1d1d1b" stroke-width="0.6" stroke-dasharray="1.2 3.2" stroke-linecap="round" opacity=".55"/>
+<line x1="402.0" y1="210.0" x2="402.0" y2="910.0" stroke="#1d1d1b" stroke-width="0.6" stroke-dasharray="1.2 3.2" stroke-linecap="round" opacity=".55"/>
+<line x1="678.0" y1="210.0" x2="678.0" y2="910.0" stroke="#1d1d1b" stroke-width="0.6" stroke-dasharray="1.2 3.2" stroke-linecap="round" opacity=".55"/>
+<line x1="540" y1="149.3" x2="540" y2="970.7" stroke="#1d1d1b" stroke-width="0.6" stroke-dasharray="1.2 3.2" stroke-linecap="round" opacity=".55"/>
+<path d="M470.0 210.0 L540.0 179.2 L610.0 210.0 L540.0 240.8 Z" fill="none" stroke="#1d1d1b" stroke-width="0.7" stroke-dasharray="1.2 3.2" stroke-linecap="round" opacity=".7"/>
+<path d="M436.0 210.0 L540.0 164.2 L644.0 210.0 L540.0 255.8 Z" fill="none" stroke="#1d1d1b" stroke-width="0.7" stroke-dasharray="1.2 3.2" stroke-linecap="round" opacity=".7"/>
+<path d="M402.0 210.0 L540.0 149.3 L678.0 210.0 L540.0 270.7 Z" fill="none" stroke="#1d1d1b" stroke-width="0.7" stroke-dasharray="1.2 3.2" stroke-linecap="round" opacity=".7"/>
+<path d="M506.0 210.0 L540.0 195.0 L574.0 210.0 L540.0 225.0 Z" fill="url(#stipple)" fill-rule="evenodd" stroke="#1d1d1b" stroke-width="0.9" stroke-linejoin="round"/>
+<path d="M470.0 385.0 L540.0 354.2 L610.0 385.0 L540.0 415.8 Z M506.0 385.0 L540.0 370.0 L574.0 385.0 L540.0 400.0 Z" fill="url(#hatch)" fill-rule="evenodd" stroke="#1d1d1b" stroke-width="0.9" stroke-linejoin="round"/>
+<path d="M436.0 560.0 L540.0 514.2 L644.0 560.0 L540.0 605.8 Z M470.0 560.0 L540.0 529.2 L610.0 560.0 L540.0 590.8 Z" fill="url(#hatch)" fill-rule="evenodd" stroke="#1d1d1b" stroke-width="0.9" stroke-linejoin="round"/>
+<path d="M402.0 735.0 L540.0 674.3 L678.0 735.0 L540.0 795.7 Z M436.0 735.0 L540.0 689.2 L644.0 735.0 L540.0 780.8 Z" fill="url(#stipple)" fill-rule="evenodd" stroke="#1d1d1b" stroke-width="0.9" stroke-linejoin="round"/>
+<path d="M402.0 910.0 L540.0 849.3 L678.0 910.0 L540.0 970.7 Z" fill="none" stroke="#1d1d1b" stroke-width="1.1" stroke-linejoin="round"/>
+<path d="M506.0 910.0 L540.0 895.0 L574.0 910.0 L540.0 925.0 Z" fill="none" stroke="#1d1d1b" stroke-width="0.7" stroke-dasharray="1.2 3.2" stroke-linecap="round"/>
+<path d="M470.0 910.0 L540.0 879.2 L610.0 910.0 L540.0 940.8 Z" fill="none" stroke="#1d1d1b" stroke-width="0.7" stroke-dasharray="1.2 3.2" stroke-linecap="round"/>
+<path d="M436.0 910.0 L540.0 864.2 L644.0 910.0 L540.0 955.8 Z" fill="none" stroke="#1d1d1b" stroke-width="0.7" stroke-dasharray="1.2 3.2" stroke-linecap="round"/>
+<line x1="378.0" y1="210.0" x2="510.0" y2="210.0" stroke="#1d1d1b" stroke-width="0.7" stroke-dasharray="1.2 3.2" stroke-linecap="round"/><circle cx="515.0" cy="210.0" r="4.2" fill="#ffffff" stroke="#1d1d1b" stroke-width="1"/>
+<text x="48" y="217" font-size="21" font-weight="600" letter-spacing=".8" fill="#1d1d1b">SOCIAL INFRASTRUCTURE</text>
+<line x1="378.0" y1="385.0" x2="474.0" y2="385.0" stroke="#1d1d1b" stroke-width="0.7" stroke-dasharray="1.2 3.2" stroke-linecap="round"/><circle cx="479.0" cy="385.0" r="4.2" fill="#ffffff" stroke="#1d1d1b" stroke-width="1"/>
+<text x="48" y="392" font-size="21" font-weight="600" letter-spacing=".8" fill="#1d1d1b">GOVERNANCE</text>
+<line x1="378.0" y1="560.0" x2="440.0" y2="560.0" stroke="#1d1d1b" stroke-width="0.7" stroke-dasharray="1.2 3.2" stroke-linecap="round"/><circle cx="445.0" cy="560.0" r="4.2" fill="#ffffff" stroke="#1d1d1b" stroke-width="1"/>
+<text x="48" y="567" font-size="21" font-weight="600" letter-spacing=".8" fill="#1d1d1b">PHYSICAL INFRASTRUCTURE</text>
+<line x1="378.0" y1="735.0" x2="406.0" y2="735.0" stroke="#1d1d1b" stroke-width="0.7" stroke-dasharray="1.2 3.2" stroke-linecap="round"/><circle cx="411.0" cy="735.0" r="4.2" fill="#ffffff" stroke="#1d1d1b" stroke-width="1"/>
+<text x="48" y="742" font-size="21" font-weight="600" letter-spacing=".8" fill="#1d1d1b">NATURE</text>
+<line x1="378.0" y1="910.0" x2="406.0" y2="910.0" stroke="#1d1d1b" stroke-width="0.7" stroke-dasharray="1.2 3.2" stroke-linecap="round"/><circle cx="411.0" cy="910.0" r="4.2" fill="#ffffff" stroke="#1d1d1b" stroke-width="1"/>
+<text x="48" y="917" font-size="21" font-weight="600" letter-spacing=".8" fill="#1d1d1b">THE NEIGHBOURHOOD SCALE</text>
+</g>
+<line x1="692" y1="210" x2="724" y2="210" stroke="#1d1d1b" stroke-width="0.75" stroke-dasharray="1.2 3.6" stroke-linecap="round" opacity="0.7" marker-end="url(#arrow)"/>
+<line x1="692" y1="385" x2="724" y2="385" stroke="#1d1d1b" stroke-width="0.75" stroke-dasharray="1.2 3.6" stroke-linecap="round" opacity="0.7" marker-end="url(#arrow)"/>
+<line x1="692" y1="560" x2="724" y2="560" stroke="#1d1d1b" stroke-width="0.75" stroke-dasharray="1.2 3.6" stroke-linecap="round" opacity="0.7" marker-end="url(#arrow)"/>
+<line x1="692" y1="735" x2="724" y2="735" stroke="#d63c23" stroke-width="1" stroke-dasharray="1.2 3.6" stroke-linecap="round" opacity="1" marker-end="url(#arrow-acc)"/>
+<line x1="692" y1="910" x2="724" y2="910" stroke="#d63c23" stroke-width="1" stroke-dasharray="1.2 3.6" stroke-linecap="round" opacity="1" marker-end="url(#arrow-acc)"/>
+<line x1="842.0" y1="210.0" x2="842.0" y2="910.0" stroke="#1d1d1b" stroke-width="0.6" stroke-dasharray="1.2 3.2" stroke-linecap="round" opacity=".55"/>
+<line x1="910.0" y1="210.0" x2="910.0" y2="910.0" stroke="#1d1d1b" stroke-width="0.6" stroke-dasharray="1.2 3.2" stroke-linecap="round" opacity=".55"/>
+<line x1="806.0" y1="210.0" x2="806.0" y2="910.0" stroke="#1d1d1b" stroke-width="0.6" stroke-dasharray="1.2 3.2" stroke-linecap="round" opacity=".55"/>
+<line x1="946.0" y1="210.0" x2="946.0" y2="910.0" stroke="#1d1d1b" stroke-width="0.6" stroke-dasharray="1.2 3.2" stroke-linecap="round" opacity=".55"/>
+<line x1="772.0" y1="210.0" x2="772.0" y2="910.0" stroke="#1d1d1b" stroke-width="0.6" stroke-dasharray="1.2 3.2" stroke-linecap="round" opacity=".55"/>
+<line x1="980.0" y1="210.0" x2="980.0" y2="910.0" stroke="#1d1d1b" stroke-width="0.6" stroke-dasharray="1.2 3.2" stroke-linecap="round" opacity=".55"/>
+<line x1="738.0" y1="210.0" x2="738.0" y2="910.0" stroke="#1d1d1b" stroke-width="0.6" stroke-dasharray="1.2 3.2" stroke-linecap="round" opacity=".55"/>
+<line x1="1014.0" y1="210.0" x2="1014.0" y2="910.0" stroke="#1d1d1b" stroke-width="0.6" stroke-dasharray="1.2 3.2" stroke-linecap="round" opacity=".55"/>
+<line x1="876" y1="149.3" x2="876" y2="970.7" stroke="#1d1d1b" stroke-width="0.6" stroke-dasharray="1.2 3.2" stroke-linecap="round" opacity=".55"/>
+<path d="M806.0 210.0 L876.0 179.2 L946.0 210.0 L876.0 240.8 Z" fill="none" stroke="#1d1d1b" stroke-width="0.7" stroke-dasharray="1.2 3.2" stroke-linecap="round" opacity=".7"/>
+<path d="M772.0 210.0 L876.0 164.2 L980.0 210.0 L876.0 255.8 Z" fill="none" stroke="#1d1d1b" stroke-width="0.7" stroke-dasharray="1.2 3.2" stroke-linecap="round" opacity=".7"/>
+<path d="M738.0 210.0 L876.0 149.3 L1014.0 210.0 L876.0 270.7 Z" fill="none" stroke="#1d1d1b" stroke-width="0.7" stroke-dasharray="1.2 3.2" stroke-linecap="round" opacity=".7"/>
+<path d="M842.0 210.0 L876.0 195.0 L910.0 210.0 L876.0 225.0 Z" fill="url(#stipple)" fill-rule="evenodd" stroke="#1d1d1b" stroke-width="0.9" stroke-linejoin="round"/>
+<path d="M806.0 385.0 L876.0 354.2 L946.0 385.0 L876.0 415.8 Z M842.0 385.0 L876.0 370.0 L910.0 385.0 L876.0 400.0 Z" fill="url(#hatch)" fill-rule="evenodd" stroke="#1d1d1b" stroke-width="0.9" stroke-linejoin="round"/>
+<path d="M772.0 560.0 L876.0 514.2 L980.0 560.0 L876.0 605.8 Z M806.0 560.0 L876.0 529.2 L946.0 560.0 L876.0 590.8 Z" fill="url(#hatch)" fill-rule="evenodd" stroke="#1d1d1b" stroke-width="0.9" stroke-linejoin="round"/>
+<path d="M738.0 735.0 L876.0 674.3 L1014.0 735.0 L876.0 795.7 Z M772.0 735.0 L876.0 689.2 L980.0 735.0 L876.0 780.8 Z" fill="#f6c6b8" fill-opacity=".45" fill-rule="evenodd"/>
+<path d="M738.0 735.0 L876.0 674.3 L1014.0 735.0 L876.0 795.7 Z M772.0 735.0 L876.0 689.2 L980.0 735.0 L876.0 780.8 Z" fill="url(#stipple-acc)" fill-rule="evenodd" stroke="#d63c23" stroke-width="0.9" stroke-linejoin="round"/>
+<path d="M738.0 910.0 L876.0 849.3 L1014.0 910.0 L876.0 970.7 Z" fill="#f6c6b8" fill-opacity=".25"/>
+<path d="M738.0 910.0 L876.0 849.3 L1014.0 910.0 L876.0 970.7 Z" fill="none" stroke="#d63c23" stroke-width="1.1" stroke-linejoin="round"/>
+<path d="M842.0 910.0 L876.0 895.0 L910.0 910.0 L876.0 925.0 Z" fill="none" stroke="#d63c23" stroke-width="0.7" stroke-dasharray="1.2 3.2" stroke-linecap="round"/>
+<path d="M806.0 910.0 L876.0 879.2 L946.0 910.0 L876.0 940.8 Z" fill="none" stroke="#d63c23" stroke-width="0.7" stroke-dasharray="1.2 3.2" stroke-linecap="round"/>
+<path d="M772.0 910.0 L876.0 864.2 L980.0 910.0 L876.0 955.8 Z" fill="none" stroke="#d63c23" stroke-width="0.7" stroke-dasharray="1.2 3.2" stroke-linecap="round"/>
+<line x1="906.0" y1="210.0" x2="1026.0" y2="210.0" stroke="#1d1d1b" stroke-width="0.7" stroke-dasharray="1.2 3.2" stroke-linecap="round"/><circle cx="901.0" cy="210.0" r="4.2" fill="#ffffff" stroke="#1d1d1b" stroke-width="1"/>
+<text x="1040" y="217" font-size="21" font-weight="600" letter-spacing=".8" fill="#1d1d1b">SOCIAL INFRASTRUCTURE</text>
+<text x="1040" y="248" font-size="21" fill="#55524e">The relationships, networks and</text>
+<text x="1040" y="276" font-size="21" fill="#55524e">communities of practice that people</text>
+<text x="1040" y="304" font-size="21" fill="#55524e">lean on to get things done together</text>
+<line x1="942.0" y1="385.0" x2="1026.0" y2="385.0" stroke="#1d1d1b" stroke-width="0.7" stroke-dasharray="1.2 3.2" stroke-linecap="round"/><circle cx="937.0" cy="385.0" r="4.2" fill="#ffffff" stroke="#1d1d1b" stroke-width="1"/>
+<text x="1040" y="392" font-size="21" font-weight="600" letter-spacing=".8" fill="#1d1d1b">GOVERNANCE</text>
+<text x="1040" y="423" font-size="21" fill="#55524e">The rules, decision rights and</text>
+<text x="1040" y="451" font-size="21" fill="#55524e">assurance that decide what can</text>
+<text x="1040" y="479" font-size="21" fill="#55524e">change, and who gets to say so</text>
+<line x1="976.0" y1="560.0" x2="1026.0" y2="560.0" stroke="#1d1d1b" stroke-width="0.7" stroke-dasharray="1.2 3.2" stroke-linecap="round"/><circle cx="971.0" cy="560.0" r="4.2" fill="#ffffff" stroke="#1d1d1b" stroke-width="1"/>
+<text x="1040" y="567" font-size="21" font-weight="600" letter-spacing=".8" fill="#1d1d1b">PHYSICAL INFRASTRUCTURE</text>
+<text x="1040" y="598" font-size="21" fill="#55524e">The systems, tools, documents and</text>
+<text x="1040" y="626" font-size="21" fill="#55524e">offices that the everyday work</text>
+<text x="1040" y="654" font-size="21" fill="#55524e">flows through</text>
+<line x1="1010.0" y1="735.0" x2="1026.0" y2="735.0" stroke="#d63c23" stroke-width="0.7" stroke-dasharray="1.2 3.2" stroke-linecap="round"/><circle cx="1005.0" cy="735.0" r="4.2" fill="#ffffff" stroke="#d63c23" stroke-width="1"/>
+<text x="1040" y="742" font-size="21" font-weight="600" letter-spacing=".8" fill="#a92c17">CULTURE</text>
+<text x="1040" y="773" font-size="21" fill="#55524e">The habits, history and language an</text>
+<text x="1040" y="801" font-size="21" fill="#55524e">organisation grows from. The</text>
+<text x="1040" y="829" font-size="21" fill="#55524e">slowest ground of all</text>
+<line x1="1010.0" y1="910.0" x2="1026.0" y2="910.0" stroke="#d63c23" stroke-width="0.7" stroke-dasharray="1.2 3.2" stroke-linecap="round"/><circle cx="1005.0" cy="910.0" r="4.2" fill="#ffffff" stroke="#d63c23" stroke-width="1"/>
+<text x="1040" y="917" font-size="21" font-weight="600" letter-spacing=".8" fill="#a92c17">THE PLACE OF WORK</text>
+<text x="1040" y="948" font-size="21" fill="#55524e">Where each of these comes together</text>
+<text x="1040" y="976" font-size="21" fill="#55524e">and becomes lived experience for</text>
+<text x="1040" y="1004" font-size="21" fill="#55524e">the people doing the work</text>
+<text x="48" y="1046" font-size="14" fill="#55524e">Left adapted from Pagh &amp; Cook (2023), illustrated by the author. Right, the author.</text>
+</svg>
