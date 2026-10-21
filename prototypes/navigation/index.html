@@ -158,8 +158,7 @@
     will-change: transform;
     transition: opacity .3s;
   }
-  .layer-btn b { display: block; margin-bottom: 3px; font-size: 10.5px; font-weight: 500; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-text); white-space: nowrap; }
-  .layer-btn span { display: block; }
+  .layer-btn span { display: block; text-shadow: 0 0 3px var(--paper), 0 0 2px var(--paper), 0 0 1px var(--paper); }
   .layer-btn[aria-pressed="true"] span { color: var(--ink-text); font-weight: 500; }
 
   /* The pace scale under the drawing */
@@ -168,7 +167,8 @@
   .scale-tick { stroke: var(--ink); stroke-width: .5; }
   .scale-dot { fill: var(--paper); stroke: var(--ink); stroke-width: .75; }
   .scale-dot.reached { fill: var(--ink); }
-  .scale-word { fill: var(--ink-text); font-family: var(--font); font-size: 10.5px; font-weight: 500; letter-spacing: .16em; }
+  .scale-word { fill: var(--muted); font-family: var(--font); font-size: 10.5px; font-weight: 500; letter-spacing: .16em; }
+  .scale-word.on, .scale-slow { fill: var(--ink-text); }
   .layer-btn:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
 
   /* Corner furniture */
@@ -266,8 +266,10 @@
     .question { font-size: 17px; }
     .turned { display: none; }
     .corner small { display: none; }
-    .layer-btn span, .layer-btn b { display: none; }
-    .layer-btn[aria-pressed="true"] span, .layer-btn[aria-pressed="true"] b { display: block; }
+    .layer-btn span { display: none; }
+    .layer-btn[aria-pressed="true"] span { display: block; }
+    .scale-word:not(.scale-slow) { display: none; }
+    .scale-word.on { display: inline; }
     .about { right: 8px; bottom: max(14px, env(safe-area-inset-bottom, 0px)); }
     .ctrl { left: 8px; transform: none; justify-content: flex-start; max-width: calc(100% - 80px); bottom: max(14px, env(safe-area-inset-bottom, 0px)); }
     .ctrl .wide { display: none; }
@@ -339,7 +341,7 @@
   </header>
 
   <div class="meta">
-    <span class="v">v0.6.0</span>
+    <span class="v">v0.6.1</span>
     <button type="button" class="t" id="theme">Dark</button>
   </div>
 
@@ -366,7 +368,7 @@
     <div class="panel">
       <p>A working sketch from <a href="https://www.civicworks.co/">CIVICWORKS</a>, to sit alongside <a href="https://www.civicworks.co/">Tasting the organisational treacle</a>. Drag it any way to turn it, or flick it to set it tumbling. Left alone, it drifts. What it turns up reshapes the drawing.</p>
       <p>Value, legitimacy and capacity after <a href="https://www.hks.harvard.edu/publications/creating-public-value-core-idea-strategic-management-government">Mark Moore</a>. Pace layers after <a href="https://longnow.org/ideas/pace-layers/">Stewart Brand</a>. Scales of a system after <a href="https://link.springer.com/chapter/10.1007/978-3-031-78357-9_2">Hill and Melander</a>. Dark matter from Bryan Boyer.</p>
-      <p>v0.6.0</p>
+      <p>v0.6.1</p>
     </div>
   </details>
 </main>
@@ -635,8 +637,7 @@
     b.className = "layer-btn";
     b.setAttribute("aria-label", name);
     b.setAttribute("aria-label", name + ", " + PACE[i].toLowerCase());
-    b.innerHTML = "<b></b><span></span>";
-    b.querySelector("b").textContent = PACE[i];
+    b.innerHTML = "<span></span>";
     b.querySelector("span").textContent = name;
     b.addEventListener("click", function () { input(); touch(); setLayer(i); });
     layersEl.appendChild(b);
@@ -646,10 +647,15 @@
   var gScale = document.getElementById("g-scale");
   var scaleLine = el("line", { "class": "scale-line" }, gScale);
   var scaleHead = el("path", { "class": "scale-head" }, gScale);
-  var scaleWord = el("text", { "class": "scale-word", "text-anchor": "middle" }, gScale);
+  var scaleWord = el("text", { "class": "scale-word scale-slow", "text-anchor": "middle" }, gScale);
   scaleWord.textContent = "SLOWER";
   var scaleTicks = LAYER_Y.map(function () { return el("line", { "class": "scale-tick" }, gScale); });
   var scaleDots = LAYER_Y.map(function () { return el("circle", { "class": "scale-dot", r: 2.4 }, gScale); });
+  var scaleWords = PACE.map(function (w) {
+    var t = el("text", { "class": "scale-word", "text-anchor": "middle" }, gScale);
+    t.textContent = w.toUpperCase();
+    return t;
+  });
 
   function sphereRadius() { return state.found.length ? 0.16 + state.found.length * 0.042 : 0.1; }
 
@@ -708,6 +714,9 @@
       var low = pts[0];
       for (var k = 1; k < pts.length; k++) if (pts[k].y > low.y) low = pts[k];
       lows[i] = low;
+      var b = layerBtns[i];
+      place(b, low.x - b.offsetWidth / 2, low.y + 8);
+      b.setAttribute("aria-pressed", String(i === state.layer));
     });
 
     // The pace scale: a ruler just below the drawing, a little wider than the cone, read from the
@@ -729,12 +738,13 @@
       scaleDots[i].setAttribute("cx", x); scaleDots[i].setAttribute("cy", baseY);
       scaleDots[i].setAttribute("r", i === state.layer ? 3.6 : 2.4);
       scaleDots[i].setAttribute("class", "scale-dot" + (state.reached[i] ? " reached" : ""));
+      scaleWords[i].setAttribute("x", x); scaleWords[i].setAttribute("y", baseY + 20);
+      scaleWords[i].setAttribute("class", "scale-word" + (i === state.layer ? " on" : ""));
+      // names on the rings stack up end on, so they go when the ruler goes
       var b = layerBtns[i];
-      place(b, x - b.offsetWidth / 2, baseY + 10);
       b.style.opacity = vis;
       b.style.pointerEvents = vis < 0.3 ? "none" : "";
       b.tabIndex = vis < 0.3 ? -1 : 0;
-      b.setAttribute("aria-pressed", String(i === state.layer));
     });
 
     // Faces, edges, the sphere and the active triangle, painted back to front
