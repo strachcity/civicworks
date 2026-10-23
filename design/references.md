@@ -8,7 +8,7 @@ What the diagrams and the site are drawn from. Kept as links and descriptions, n
 
 What is being borrowed:
 
-- **One ink on pale paper.** A single saturated colour does all the work: ultramarine on one poster, red-orange on the other, both on light grey. Here it is `#d63c23` on `#efeeeb` or white.
+- **One ink on white.** A single saturated colour does all the work: ultramarine on one poster, red-orange on the other. The posters sit on light grey; here the paper is pure white (`#ffffff`), as in the current navigation and place prototypes, and the ink is `#d63c23`. Not off-white, not grey.
 - **Solid ink, a pale tint, and nothing between.** Bodies are flat pale tints of the ink (salmon on the red poster, lavender on the blue), outlined in full-strength ink; the one thing that matters in a vignette (an impactor, a moon) is the only solid fill.
 - **A second colour only to mark contrast.** Where the blue poster summarises the competing moon theories it switches to the red, so colour means "the other case", never decoration.
 - **Texture instead of colour for fills.** Diagonal hatching, cross-hatching and stipple at fine weights, plus flat light tints of the one ink. A legend is a row of texture swatches.
