@@ -29,7 +29,7 @@ Notes here are deliberately blunt and provisional. Prose written to essay standa
 
 ## Prototypes
 
-**[prototypes/](prototypes/)** holds interactive companions to published pieces, served on GitHub Pages. They are made from the writing rather than being part of the wiki, and only that folder is published. The first is [Experimentation as navigation](https://strachcity.github.io/civicworks/navigation/), for *Tasting the organisational treacle*.
+**[prototypes/](prototypes/)** holds interactive companions to published pieces, served on GitHub Pages at [experiments.civicworks.co](https://experiments.civicworks.co/). They are made from the writing rather than being part of the wiki, and only that folder is published. The first is [Experimentation as navigation](https://experiments.civicworks.co/navigation/), for *Tasting the organisational treacle*.
 
 ## What stays out
 

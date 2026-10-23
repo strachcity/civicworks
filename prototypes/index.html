@@ -2,16 +2,106 @@
 <html lang="en-GB">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CIVICWORKS prototypes</title>
-<meta http-equiv="refresh" content="0; url=navigation/">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>CIVICWORKS experiments</title>
+<meta name="description" content="Working drawings and sketches made alongside the writing on CIVICWORKS.">
+<meta property="og:title" content="CIVICWORKS experiments">
+<meta property="og:description" content="Working drawings and sketches made alongside the writing.">
+<meta property="og:image" content="https://experiments.civicworks.co/navigation/og.png">
+<meta property="og:url" content="https://experiments.civicworks.co/">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@300;400;500&display=swap">
 <style>
-  body { margin: 0; padding: 28px 16px; background: #f6f3ef; color: #2a2422; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; }
-  a { color: #e2442f; }
-  @media (prefers-color-scheme: dark) { body { background: #171312; color: #f1e9e5; } a { color: #ff6b52; } }
+  /* Same family as the prototypes: ink on paper, small type, the drawings do the work.
+     The thumbnails are white prints, so the page stays on white in every theme. */
+  :root {
+    --paper: #ffffff;
+    --ink: #d63c23;
+    --ink-text: #a92c17;
+    --text: #1d1d1b;
+    --muted: #55524e;
+    --rule: #ecd9d3;
+    --focus: #1f3fd6;
+    --font: "Hanken Grotesk", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    color-scheme: light;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--text);
+    font-family: var(--font);
+    font-size: 14px;
+    line-height: 1.45;
+    -webkit-font-smoothing: antialiased;
+  }
+  .page {
+    max-width: 960px;
+    margin: 0 auto;
+    min-height: 100svh;
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    gap: 40px;
+    padding-block: max(24px, env(safe-area-inset-top, 0px)) max(20px, env(safe-area-inset-bottom, 0px));
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+  }
+  header { display: flex; justify-content: space-between; gap: 16px; align-items: flex-start; }
+  h1 { font-size: 20px; font-weight: 400; letter-spacing: -.005em; line-height: 1.2; margin: 0; color: var(--ink-text); }
+  header p { font-size: 13px; color: var(--muted); margin: 6px 0 0; max-width: 46ch; }
+  .meta { font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); white-space: nowrap; }
+  ol { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 380px), 1fr)); gap: 40px 32px; align-content: start; }
+  li a { display: block; color: inherit; text-decoration: none; border-radius: 4px; }
+  li a:focus-visible { outline: 2px solid var(--focus); outline-offset: 4px; }
+  .thumb { aspect-ratio: 1200 / 630; border: 0.5px solid var(--rule); overflow: hidden; }
+  .thumb img { display: block; width: 100%; height: 100%; object-fit: cover; transition: transform .4s ease; }
+  li a:hover .thumb img { transform: scale(1.015); }
+  h2 { font-size: 16px; font-weight: 400; margin: 14px 0 4px; color: var(--ink-text); }
+  li a:hover h2 { text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 0.75px; }
+  li p { margin: 0; font-size: 13px; color: var(--muted); }
+  .from { margin-top: 8px; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+  footer { font-size: 12.5px; color: var(--muted); }
+  footer a { color: var(--ink-text); }
+  footer a:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; border-radius: 4px; }
+  @media (prefers-reduced-motion: reduce) { .thumb img { transition: none; } }
 </style>
 </head>
 <body>
-<p><a href="navigation/">Experimentation as navigation</a></p>
+<div class="page">
+  <header>
+    <div>
+      <h1>Experiments</h1>
+      <p>Working drawings and sketches made alongside the writing on CIVICWORKS. Unfinished on purpose.</p>
+    </div>
+    <span class="meta">CIVICWORKS</span>
+  </header>
+
+  <main>
+    <ol>
+      <li>
+        <a href="navigation/">
+          <div class="thumb"><img src="navigation/og.png" alt="" width="1200" height="630"></div>
+          <h2>Experimentation as navigation</h2>
+          <p>Spin an experiment across value, legitimacy and capacity, and through the layers of an institution.</p>
+          <p class="from">Tasting the organisational treacle</p>
+        </a>
+      </li>
+      <li>
+        <a href="place/">
+          <div class="thumb"><img src="place/place-diagram-single.png" style="object-position: center top" alt="" width="1456" height="1380" loading="lazy"></div>
+          <h2>An organisation is a place too</h2>
+          <p>An organisation drawn as five layers, the same layers a neighbourhood has, in different material.</p>
+          <p class="from">Tasting the organisational treacle</p>
+        </a>
+      </li>
+    </ol>
+  </main>
+
+  <footer>
+    <p>The writing lives at <a href="https://www.civicworks.co/">civicworks.co</a>.</p>
+  </footer>
+</div>
 </body>
 </html>
