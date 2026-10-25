@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Experimentation as probes</title>
+<meta name="description" content="Three directions for an editorial illustration in Tasting the organisational treacle. A working page.">
+<meta name="robots" content="noindex">
+<link rel="icon" href="/favicon.ico" sizes="32x32">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@300;400;500&display=swap">
+<style>
+  /* A working sheet for comparing three illustrations. Same family as the front page and the
+     prototypes: one ink on white, small type, the drawings do the work. The illustrations are
+     white prints, so the sheet stays on white in every theme. */
+  :root {
+    --paper: #ffffff;
+    --ink: #d63c23;
+    --ink-text: #a92c17;
+    --text: #1d1d1b;
+    --muted: #55524e;
+    --rule: #ecd9d3;
+    --tint-faint: rgba(246, 198, 184, 0.2);
+    --focus: #1f3fd6;
+    --font: "Hanken Grotesk", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    color-scheme: light;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--paper); color: var(--text); font-family: var(--font); font-size: 14px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+  .page {
+    max-width: 1080px; margin: 0 auto;
+    padding-block: max(24px, env(safe-area-inset-top, 0px)) 64px;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+  }
+  header { display: flex; justify-content: space-between; gap: 16px; align-items: flex-start; }
+  h1 { font-size: 20px; font-weight: 400; line-height: 1.2; margin: 0; color: var(--ink-text); }
+  header p { font-size: 13px; color: var(--muted); margin: 6px 0 0; max-width: 56ch; }
+  .meta { display: flex; gap: 8px; align-items: center; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); white-space: nowrap; }
+
+  .placement { margin: 32px 0 8px; display: grid; gap: 10px; max-width: 64ch; }
+  .placement p { margin: 0; font-size: 14px; color: var(--muted); font-style: italic; }
+  .placement .slot { font-style: normal; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-text); border-left: 1.5px solid var(--ink); padding-left: 10px; }
+
+  section.concept { margin-top: 56px; padding-top: 20px; border-top: .5px solid var(--ink); }
+  .head { display: flex; flex-wrap: wrap; gap: 6px 16px; align-items: baseline; justify-content: space-between; }
+  h2 { font-size: 18px; font-weight: 400; margin: 0; color: var(--ink-text); }
+  h2 .letter { font-size: 11px; font-weight: 500; letter-spacing: .14em; margin-right: 10px; }
+  .says { font-size: 13px; color: var(--muted); margin: 4px 0 0; }
+  .frame { margin: 18px 0 0; border: .5px solid var(--rule); }
+  .frame svg { display: block; width: 100%; height: auto; }
+  .controls { display: flex; flex-wrap: wrap; gap: 6px 16px; align-items: center; margin-top: 10px; font-size: 12.5px; color: var(--ink-text); }
+  .controls label { display: inline-flex; gap: 8px; align-items: center; }
+  input[type="range"] { accent-color: var(--ink); width: 160px; }
+  input[type="checkbox"] { accent-color: var(--ink); }
+  button.t {
+    font: inherit; font-size: 12.5px; color: var(--ink-text); background: transparent;
+    border: .5px dashed var(--ink); border-radius: 999px; padding: 5px 12px; min-height: 32px; cursor: pointer;
+  }
+  button.t:hover { background: var(--tint-faint); }
+  button.t[aria-pressed="true"] { border-style: solid; }
+  button.t:focus-visible, input:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+
+  .notes { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 12px 32px; margin-top: 16px; }
+  .notes h3 { font-size: 11px; font-weight: 500; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-text); margin: 0 0 4px; }
+  .notes p { margin: 0; font-size: 13.5px; color: var(--muted); max-width: 60ch; }
+
+  .compare { margin-top: 64px; padding-top: 20px; border-top: 1.1px solid var(--ink); }
+  .compare h2 { margin-bottom: 12px; }
+  .compare p { font-size: 14px; color: var(--muted); max-width: 66ch; margin: 0 0 12px; }
+  .compare b { font-weight: 500; color: var(--text); }
+  footer { margin-top: 48px; font-size: 12.5px; color: var(--muted); }
+  footer a { color: var(--ink-text); }
+
+  /* phone width: every frame drawn at the width a phone reader sees */
+  body.phone .frame { max-width: 375px; }
+
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+</style>
+</head>
+<body>
+<div class="page">
+  <header>
+    <div>
+      <h1>Experimentation as probes</h1>
+      <p>Three directions for one small illustration in Tasting the organisational treacle. A working page, not yet in the essay. Each one works as a still; the controls are there to play with.</p>
+    </div>
+    <div class="meta">
+      <button type="button" class="t" id="phone" aria-pressed="false">Phone width</button>
+    </div>
+  </header>
+
+  <div class="placement">
+    <p>You start to work with the materials of the institution itself, discovering how they had been arranged around the existing service and where you might rearrange them to make something different possible.</p>
+    <div class="slot">The illustration goes here</div>
+    <p>This is exactly where the value of experimentation lies. Discovering what an institution is made of, where its arrangements can be challenged and what might become possible if we started designing with those materials rather than treating them as fixed conditions around our work.</p>
+  </div>
+
+  <section class="concept" aria-labelledby="a-h">
+    <div class="head">
+      <h2 id="a-h"><span class="letter">A</span>Pull one thread</h2>
+    </div>
+    <p class="says">We learn what a system is made of by trying to change something within it.</p>
+    <div class="frame"><svg id="svg-a" role="img" aria-label="A woven cloth of institutional materials, legislation, interpretation, practice, responsibility and relationships. An experiment pulls one thread out to the side, and the threads it crosses pucker towards the pull."></svg></div>
+    <div class="controls">
+      <label for="pull">Pull <input type="range" id="pull" min="0" max="1" step="0.01" value="0.8"></label>
+    </div>
+    <div class="notes">
+      <div>
+        <h3>What it shows</h3>
+        <p>An institution as a cloth woven from different materials, each with its own texture, none of them underneath the others. Pull one thread and the ones it crosses pucker, so the connections only show when something moves. Legislation bends least.</p>
+      </div>
+      <div>
+        <h3>What it loses</h3>
+        <p>A weave is regular and an institution isn't. It reads as everything touching everything in a tidy grid, and it can suggest the thread comes out cleanly. It says little about room to rearrange, only about connection.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="concept" aria-labelledby="b-h">
+    <div class="head">
+      <h2 id="b-h"><span class="letter">B</span>Rebalance the mobile</h2>
+    </div>
+    <p class="says">Sometimes a different service becomes possible by changing the relationships between existing materials.</p>
+    <div class="frame"><svg id="svg-b" role="img" aria-label="A hanging mobile of institutional materials. Legislation hangs from a fixed joint and doesn't swing. An experiment adds a small weight under practice, the free arms tilt, and roles swings up into the place of another arrangement. The old position shows as a dotted outline."></svg></div>
+    <div class="controls">
+      <label for="weight">The experiment's weight <input type="range" id="weight" min="0" max="1" step="0.01" value="0.85"></label>
+      <label for="ghost"><input type="checkbox" id="ghost" checked> Show where it was</label>
+    </div>
+    <div class="notes">
+      <div>
+        <h3>What it shows</h3>
+        <p>The materials hang in a balance that produces the current service. A small weight shifts the free arms, the fixed joint stays put, and the change gets taken up somewhere else, where it makes another arrangement possible. Constructive, and honest that not everything swings.</p>
+      </div>
+      <div>
+        <h3>What it loses</h3>
+        <p>Balance implies the system settles, and that one weight always finds a new equilibrium. It's the most mechanical of the three, and a mobile is a sculpture someone made on purpose, which institutions mostly aren't.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="concept" aria-labelledby="c-h">
+    <div class="head">
+      <h2 id="c-h"><span class="letter">C</span>Taste the treacle</h2>
+    </div>
+    <p class="says">Experiments help us discover what gets stuck, and where there may be room to move.</p>
+    <div class="frame"><svg id="svg-c" role="img" aria-label="An experiment's path through a stippled field that is thicker in places. Its marks bunch up where the field is thick. It loops in three tangles where it gets stuck, and bends round two neat sets of rings."></svg></div>
+    <div class="controls">
+      <button type="button" class="t" id="play">Play the probe</button>
+      <button type="button" class="t" id="reseed">Another institution</button>
+    </div>
+    <div class="notes">
+      <div>
+        <h3>What it shows</h3>
+        <p>The institution as texture you only feel by moving through it. The marks bunch where it's thick, so the drawing reads as slowing down. Neat rings are constraints that protect something, and the probe goes round them. Tangles are habit, and it pushes through them, slowly, sometimes turning a loop.</p>
+      </div>
+      <div>
+        <h3>What it loses</h3>
+        <p>It doesn't name any materials, so it leans on the essay to say what the friction is. It's about resistance more than rearrangement, and the difference between a ring and a tangle is a visual hint a reader might not take.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="compare" aria-labelledby="cmp-h">
+    <h2 id="cmp-h">How they compare</h2>
+    <p><b>Does it show something the prose doesn't?</b> C does most clearly. The paragraph after the slot says what an institution is made of, and C gives the feel of moving through it instead. A shows connection, which the prose implies but doesn't show. B shows rearrangement, which the next paragraph names.</p>
+    <p><b>Materials and their relationships.</b> A is strongest, with five named materials and visible knock-on effects. B names four and shows that they differ in how freely they move. C names none.</p>
+    <p><b>Experimentation as active inquiry.</b> All three have the experiment doing something. In A it pulls, in B it weighs, in C it travels. C is the only one where the probe learns by moving rather than by acting once.</p>
+    <p><b>Legitimate constraints as well as friction.</b> B and C both build this in, B with the fixed joint and C with rings against tangles. A only hints at it, through the stiffer legislation threads.</p>
+    <p><b>Next to the navigation model.</b> C complements it best, since it's the treacle itself rather than another structure. A sits closest to the Materials prototype, and its threads are not far from those arcs. B introduces a second mechanical object, which competes a little.</p>
+    <p><b>On a phone.</b> All three shrink to about a quarter of their size, and the small labels go below reading size. C loses nothing, because it never relied on words. B still reads as a mobile tipping. A turns into a fine grid, and without its labels it's the hardest to read at that size.</p>
+    <p><b>Worth the space?</b> C is the most distinctive and the most CIVICWORKS. A is the clearest to a first-time reader. B is the most playful but the least likely to survive as a still.</p>
+  </section>
+
+  <footer>
+    <p>Drawn in code from <a href="illustrations.js">illustrations.js</a>, so any of the three can be lifted into the essay. Back to the <a href="../">experiments</a>.</p>
+  </footer>
+</div>
+
+<script src="illustrations.js"></script>
+<script>
+(function () {
+  "use strict";
+  var P = window.PROBES;
+  var reduced = !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+  var svgA = document.getElementById("svg-a"), svgB = document.getElementById("svg-b"), svgC = document.getElementById("svg-c");
+  var pull = document.getElementById("pull"), weight = document.getElementById("weight"), ghost = document.getElementById("ghost");
+
+  function drawA() { P.weave(svgA, { pull: +pull.value }); }
+  function drawB() { P.mobile(svgB, { weight: +weight.value, ghost: ghost.checked }); }
+  pull.addEventListener("input", drawA);
+  weight.addEventListener("input", drawB);
+  ghost.addEventListener("change", drawB);
+
+  // C draws once, then the probe replays its route. The same number of marks appears each frame,
+  // so it moves slowly where the marks are dense, which is where the field is thick.
+  var seed = 7, marks = [], anim = null;
+  function drawC() { marks = P.treacle(svgC, { seed: seed }); }
+  function play() {
+    if (reduced) return;
+    cancelAnimationFrame(anim);
+    var lines = svgC.querySelectorAll(".marks line"), head = svgC.querySelector(".probe-head");
+    var hx = +head.getAttribute("data-x"), hy = +head.getAttribute("data-y");
+    lines.forEach(function (l) { l.style.visibility = "hidden"; });
+    var i = 0;
+    (function step() {
+      for (var k = 0; k < 2 && i < lines.length; k++, i++) lines[i].style.visibility = "";
+      var m = marks[Math.min(i, marks.length - 1)];
+      head.setAttribute("transform", "translate(" + (m[0] - hx).toFixed(1) + " " + (m[1] - hy).toFixed(1) + ")");
+      if (i < lines.length) anim = requestAnimationFrame(step);
+    })();
+  }
+  document.getElementById("play").addEventListener("click", play);
+  document.getElementById("reseed").addEventListener("click", function () { seed = (seed * 7919 + 13) % 100003; drawC(); play(); });
+
+  var phone = document.getElementById("phone");
+  phone.addEventListener("click", function () {
+    var on = !document.body.classList.contains("phone");
+    document.body.classList.toggle("phone", on);
+    phone.setAttribute("aria-pressed", String(on));
+  });
+
+  drawA(); drawB(); drawC();
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { drawA(); drawB(); });
+})();
+</script>
+</body>
+</html>
