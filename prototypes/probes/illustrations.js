@@ -2,7 +2,8 @@
 // language: one ink on white, tints and textures instead of colour, three line weights.
 //
 // Each function draws into an empty <svg> and can be called again with new options:
-//   PROBES.weave(svg, { pull: 0.8 })                    A, pull one thread
+//   PROBES.weave(svg, { pull: 0.8, arrows: true })      A, pull one thread
+//   PROBES.weaveBeforeAfter(svg, { pull: 0.85 })       A, before and after, with arrows
 //   PROBES.mobile(svg, { weight: 0.85, ghost: true })    B, rebalance the mobile
 //   PROBES.treacle(svg, { seed: 7, reveal: 1 })          C, taste the treacle
 // Colours are written in, not taken from CSS, so a drawing can be lifted out as a standalone SVG.
@@ -76,13 +77,22 @@
     { name: "Responsibility", fill: "cross", stiff: 0.7 },
     { name: "Relationships", fill: "blank", stiff: 1 }
   ];
-  function weave(svg, opts) {
-    var p = opts && opts.pull != null ? opts.pull : 0.8;
-    var url = start(svg, "wv", "One thread pulled from a woven cloth of institutional materials, puckering the threads it crosses");
-    var x0 = 470, x1 = 1060, y0 = 110, y1 = 530, NW = 12, NF = 6, BAND = 17;
-    var wx = [], wy = [];
-    for (var i = 0; i < NW; i++) wx.push(x0 + (i + 0.5) * (x1 - x0) / NW);
-    for (var j = 0; j < NF; j++) wy.push(y0 + (j + 0.5) * (y1 - y0) / NF);
+  // an arrow in the drawing's own line: a thin shaft and an open head
+  function arrow(parent, x1, y1, x2, y2, w, h) {
+    var a = Math.atan2(y2 - y1, x2 - x1), s = 0.48;
+    el("path", { d: line([[x1, y1], [x2, y2]]), stroke: INK, "stroke-width": w, "stroke-linecap": "round", fill: "none" }, parent);
+    el("path", { d: line([[x2 - h * Math.cos(a - s), y2 - h * Math.sin(a - s)], [x2, y2], [x2 - h * Math.cos(a + s), y2 - h * Math.sin(a + s)]]),
+      stroke: INK, "stroke-width": w, "stroke-linecap": "round", "stroke-linejoin": "round", fill: "none" }, parent);
+  }
+
+  // Draws the cloth into g, in the drawing's own coordinates, and returns where things landed so
+  // labels can be placed outside a scaled group. o.tail draws the pulled thread out to the
+  // experiment; o.arrows adds arrows for how everything moves; o.k thickens arrows when g is scaled.
+  function cloth(g, url, p, o) {
+    var x0 = 470, x1 = 1060, y0 = 110, y1 = 530, NW = 12, NF = 6, BAND = 17, k = o.k || 1;
+    var wx = [], wy = [], i, j;
+    for (i = 0; i < NW; i++) wx.push(x0 + (i + 0.5) * (x1 - x0) / NW);
+    for (j = 0; j < NF; j++) wy.push(y0 + (j + 0.5) * (y1 - y0) / NF);
     var pulled = 4, yp = wy[pulled]; // an interpretation thread, where the essay finds room
     function warpMat(i) { return WEAVE[i % 5]; }
     function weftMat(j) { return WEAVE[(j + 2) % 5]; }
@@ -95,48 +105,103 @@
     // neighbouring wefts gather towards the pulled one, more towards the right
     function weftY(j, x) {
       if (j === pulled) return yp;
-      var g = Math.pow(Math.max(0, (x - x0) / (x1 - x0)), 1.6);
-      return wy[j] + p * 30 * Math.sign(yp - wy[j]) * Math.exp(-Math.pow(wy[j] - yp, 2) / (2 * 110 * 110)) * g;
+      var gx = Math.pow(Math.max(0, (x - x0) / (x1 - x0)), 1.6);
+      return wy[j] + p * 30 * Math.sign(yp - wy[j]) * Math.exp(-Math.pow(wy[j] - yp, 2) / (2 * 110 * 110)) * gx;
     }
     function warpPts(i, ya, yb) { var a = []; for (var y = ya; y <= yb + 0.1; y += 5) a.push([warpX(i, y), y]); return a; }
     function weftPts(j, xa, xb) { var a = []; for (var x = xa; x <= xb + 0.1; x += 5) a.push([x, weftY(j, x)]); return a; }
-    function band(d, m, g) {
+    function band(d, m) {
       el("path", { d: d, fill: "none", stroke: INK, "stroke-width": BAND, "stroke-linecap": "butt" }, g);
       el("path", { d: d, fill: "none", stroke: PAPER, "stroke-width": BAND - 1.6, "stroke-linecap": "butt" }, g);
       if (m.fill === "tint") el("path", { d: d, fill: "none", stroke: TINT, "stroke-width": BAND - 1.6 }, g);
       else if (m.fill !== "blank") el("path", { d: d, fill: "none", stroke: url(m.fill), "stroke-width": BAND - 1.6 }, g);
       else el("path", { d: d, fill: "none", stroke: INK, "stroke-width": .6, "stroke-dasharray": "1 3.5", "stroke-linecap": "round" }, g);
     }
-    var g = el("g", {}, svg);
-    for (i = 0; i < NW; i++) band(line(warpPts(i, y0 - 22, y1 + 22)), warpMat(i), g);
     // the pulled thread has been drawn partway out: its tail leaves a gap on the left
-    for (j = 0; j < NF; j++) {
-      var xa = j === pulled ? x0 - 22 + p * 150 : x0 - 22;
-      band(line(weftPts(j, xa, x1 + 22)), weftMat(j), g);
-    }
+    function startX(j) { return j === pulled ? x0 - 22 + p * 150 : x0 - 22; }
+    for (i = 0; i < NW; i++) band(line(warpPts(i, y0 - 22, y1 + 22)), warpMat(i));
+    for (j = 0; j < NF; j++) band(line(weftPts(j, startX(j), x1 + 22)), weftMat(j));
     // over and under: where a warp should lie on top, draw that short piece of it again
     for (i = 0; i < NW; i++) for (j = 0; j < NF; j++) {
       if ((i + j) % 2) continue;
-      if (j === pulled && wx[i] < x0 - 22 + p * 150) continue;
+      if (wx[i] < startX(j)) continue;
       var yc = weftY(j, wx[i]);
-      band(line(warpPts(i, yc - BAND * 0.75, yc + BAND * 0.75)), warpMat(i), g);
+      band(line(warpPts(i, yc - BAND * 0.75, yc + BAND * 0.75)), warpMat(i));
     }
-    // the pulled thread runs out to the experiment
     var ex = x1 + 22, px = ex + 90 + p * 170, py = yp + 18 * p;
-    var tail = [[ex, yp], [ex + (px - ex) * 0.5, yp + (py - yp) * 0.2], [px - 16, py]];
-    band("M" + ex + " " + yp + " Q " + tail[1][0].toFixed(1) + " " + tail[1][1].toFixed(1) + " " + tail[2][0].toFixed(1) + " " + tail[2][1].toFixed(1), weftMat(pulled), g);
-    probe(svg, px, py);
-    label(svg, "The experiment", px, py + 44, "middle", true);
-    // one label per material, at the left end of a weft that carries it
-    var done = {};
-    for (j = 0; j < NF; j++) {
-      var m = weftMat(j);
-      if (done[m.name]) continue;
-      done[m.name] = true;
-      var lx = j === pulled ? x0 - 22 + p * 150 : x0 - 22;
-      leader(svg, 360, wy[j], lx - 8, wy[j]);
-      label(svg, m.name, 340, wy[j] + 5, "end");
+    if (o.tail) {
+      var mid = [ex + (px - ex) * 0.5, yp + (py - yp) * 0.2];
+      band("M" + ex + " " + yp + " Q " + mid[0].toFixed(1) + " " + mid[1].toFixed(1) + " " + (px - 16).toFixed(1) + " " + py.toFixed(1), weftMat(pulled));
+      probe(g, px, py);
     }
+    if (o.arrows && p > 0) {
+      // in each gap of the cloth, an arrow for which way that part of it has moved, as long as it moved
+      for (i = 0; i < NW - 1; i++) for (j = 0; j < NF - 1; j++) {
+        var cx0 = (wx[i] + wx[i + 1]) / 2, cy0 = (wy[j] + wy[j + 1]) / 2;
+        var dx = (warpX(i, cy0) - wx[i] + warpX(i + 1, cy0) - wx[i + 1]) / 2;
+        var dy = (weftY(j, cx0) - wy[j] + weftY(j + 1, cx0) - wy[j + 1]) / 2;
+        var mag = Math.hypot(dx, dy);
+        if (mag < 4) continue;
+        var L = Math.min(27, 9 + mag * 0.5), ux = dx / mag, uy = dy / mag, cx = cx0 + dx, cy = cy0 + dy;
+        arrow(g, cx - ux * L / 2, cy - uy * L / 2, cx + ux * L / 2, cy + uy * L / 2, 1 * k, (5 + L * 0.12) * k);
+      }
+      // the experiment pulls, and the thread follows it out
+      arrow(g, px + 22, py, px + 82, py, 1.1 * k, 8 * k);
+      arrow(g, x0 - 22, yp, startX(pulled) - 6, yp, 1.1 * k, 7 * k);
+    }
+    return {
+      labels: WEAVE.map(function (m) { for (var j = 0; j < NF; j++) if (weftMat(j) === m) return { name: m.name, y: wy[j], x: startX(j), pulled: j === pulled }; }),
+      px: px, py: py, left: x0 - 22, ex: ex, top: y0 - 22, bottom: y1 + 22,
+      stiff: { x: warpX(10, y1 + 22), y: y1 + 22 } // a legislation warp near the exit
+    };
+  }
+
+  function weaveLabels(svg, c, arrows, X, Y, lx) {
+    lx = lx || 340;
+    c.labels.forEach(function (l) {
+      // with arrows, the pulled thread's leader stops at the cloth's edge and the arrow takes over
+      if (arrows && l.pulled) el("path", { d: line([[lx + 20, Y(l.y)], [X(c.left) - 8, Y(l.y)]]), stroke: INK, "stroke-width": .6, "stroke-dasharray": "1 3.5", "stroke-linecap": "round", fill: "none" }, svg);
+      else leader(svg, lx + 20, Y(l.y), X(l.x) - 8, Y(l.y));
+      label(svg, l.name, lx, Y(l.y) + 5, "end");
+    });
+  }
+  function stiffNote(svg, c, X, Y) {
+    var sx = X(c.stiff.x), sy = Y(c.stiff.y);
+    leader(svg, sx, sy + 34, sx, sy + 6);
+    label(svg, "Legislation bends least", sx, sy + 56, "middle", true);
+  }
+
+  function weave(svg, opts) {
+    var p = opts && opts.pull != null ? opts.pull : 0.8, arrows = !!(opts && opts.arrows);
+    var url = start(svg, "wv", arrows
+      ? "One thread pulled from a woven cloth of institutional materials. Arrows show the threads it crosses dragged towards the pull, its neighbours gathering in, and legislation bending least"
+      : "One thread pulled from a woven cloth of institutional materials, puckering the threads it crosses");
+    var g = el("g", {}, svg);
+    var c = cloth(g, url, p, { tail: true, arrows: arrows });
+    function id(v) { return v; }
+    label(svg, "The experiment", c.px, c.py + 44, "middle", true);
+    weaveLabels(svg, c, arrows, id, id);
+    if (arrows && p > 0) stiffNote(svg, c, id, id);
+  }
+
+  // The same cloth twice, untouched and then pulled, smaller, with the arrows on the second.
+  function weaveBeforeAfter(svg, opts) {
+    var p = opts && opts.pull != null ? opts.pull : 0.85, s = 0.6, ty = 318 - 320 * s;
+    var url = start(svg, "wb", "The woven cloth of institutional materials before and after one thread is pulled. Arrows show how the cloth moves, with legislation bending least");
+    var txA = 290 - 448 * s, txB = 810 - 448 * s;
+    function place(tx) {
+      return { g: el("g", { transform: "translate(" + tx.toFixed(1) + " " + ty.toFixed(1) + ") scale(" + s + ")" }, svg),
+        X: function (v) { return tx + v * s; }, Y: function (v) { return ty + v * s; } };
+    }
+    var A = place(txA), B = place(txB);
+    var a = cloth(A.g, url, 0, {});
+    var b = cloth(B.g, url, p, { tail: true, arrows: true, k: 1 / s });
+    weaveLabels(svg, a, false, A.X, A.Y, 250);
+    label(svg, "Before", (A.X(a.left) + A.X(a.ex)) / 2, A.Y(a.top) - 30, "middle");
+    label(svg, "After one thread is pulled", (B.X(b.left) + B.X(b.ex)) / 2, B.Y(b.top) - 30, "middle");
+    label(svg, "The experiment", B.X(b.px), B.Y(b.py) + 34, "middle", true);
+    stiffNote(svg, b, B.X, B.Y);
+    arrow(svg, A.X(a.ex) + 28, 318, B.X(b.left) - 28, 318, 1.1, 8);
   }
 
   // ---- B. Rebalance the mobile.
@@ -323,5 +388,5 @@
     return marks;
   }
 
-  window.PROBES = { weave: weave, mobile: mobile, treacle: treacle, size: { width: W, height: H } };
+  window.PROBES = { weave: weave, weaveBeforeAfter: weaveBeforeAfter, mobile: mobile, treacle: treacle, size: { width: W, height: H } };
 })();

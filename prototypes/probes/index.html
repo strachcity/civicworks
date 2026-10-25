@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Experimentation as probes</title>
 <meta name="description" content="Three directions for an editorial illustration in Tasting the organisational treacle. A working page.">
-<meta name="robots" content="noindex">
 <link rel="icon" href="/favicon.ico" sizes="32x32">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
@@ -65,8 +64,10 @@
   button.t:focus-visible, input:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
 
   .notes { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 12px 32px; margin-top: 16px; }
-  .notes h3 { font-size: 11px; font-weight: 500; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-text); margin: 0 0 4px; }
-  .notes p { margin: 0; font-size: 13.5px; color: var(--muted); max-width: 60ch; }
+  .stills { margin-top: 28px; }
+  .stills .frame { margin-top: 12px; }
+  .notes h3, .stills h3 { font-size: 11px; font-weight: 500; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-text); margin: 0 0 4px; }
+  .notes p, .stills p { margin: 0; font-size: 13.5px; color: var(--muted); max-width: 60ch; }
 
   .compare { margin-top: 64px; padding-top: 20px; border-top: 1.1px solid var(--ink); }
   .compare h2 { margin-bottom: 12px; }
@@ -117,6 +118,12 @@
         <h3>What it loses</h3>
         <p>A weave is regular and an institution isn't. It reads as everything touching everything in a tidy grid, and it can suggest the thread comes out cleanly. It says little about room to rearrange, only about connection.</p>
       </div>
+    </div>
+    <div class="stills">
+      <h3>As a still for the essay</h3>
+      <p>Two ways to show the movement without the slider. Arrows on the pulled cloth, or the cloth before and after with the arrows on the second. Both follow the pull above.</p>
+      <div class="frame"><svg id="svg-a-arrows" role="img" aria-label="The woven cloth with one thread pulled out to an experiment. Small arrows in the gaps of the cloth show the threads it crosses dragged towards the pull and its neighbours gathering in. Legislation bends least."></svg></div>
+      <div class="frame"><svg id="svg-a-ba" role="img" aria-label="The woven cloth twice. Before, the threads lie straight. After one thread is pulled out to an experiment, the threads it crosses are dragged towards the pull, shown by small arrows, and legislation bends least."></svg></div>
     </div>
   </section>
 
@@ -186,10 +193,14 @@
   "use strict";
   var P = window.PROBES;
   var reduced = !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
-  var svgA = document.getElementById("svg-a"), svgB = document.getElementById("svg-b"), svgC = document.getElementById("svg-c");
+  var svgA = document.getElementById("svg-a"), svgAr = document.getElementById("svg-a-arrows"), svgAba = document.getElementById("svg-a-ba"), svgB = document.getElementById("svg-b"), svgC = document.getElementById("svg-c");
   var pull = document.getElementById("pull"), weight = document.getElementById("weight"), ghost = document.getElementById("ghost");
 
-  function drawA() { P.weave(svgA, { pull: +pull.value }); }
+  function drawA() {
+    P.weave(svgA, { pull: +pull.value });
+    P.weave(svgAr, { pull: +pull.value, arrows: true });
+    P.weaveBeforeAfter(svgAba, { pull: +pull.value });
+  }
   function drawB() { P.mobile(svgB, { weight: +weight.value, ghost: ghost.checked }); }
   pull.addEventListener("input", drawA);
   weight.addEventListener("input", drawB);

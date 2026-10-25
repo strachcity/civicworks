@@ -1,12 +1,13 @@
 // Exports each illustration from the page as an essay-ready image, so the page and the images
 // share one drawing.   NODE_PATH=$(npm root -g) node capture.js [outdir]
-// Needs Playwright with Chromium. Writes probe-a-weave, probe-b-mobile and probe-c-treacle, each
+// Needs Playwright with Chromium. Writes probe-a-weave (plain, -arrows and -before-after),
+// probe-b-mobile and probe-c-treacle, each
 // as a 1456 x 640 PNG on white and as a standalone SVG with real text.
 const { chromium } = require('playwright');
 const fs = require('fs');
 const path = require('path');
 const out = process.argv[2] || __dirname;
-const SHOTS = [['svg-a', 'probe-a-weave'], ['svg-b', 'probe-b-mobile'], ['svg-c', 'probe-c-treacle']];
+const SHOTS = [['svg-a', 'probe-a-weave'], ['svg-a-arrows', 'probe-a-weave-arrows'], ['svg-a-ba', 'probe-a-weave-before-after'], ['svg-b', 'probe-b-mobile'], ['svg-c', 'probe-c-treacle']];
 (async () => {
   const exe = fs.existsSync('/opt/pw-browsers/chromium') ? '/opt/pw-browsers/chromium' : undefined;
   const b = await chromium.launch({ executablePath: exe });
