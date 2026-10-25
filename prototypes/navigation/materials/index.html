@@ -1,0 +1,1512 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Navigation with materials</title>
+<meta name="description" content="The navigation model with the design materials of institutional change. Pick a material, see which layers it reaches and which tensions it pulls on, and what changing it would take. A companion to Tasting the organisational treacle on CIVICWORKS.">
+<meta property="og:title" content="Navigation with materials">
+<meta property="og:description" content="The materials an experiment runs into, inside the navigation model.">
+<meta property="og:image" content="https://experiments.civicworks.co/navigation/materials/og.png">
+<meta property="og:url" content="https://experiments.civicworks.co/navigation/materials/">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/favicon.ico" sizes="32x32">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@300;400;500&display=swap">
+<style>
+  /* One screen, one object. The model sits in the middle at about 60% of the shorter side;
+     everything else is small type pinned to the corners. Two tones, one ink on paper.
+     Line weights: 0.5 structure, 0.75 form, 1.25 emphasis. */
+  :root {
+    --paper: #ffffff;
+    --ink: #d63c23;          /* lines and marks */
+    --ink-text: #a92c17;     /* running text, 6.5:1 on paper */
+    --muted: #93402f;        /* secondary text, 6:1 on paper */
+    --tint: #f6c6b8;
+    --tint-faint: rgba(246, 198, 184, 0.2);
+    --focus: #1f3fd6;
+    --font: "Hanken Grotesk", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper: #120d0c;
+      --ink: #ff7457;
+      --ink-text: #ffa48f;
+      --muted: #d88f7f;
+      --tint: #4e241c;
+      --tint-faint: rgba(110, 48, 36, 0.3);
+      --focus: #9db4ff;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper: #120d0c;
+    --ink: #ff7457;
+    --ink-text: #ffa48f;
+    --muted: #d88f7f;
+    --tint: #4e241c;
+    --tint-faint: rgba(110, 48, 36, 0.3);
+    --focus: #9db4ff;
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink-text);
+    font-family: var(--font);
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 1.45;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .screen {
+    position: relative;
+    height: 100svh;
+    min-height: 600px;
+    overflow: hidden;
+  }
+
+  /* The model fills the screen as a drawing surface; the overlays sit on top */
+  .stage {
+    position: absolute; inset: 0;
+    -webkit-user-select: none; user-select: none;
+    touch-action: none;
+    cursor: grab;
+    outline: none;
+  }
+  .stage.dragging, .stage.dragging * { cursor: grabbing !important; }
+  .stage.over-ring { cursor: pointer; }
+  .meta, .ctrl, #layers { pointer-events: none; }
+  .meta > *, .ctrl > button, .layer-btn { pointer-events: auto; }
+  .stage:focus-visible .frame-circle { stroke: var(--focus); stroke-width: 1.5; stroke-opacity: 1; }
+  .stage svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+
+  .frame-circle { fill: none; stroke: var(--ink); stroke-width: .5; stroke-opacity: .22; }
+  .axis { stroke: var(--ink); stroke-width: .5; stroke-dasharray: 1 4; stroke-linecap: round; }
+  .top-disc { fill: none; stroke: var(--ink); stroke-width: .5; stroke-dasharray: 1 5; stroke-linecap: round; opacity: .35; }
+  .edge-ext { stroke: var(--ink); stroke-width: .5; stroke-dasharray: 1 3; stroke-linecap: round; }
+  .ring-back { fill: none; stroke: var(--ink); stroke-width: .5; stroke-dasharray: 1 3; stroke-linecap: round; }
+  .ring-front { fill: none; stroke: var(--ink); stroke-width: .75; }
+  .ring-disc { fill: none; }
+  .layer.unreached .ring-front { stroke-dasharray: 2 3; opacity: .45; }
+  .layer.unreached .ring-back { opacity: .3; }
+  .layer.active .ring-front { stroke-width: 1.1; }
+  .layer.active .ring-disc { fill: url(#hatch); }
+  .layer.hit .ring-front { animation: hit 1.2s ease-out; }
+  @keyframes hit { 0% { stroke-width: 3.5; } 100% { stroke-width: 1.1; } }
+  .face { fill: var(--tint-faint); stroke: var(--ink); stroke-width: .5; stroke-opacity: .35; stroke-linejoin: round; }
+  .face.facing { fill: url(#stipple); }
+  .edge { fill: none; stroke: var(--ink); stroke-width: .75; stroke-linejoin: round; }
+  .edge.facing { stroke-width: 1.1; }
+  .tri { fill: var(--tint); fill-opacity: .3; stroke: var(--ink); stroke-width: 1; stroke-linejoin: round; }
+  .tri-dot { fill: var(--ink); }
+  .section { fill: none; stroke: var(--ink); stroke-width: .5; stroke-dasharray: 1 3; stroke-linecap: round; stroke-linejoin: round; opacity: .35; }
+  .section.reached { opacity: .7; }
+  .far-tri { fill: none; stroke: var(--ink); stroke-width: .5; stroke-dasharray: 1 4; stroke-linecap: round; opacity: .6; }
+  .vertex { fill: var(--ink); }
+  .trail { fill: none; stroke: var(--ink); stroke-width: .75; stroke-dasharray: 1 2.5; stroke-linecap: round; }
+  .trail-dot { fill: var(--paper); stroke: var(--ink); stroke-width: .75; }
+  .trail-dot.last { fill: var(--ink); }
+  .hint { position: absolute; left: 0; top: 0; width: 46px; height: 46px; pointer-events: none; transition: opacity .8s; }
+  .hint path { fill: none; stroke: var(--ink); stroke-width: .75; stroke-dasharray: 1 3; stroke-linecap: round; }
+  .hint .head { fill: var(--ink); stroke: none; }
+  .hint svg { width: 100%; height: 100%; overflow: visible; animation: turnhint 6s linear infinite; }
+  @keyframes turnhint { to { transform: rotate(360deg); } }
+  .hint.gone { opacity: 0; }
+  .sphere-base { fill: var(--tint); stroke: var(--ink); stroke-width: .75; }
+  .sphere-dots { fill: url(#stipple-dense); }
+
+  /* Labels drawn over the model */
+  .lbl {
+    position: absolute; left: 0; top: 0;
+    pointer-events: none;
+    text-align: center;
+    color: var(--ink-text);
+    transition: opacity .4s;
+    will-change: transform;
+  }
+  .corner { width: 180px; }
+  .corner b {
+    font-weight: 500; font-size: 12px; letter-spacing: .14em; text-transform: uppercase;
+    padding: 1px 6px;
+    background: var(--paper);
+  }
+  .corner.behind b { color: var(--muted); font-weight: 400; }
+  .corner.facing b { box-shadow: inset 0 -1px 0 var(--ink); }
+  .corner small {
+    display: block; margin-top: 4px;
+    font-size: 12px; font-weight: 400; line-height: 1.35; color: var(--muted);
+    opacity: 0; transition: opacity .4s;
+  }
+  .corner.facing small, .corner.asked small { opacity: 1; }
+  .depth-lbl { font-size: 11px; font-weight: 500; letter-spacing: .16em; text-transform: uppercase; white-space: nowrap; text-shadow: 0 0 3px var(--paper), 0 0 2px var(--paper), 0 0 1px var(--paper); }
+
+  .layer-btn {
+    position: absolute; left: 0; top: 0;
+    width: 120px;
+    padding: 4px 2px;
+    border: 0; background: transparent;
+    font: inherit; font-size: 12px; line-height: 1.3; font-weight: 400;
+    color: var(--muted);
+    text-align: center;
+    cursor: pointer;
+    will-change: transform;
+    transition: opacity .3s;
+  }
+  .layer-btn span { display: block; text-shadow: 0 0 3px var(--paper), 0 0 2px var(--paper), 0 0 1px var(--paper); }
+  .layer-btn[aria-pressed="true"] span { color: var(--ink-text); font-weight: 500; }
+
+  /* The pace scale under the drawing */
+  .scale-line { stroke: var(--ink); stroke-width: .5; fill: none; }
+  .scale-head { fill: var(--ink); }
+  .scale-tick { stroke: var(--ink); stroke-width: .5; }
+  .scale-dot { fill: var(--paper); stroke: var(--ink); stroke-width: .75; }
+  .scale-dot.reached { fill: var(--ink); }
+  .scale-word { fill: var(--muted); font-family: var(--font); font-size: 10.5px; font-weight: 500; letter-spacing: .16em; }
+  .scale-word.on, .scale-slow { fill: var(--ink-text); }
+  .layer-btn:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+
+  /* Corner furniture */
+  .title {
+    position: absolute;
+    top: max(24px, env(safe-area-inset-top, 0px));
+    left: max(24px, env(safe-area-inset-left, 0px));
+    max-width: 300px;
+    pointer-events: none;
+  }
+  .title h1 { font-size: 20px; font-weight: 400; letter-spacing: -.005em; line-height: 1.2; margin: 0; }
+  .title p { font-size: 13px; color: var(--muted); margin: 6px 0 0; }
+
+  .meta {
+    position: absolute;
+    top: max(20px, env(safe-area-inset-top, 0px));
+    right: max(20px, env(safe-area-inset-right, 0px));
+    display: flex; gap: 12px; align-items: center;
+    font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted);
+  }
+
+  .note {
+    position: absolute;
+    left: max(24px, env(safe-area-inset-left, 0px));
+    bottom: calc(max(24px, env(safe-area-inset-bottom, 0px)) + 56px);
+    width: min(340px, calc(100% - 48px));
+    pointer-events: none;
+  }
+  .where { font-size: 11px; font-weight: 500; letter-spacing: .14em; text-transform: uppercase; margin: 0 0 8px; }
+  .newlayer { display: inline-block; font-size: 11px; color: var(--muted); border: .75px dashed var(--ink); border-radius: 999px; padding: 0 9px; margin: 0 0 8px; }
+  .question { font-size: 21px; font-weight: 300; line-height: 1.32; margin: 0; letter-spacing: -.005em; }
+  .turned { margin: 12px 0 0; padding-top: 10px; border-top: .5px solid var(--ink); font-size: 13px; color: var(--muted); }
+  .turned b { font-weight: 500; font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-text); margin-right: 6px; }
+
+  .ctrl {
+    position: absolute;
+    left: 50%; transform: translateX(-50%);
+    bottom: max(20px, env(safe-area-inset-bottom, 0px));
+    display: flex; gap: 2px; align-items: center; flex-wrap: wrap; justify-content: center;
+    width: max-content; max-width: calc(100% - 32px);
+  }
+  button.t {
+    font: inherit; font-size: 12.5px; font-weight: 400;
+    color: var(--ink-text);
+    background: transparent;
+    border: 0; border-radius: 999px;
+    padding: 6px 12px; min-height: 36px;
+    cursor: pointer;
+  }
+  button.t:hover { background: var(--tint-faint); }
+  button.t[aria-pressed="true"] { box-shadow: inset 0 0 0 .75px var(--ink); }
+  button.t:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; }
+  .sep { width: .5px; height: 16px; background: var(--ink); opacity: .6; margin: 0 6px; }
+
+  .about {
+    position: absolute;
+    right: max(24px, env(safe-area-inset-right, 0px));
+    bottom: max(20px, env(safe-area-inset-bottom, 0px));
+    max-width: min(360px, calc(100% - 48px));
+    text-align: right;
+  }
+  .about summary {
+    list-style: none; cursor: pointer;
+    font-size: 12.5px; padding: 8px 4px; min-height: 36px;
+    color: var(--ink-text);
+  }
+  .about summary::-webkit-details-marker { display: none; }
+  .about summary:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; border-radius: 4px; }
+  .about[open] .panel { display: block; }
+  .about .panel {
+    position: absolute; right: 0; bottom: 44px;
+    width: min(340px, calc(100vw - 48px));
+    text-align: left;
+    background: var(--paper);
+    border: .75px solid var(--ink);
+    padding: 14px 16px;
+    font-size: 12.5px; color: var(--muted);
+  }
+  .about .panel p { margin: 0 0 8px; }
+  .about .panel p:last-child { margin: 0; }
+  .about a { color: var(--ink-text); }
+
+  svg.leader { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; }
+  .leader path { fill: none; stroke: var(--ink); stroke-width: .5; stroke-opacity: .7; }
+  .leader .pin { fill: var(--ink); }
+  .leader .ring { fill: none; stroke: var(--ink); stroke-width: .5; }
+
+  @media (max-width: 720px) {
+    .title { left: 16px; top: max(18px, env(safe-area-inset-top, 0px)); max-width: 220px; }
+    .title h1 { font-size: 17px; }
+    .title p { display: none; }
+    .meta { right: 12px; top: max(12px, env(safe-area-inset-top, 0px)); }
+    .meta .v { display: none; }
+    .note { left: 16px; width: calc(100% - 32px); bottom: calc(max(16px, env(safe-area-inset-bottom, 0px)) + 52px); }
+    .question { font-size: 17px; }
+    .turned { display: none; }
+    .corner small { display: none; }
+    .layer-btn span { display: none; }
+    .layer-btn[aria-pressed="true"] span { display: block; }
+    .scale-word:not(.scale-slow) { display: none; }
+    .scale-word.on { display: inline; }
+    .about { right: 8px; bottom: max(14px, env(safe-area-inset-bottom, 0px)); }
+    .ctrl { left: 8px; transform: none; justify-content: flex-start; max-width: calc(100% - 80px); bottom: max(14px, env(safe-area-inset-bottom, 0px)); }
+    .ctrl .wide { display: none; }
+  }
+
+  /* ---- Materials mode. Off, the page is the navigation model as it was. */
+  .arc-band { fill: none; stroke: var(--tint); stroke-width: 9; stroke-linecap: round; stroke-linejoin: round; opacity: .9; }
+  .arc-band.second { stroke: url(#hatch); stroke-width: 9; opacity: 1; }
+  .arc-line { fill: none; stroke: var(--ink); stroke-width: 1.1; stroke-linecap: round; stroke-linejoin: round; }
+  .arc-line.second { stroke-dasharray: 5 3; }
+  .arc-line.dep { stroke-width: .75; stroke-dasharray: 1 3.5; opacity: .75; }
+  .arc-band.back, .arc-line.back { opacity: .35; }
+  .thread { stroke: var(--ink); stroke-width: .5; stroke-dasharray: 1 3; stroke-linecap: round; fill: none; }
+  .thread-end { fill: var(--paper); stroke: var(--ink); stroke-width: .75; }
+  .layer.outside .ring-front, .layer.outside .ring-back { opacity: .22; }
+  .layer.inside .ring-front { stroke-width: 1.1; stroke-dasharray: none; opacity: 1; }
+  .layer-btn.outside { opacity: .35 !important; }
+  .corner.pulled b { box-shadow: inset 0 -1px 0 var(--ink); }
+  .scale-dec { fill: var(--muted); font-family: var(--font); font-size: 10px; font-weight: 400; letter-spacing: .04em; }
+  .scale-cap { fill: var(--ink-text); font-family: var(--font); font-size: 9.5px; font-weight: 500; letter-spacing: .16em; }
+  .scale-dot.reach { stroke-width: 1.25; }
+
+  .mats {
+    position: absolute;
+    right: max(24px, env(safe-area-inset-right, 0px));
+    top: 50%; transform: translateY(-50%);
+    width: 236px;
+  }
+  .mats-head { font-size: 11px; font-weight: 500; letter-spacing: .14em; text-transform: uppercase; margin: 0 0 4px; }
+  .mats-sub { font-size: 12px; color: var(--muted); margin: 0 0 10px; }
+  .mats ol { list-style: none; margin: 0; padding: 0; border-top: .5px solid var(--ink); }
+  .mat {
+    display: flex; gap: 10px; align-items: center; width: 100%;
+    font: inherit; font-size: 12.5px; line-height: 1.3; text-align: left;
+    color: var(--ink-text); background: transparent; border: 0;
+    border-bottom: .5px solid var(--tint); padding: 6px 4px; min-height: 30px; cursor: pointer;
+  }
+  .mat:hover { background: var(--tint-faint); }
+  .mat:focus-visible { outline: 2px solid var(--focus); outline-offset: -2px; }
+  .mat[aria-pressed="true"] { font-weight: 500; }
+  .mk { flex: none; width: 9px; height: 9px; border-radius: 50%; border: .75px solid var(--ink); }
+  .mk.seen { background: linear-gradient(90deg, var(--ink) 50%, transparent 50%); }
+  .mk.learned { background: var(--ink); }
+  .mats-legend { font-size: 11px; color: var(--muted); margin: 10px 0 0; line-height: 1.5; }
+  .mats-legend .mk { display: inline-block; vertical-align: -1px; margin-right: 4px; }
+  .mats .walk { margin-top: 8px; padding-left: 4px; }
+
+  .note.mat-on { pointer-events: auto; }
+  .mrows { margin: 12px 0 0; padding: 10px 0 0; border-top: .5px solid var(--ink); display: grid; grid-template-columns: auto 1fr; gap: 4px 12px; font-size: 12.5px; }
+  .mrows dt { font-size: 10px; font-weight: 500; letter-spacing: .14em; text-transform: uppercase; padding-top: 2px; }
+  .mrows dd { margin: 0; color: var(--muted); }
+  .mask { margin: 10px 0 0; font-size: 13.5px; font-style: italic; color: var(--ink-text); }
+  .mreveal { margin: 10px 0 0; font-size: 13px; color: var(--muted); }
+  .mreveal b { font-weight: 500; font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-text); margin-right: 6px; }
+  .mchange { margin: 8px 0 0; font-size: 12.5px; color: var(--muted); }
+  .mchange i { color: var(--ink-text); }
+  .mact { display: flex; flex-wrap: wrap; gap: 6px 4px; margin: 12px 0 0; align-items: center; }
+  .mact .lead { font-size: 10px; font-weight: 500; letter-spacing: .14em; text-transform: uppercase; margin: 0 4px 0 0; }
+  .chip { font: inherit; font-size: 12px; color: var(--ink-text); background: transparent; border: .5px dashed var(--ink); border-radius: 999px; padding: 3px 10px; min-height: 28px; cursor: pointer; }
+  .chip:hover { background: var(--tint-faint); }
+  .chip:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; }
+
+  @media (max-width: 720px) {
+    .mats { top: auto; transform: none; left: 0; right: 0; width: auto; bottom: calc(max(14px, env(safe-area-inset-bottom, 0px)) + 44px); padding: 0 12px; }
+    .mats-head, .mats-sub, .mats-legend { display: none; }
+    .mats ol { display: flex; gap: 6px; overflow-x: auto; border: 0; padding-bottom: 4px; }
+    .mats li { flex: none; }
+    .mat { border: .5px solid var(--ink); border-radius: 999px; padding: 4px 10px; white-space: nowrap; background: var(--paper); }
+    .mats .walk { display: none; }
+    .note.mat-on { bottom: calc(max(16px, env(safe-area-inset-bottom, 0px)) + 96px); }
+    .mrows, .mchange, .mask, .mact .lead, .mact [data-act="compare"] { display: none; }
+    .note.mat-on { background: var(--paper); max-height: 34svh; overflow-y: auto; padding: 8px 0 4px; }
+    .note.mat-on .question { font-size: 15px; }
+    .scale-dec:not(.on) { display: none; }
+    .ctrl .mtoggle { display: inline-block; }
+  }
+
+  .sr-only {
+    position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+    overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+  }
+  [hidden] { display: none !important; }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+  }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <pattern id="hatch" width="3" height="3" patternUnits="userSpaceOnUse" patternTransform="rotate(-45)">
+      <line x1="0" y1="0" x2="0" y2="3" style="stroke:var(--ink)" stroke-width=".4" opacity=".6"/>
+    </pattern>
+    <pattern id="hatch-h" width="6" height="3" patternUnits="userSpaceOnUse">
+      <line x1="0" y1="0" x2="6" y2="0" style="stroke:var(--ink)" stroke-width=".4" opacity=".7"/>
+    </pattern>
+    <pattern id="stipple" width="5" height="5" patternUnits="userSpaceOnUse">
+      <circle cx="1.25" cy="1.25" r=".45" style="fill:var(--ink)"/>
+      <circle cx="3.75" cy="3.75" r=".45" style="fill:var(--ink)"/>
+    </pattern>
+    <pattern id="stipple-dense" width="2.4" height="2.4" patternUnits="userSpaceOnUse">
+      <circle cx=".6" cy=".6" r=".42" style="fill:var(--ink)"/>
+      <circle cx="1.8" cy="1.8" r=".42" style="fill:var(--ink)"/>
+    </pattern>
+  </defs>
+</svg>
+
+<main class="screen" id="screen">
+  <div class="sr-only" id="model-desc">
+    <p>The model has three dimensions, drawn as one object lying on its side. Across are three questions that never line up neatly. Value asks whether people will use what we've made and what value it might create. Legitimacy asks whether we have the support and permission to pursue it. Capacity asks whether the organisation can actually deliver it.</p>
+    <p>Through are five layers of an institution, from the narrow end on the left to the wide end on the right. Citizen interaction, service processes and technology, organisational priorities, cross-institutional arrangements, and political and strategic support. They are drawn as rings on a cone that widens and fades, because you rarely know which layers matter until you hit them.</p>
+    <p>Depth is the learning that comes from moving across and through, drawn as a sphere that grows as the experiment reveals dependencies, starts new conversations and challenges assumptions.</p>
+    <p>Drag in any direction to turn it. Focus the drawing to use the keyboard. Up and down arrows turn it to face the next question. Left and right arrows move between layers. Page up looks end on, page down looks from the citizen end, and home looks side on. It turns slowly by itself when left alone.</p>
+  </div>
+
+  <div class="stage" id="stage" tabindex="0" role="application" aria-roledescription="model you can turn" aria-label="Experimentation as navigation" aria-describedby="model-desc">
+    <svg id="scene" aria-hidden="true">
+      <circle class="frame-circle" id="frame-circle"/>
+      <g id="g-scale"></g>
+      <g id="g-back"></g>
+      <g id="g-mid"></g>
+      <g id="g-front"></g>
+    </svg>
+    <span class="lbl corner" id="lbl-value"><b>Value</b><small>Will people use what we've made, and what value might it create?</small></span>
+    <span class="lbl corner" id="lbl-legitimacy"><b>Legitimacy</b><small>Do we have the support and permission to pursue it?</small></span>
+    <span class="lbl corner" id="lbl-capacity"><b>Capacity</b><small>Can the organisation actually deliver it?</small></span>
+    <span class="lbl depth-lbl" id="lbl-depth">Depth</span>
+    <span class="hint" id="hint" aria-hidden="true"><svg viewBox="-23 -23 46 46"><path d="M 0 -18 A 18 18 0 1 1 -17 -6"/><path class="head" d="M -20 -10 L -13 -8 L -18 -2 Z"/><path d="M 0 -8 A 8 8 0 1 0 7 4"/><path class="head" d="M 9 0 L 9 7 L 3 5 Z"/></svg></span>
+    <svg class="leader" aria-hidden="true">
+      <path id="leader-path"/>
+      <circle class="ring" id="leader-ring" r="4.5"/>
+      <circle class="pin" id="leader-pin" r="1.8"/>
+    </svg>
+  </div>
+
+  <div id="layers" role="group" aria-label="Layers of the institution"></div>
+
+  <header class="title">
+    <h1>Experimentation as navigation</h1>
+    <p>With the design materials of institutional change. Experiments run into them, learn about them and occasionally change them.</p>
+  </header>
+
+  <div class="meta">
+    <span class="v">Materials v0.1.0</span>
+    <button type="button" class="t" id="theme">Dark</button>
+  </div>
+
+  <section class="note" id="note" aria-live="polite" aria-atomic="true">
+    <p class="where" id="where">Start here</p>
+    <p class="newlayer" id="newlayer" hidden>A layer you hadn't hit yet</p>
+    <p class="question" id="question">Start with a question.</p>
+    <p class="turned" id="turned" hidden></p>
+    <div id="mat-extra"></div>
+  </section>
+
+  <div class="ctrl" role="group" aria-label="Turn the model">
+    <button type="button" class="t" id="spin-up" aria-label="Turn to the next question">&#8593;</button>
+    <button type="button" class="t" id="spin-down" aria-label="Turn to the previous question">&#8595;</button>
+    <span class="sep" aria-hidden="true"></span>
+    <button type="button" class="t" data-view="side" aria-pressed="false">Side on</button>
+    <button type="button" class="t" data-view="end" aria-pressed="false">End on</button>
+    <button type="button" class="t wide" data-view="citizen" aria-pressed="false">Citizen end</button>
+    <span class="sep" aria-hidden="true"></span>
+    <button type="button" class="t mtoggle" id="mat-toggle" aria-pressed="false">Materials</button>
+    <span class="sep wide" aria-hidden="true"></span>
+    <button type="button" class="t wide" id="reset">Start again</button>
+  </div>
+
+  <nav class="mats" id="mats" aria-label="Design materials" hidden>
+    <p class="mats-head">Materials</p>
+    <p class="mats-sub">The things an experiment runs into. Pick one, then a second to compare.</p>
+    <ol id="mat-list"></ol>
+    <button type="button" class="t walk" id="mat-walk">Walk through an example</button>
+    <p class="mats-legend"><span class="mk"></span>not met <span class="mk seen"></span>encountered <span class="mk learned"></span>learned about<br>Changing one takes more than a click.</p>
+  </nav>
+
+  <details class="about">
+    <summary>About</summary>
+    <div class="panel">
+      <p>A working sketch from <a href="https://www.civicworks.co/">CIVICWORKS</a>, to sit alongside <a href="https://www.civicworks.co/">Tasting the organisational treacle</a>. Drag it any way to turn it, or flick it to set it tumbling. Left alone, it drifts. What it turns up reshapes the drawing.</p>
+      <p>Value, legitimacy and capacity after <a href="https://www.hks.harvard.edu/publications/creating-public-value-core-idea-strategic-management-government">Mark Moore</a>. Pace layers after <a href="https://longnow.org/ideas/pace-layers/">Stewart Brand</a>. Scales of a system after <a href="https://link.springer.com/chapter/10.1007/978-3-031-78357-9_2">Hill and Melander</a>. Dark matter from Bryan Boyer.</p>
+      <p>Design materials are a provisional reading, not a map. Where each one sits is contextual, overlapping and often contested. The layers, the questions and depth are the same model as <a href="../">the original</a>.</p>
+      <p>Materials v0.1.0, built on navigation v0.6.1</p>
+    </div>
+  </details>
+</main>
+
+<script src="materials.js"></script>
+<script>
+(function () {
+  "use strict";
+
+  // ---- content
+  var LAYERS = [
+    "Citizen interaction",
+    "Service processes and technology",
+    "Organisational priorities",
+    "Cross-institutional arrangements",
+    "Political and strategic support"
+  ];
+
+  // How fast each layer moves, from an afternoon at the citizen end to a parliament or more
+  var PACE = ["An afternoon", "Months", "A budget year", "Years", "A parliament or more"];
+
+  var CORNERS = [
+    { id: "value", name: "Value", deg: 90 },
+    { id: "legitimacy", name: "Legitimacy", deg: 210 },
+    { id: "capacity", name: "Capacity", deg: 330 }
+  ];
+
+  // Six faces, one every 60 degrees of turn. Corners face you on even turns, edges on odd.
+  var FACES = ["value", "legitimacy|value", "legitimacy", "capacity|legitimacy", "capacity", "capacity|value"];
+
+  // What the question sounds like at each layer, and what an experiment might turn up there.
+  var CELLS = {
+    value: [
+      { q: "Will someone use this, and does it make the thing they came to do any easier?", kind: "assumption", f: "The option everyone said people wouldn't want, some people chose." },
+      { q: "Does the change survive the systems behind it, or does the value leak out somewhere in the process?", kind: "dependency", f: "The improvement at the front stops at a step the team can't see." },
+      { q: "Does the organisation think this problem is worth solving this year?", kind: "assumption", f: "What the team took for a priority sits nowhere on the organisation's list." },
+      { q: "Does the value land here, or in somebody else's service?", kind: "assumption", f: "The benefit turns up in another organisation's numbers." },
+      { q: "Can anyone at the top say why this matters beyond one service?", kind: "conversation", f: "Someone senior asks what this would look like everywhere. It's the first time the question has been asked." }
+    ],
+    legitimacy: [
+      { q: "Who says this interaction has to work the way it does now? Sometimes the rule is real and sometimes it's a habit.", kind: "assumption", f: "A rule everyone treated as fixed had more room in it than anyone had checked." },
+      { q: "Who owns the process, and do they know you're testing it?", kind: "conversation", f: "The process owner hears about the test for the first time, and has a view." },
+      { q: "Who has to put this on their list, and what comes off to make room?", kind: "conversation", f: "Two teams who each thought it was the other's job finally talk about it." },
+      { q: "Whose agreement do you need that you don't yet know you need?", kind: "conversation", f: "A partner you'd never needed before turns out to hold a veto." },
+      { q: "Who has the authority to change any of it, and would they want to?", kind: "dependency", f: "The rule that shaped the form was decided up here, for a different reason, a long time ago." }
+    ],
+    capacity: [
+      { q: "Can the team run it for a few real people without it falling over?", kind: "dependency", f: "It only worked because someone was quietly doing the bit the system couldn't." },
+      { q: "Can you do this with what already exists, or does it need integration that isn't resourced?", kind: "dependency", f: "The workaround runs on automations built for something else. Useful, and fragile." },
+      { q: "Who would pay for it, staff it and look after it once the test ends?", kind: "dependency", f: "No budget covers the thing after the test. It doesn't belong to anyone yet." },
+      { q: "Does the change depend on another organisation's systems, data or timetable?", kind: "dependency", f: "Your change is waiting on someone else's release, contract or timetable." },
+      { q: "Is there money, mandate and patience for more than a test?", kind: "assumption", f: "What looked impossible had mostly never been asked for." }
+    ]
+  };
+
+  var BETWEEN = {
+    "legitimacy|value": "Between value and legitimacy. What people would use and what you're allowed to try rarely line up.",
+    "capacity|legitimacy": "Between legitimacy and capacity. Permission to do it and the means to do it tend to arrive at different times.",
+    "capacity|value": "Between capacity and value. What the organisation can deliver pulls against what would be worth delivering."
+  };
+
+  var VIEWS = {
+    intro: { where: "Start here", q: "Start with a question. Turn it to face value, legitimacy or capacity, and pick a layer to see how far along it goes." },
+    end: { where: "End on · Across", q: "End on, the layers collapse and three questions are left. They never line up neatly, and learning about one changes how you approach the others. What stays open is which scale each one applies at." },
+    citizen: { where: "From the citizen end · Through", q: "From where someone fills in the form, every layer is stacked behind the next, and you can't see where any of them stops. You rarely know which layers matter until you hit them." }
+  };
+
+  var KIND_LABEL = { dependency: "Dependency", conversation: "Conversation", assumption: "Assumption", decision: "Decision right", carry: "Carries forward" };
+
+  // ---- design materials, from materials.js. The drawing reads whatever is there.
+  var MATS = window.MATERIALS || [], PAIRS = window.MATERIAL_PAIRS || {}, SCEN = window.MATERIAL_SCENARIO || null;
+  function matById(id) { return MATS.filter(function (m) { return m.id === id; })[0]; }
+  // How quickly a decision can be taken at each layer, as distinct from how quickly the arrangements
+  // under it change. Political attention can turn overnight while commitments outlast a parliament.
+  var DECIDE = ["On the spot", "Days to weeks", "A board meeting", "When partners agree", "Can be overnight"];
+  // seen is encountered, learned is probed. Nothing here records a material as changed.
+  var mat = { on: false, sel: [], seen: {}, learned: {}, step: -1 };
+
+  // ---- theme toggle, remembered per viewer where storage allows
+  var root = document.documentElement;
+  var themeBtn = document.getElementById("theme");
+  function isDark() {
+    var t = root.getAttribute("data-theme");
+    if (t) return t === "dark";
+    return !!(window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches);
+  }
+  function labelTheme() {
+    themeBtn.textContent = isDark() ? "Light" : "Dark";
+    themeBtn.setAttribute("aria-label", isDark() ? "Switch to light mode" : "Switch to dark mode");
+  }
+  try { var saved = localStorage.getItem("nav-theme"); if (saved) root.setAttribute("data-theme", saved); } catch (e) {}
+  labelTheme();
+  themeBtn.addEventListener("click", function () {
+    var next = isDark() ? "light" : "dark";
+    root.setAttribute("data-theme", next);
+    try { localStorage.setItem("nav-theme", next); } catch (e) {}
+    labelTheme();
+  });
+
+  // ---- geometry, in world units. The cone's axis is y; it's drawn lying on its side.
+  var LAYER_Y = [-1.6, -0.8, 0, 0.8, 1.6];
+  var APEX = -2.25, TOP = 2.3, K = 0.5, D = 11, MID = (APEX + TOP) / 2;
+  var SCALE_AT = 2.95; // the pace scale's height below centre, just outside the frame circle
+  function radius(y) { return K * (y - APEX); }
+
+  // What the experiment turns up bends the drawing. Each layer can swell and each question can
+  // pull its corner outward; both ease towards their targets so the shape changes slowly.
+  var warp = { ring: [0, 0, 0, 0, 0], ringT: [0, 0, 0, 0, 0], corner: { value: 0, legitimacy: 0, capacity: 0 }, cornerT: { value: 0, legitimacy: 0, capacity: 0 } };
+  function ringGrow(y) {
+    if (y <= LAYER_Y[0]) return warp.ring[0] * Math.max(0, (y - APEX) / (LAYER_Y[0] - APEX));
+    if (y >= LAYER_Y[4]) return warp.ring[4];
+    var i = Math.min(3, Math.floor((y - LAYER_Y[0]) / 0.8)), t = (y - LAYER_Y[i]) / 0.8;
+    return warp.ring[i] * (1 - t) + warp.ring[i + 1] * t;
+  }
+  function ringPoint(y, deg) {
+    var a = deg * Math.PI / 180, r = radius(y) * (1 + ringGrow(y));
+    return [r * Math.cos(a), y, r * Math.sin(a)];
+  }
+  // The triangle runs in straight lines from the apex. Learning stretches a corner, never bends an edge.
+  function pyrPoint(y, id) {
+    var c = corner(id), a = c.deg * Math.PI / 180, r = radius(y) * (1 + warp.corner[id]);
+    return [r * Math.cos(a), y, r * Math.sin(a)];
+  }
+  // A face of the six: corners on even turns, the middle of a triangle edge on odd ones
+  function facePoint(y, k) {
+    var face = FACES[k];
+    if (face.indexOf("|") < 0) return pyrPoint(y, face);
+    var pair = face.split("|"), p1 = pyrPoint(y, pair[0]), p2 = pyrPoint(y, pair[1]);
+    return [(p1[0] + p2[0]) / 2, y, (p1[2] + p2[2]) / 2];
+  }
+
+  // A material leans across part of each ring it reaches: centred on the one corner it pulls on,
+  // spanning the arc between two, or all the way round for all three.
+  function arcFor(pulls) {
+    if (pulls.length >= 3) return [0, 360];
+    var d = pulls.map(function (id) { return corner(id).deg; });
+    if (d.length === 1) return [d[0] - 40, d[0] + 40];
+    var a = d[0], b = d[1];
+    if ((b - a + 360) % 360 > 180) { var t = a; a = b; b = t; } // the short way round
+    return [a - 22, a + (b - a + 360) % 360 + 22];
+  }
+  // the arc of a ring a material sits on, split into the half facing you and the half behind
+  function arcPaths(y, arc) {
+    var cz = project([0, y, 0]).z, front = "", back = "", prev = null, last = null;
+    var step = (arc[1] - arc[0]) / Math.max(6, Math.round((arc[1] - arc[0]) / 5));
+    for (var a = arc[0]; a <= arc[1] + 0.01; a += step) {
+      var p = project(ringPoint(y, a)), isBack = p.z < cz - 1e-4;
+      var seg = p.x.toFixed(1) + " " + p.y.toFixed(1);
+      if (prev !== isBack && last) { if (isBack) back += "M" + last; else front += "M" + last; }
+      if (isBack) back += (prev === isBack ? "L" : "M") + seg; else front += (prev === isBack ? "L" : "M") + seg;
+      prev = isBack; last = seg;
+    }
+    return { front: front, back: back };
+  }
+  function matReach() {
+    if (!mat.on || !mat.sel.length) return null;
+    var r = {};
+    mat.sel.forEach(function (id) { matById(id).layers.forEach(function (i) { r[i] = true; }); });
+    return r;
+  }
+  function matPulls(cid) {
+    return mat.on && mat.sel.some(function (id) { return matById(id).pulls.indexOf(cid) >= 0; });
+  }
+
+  // ---- view state
+  var reduced = !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+  var IDLE_MS = 3500, DRIFT = 0.011; // degrees per ms when left alone
+  // view.M takes a point (relative to the model's centre) to screen right, screen down and towards the viewer.
+  var view = { M: null, spin: 0, align: null, vx: 0, vy: 0, coasting: false, pendingFace: null };
+  function fromAngles(yawDeg, pitchDeg) {
+    var ya = yawDeg * Math.PI / 180, pa = pitchDeg * Math.PI / 180;
+    function map(p) {
+      var x1 = p[0] * Math.cos(ya) + p[2] * Math.sin(ya), z1 = -p[0] * Math.sin(ya) + p[2] * Math.cos(ya);
+      return [p[1] * Math.cos(pa) - z1 * Math.sin(pa), x1, p[1] * Math.sin(pa) + z1 * Math.cos(pa)];
+    }
+    var c0 = map([1, 0, 0]), c1 = map([0, 1, 0]), c2 = map([0, 0, 1]);
+    return [[c0[0], c1[0], c2[0]], [c0[1], c1[1], c2[1]], [c0[2], c1[2], c2[2]]];
+  }
+  function mul(A, B) {
+    var C = [[0, 0, 0], [0, 0, 0], [0, 0, 0]];
+    for (var i = 0; i < 3; i++) for (var j = 0; j < 3; j++) C[i][j] = A[i][0] * B[0][j] + A[i][1] * B[1][j] + A[i][2] * B[2][j];
+    return C;
+  }
+  function rot(ax, deg) {
+    var t = deg * Math.PI / 180, c = Math.cos(t), s = Math.sin(t), v = 1 - c, x = ax[0], y = ax[1], z = ax[2];
+    return [[c + x * x * v, x * y * v - z * s, x * z * v + y * s], [y * x * v + z * s, c + y * y * v, y * z * v - x * s], [z * x * v - y * s, z * y * v + x * s, c + z * z * v]];
+  }
+  function dot(a, b) { return a[0] * b[0] + a[1] * b[1] + a[2] * b[2]; }
+  function cross(a, b) { return [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]]; }
+  function unit(a) { var l = Math.hypot(a[0], a[1], a[2]) || 1; return [a[0] / l, a[1] / l, a[2] / l]; }
+  function apply(m, p) { return [dot(m[0], p), dot(m[1], p), dot(m[2], p)]; }
+  function turnBy(axisView, deg) { view.M = mul(rot(unit(axisView), deg), view.M); }
+  // keep M a clean rotation after many small multiplications
+  function tidy() {
+    var M = view.M, c0 = unit([M[0][0], M[1][0], M[2][0]]), c1 = [M[0][1], M[1][1], M[2][1]];
+    var d = dot(c0, c1); c1 = unit([c1[0] - d * c0[0], c1[1] - d * c0[1], c1[2] - d * c0[2]]);
+    var c2 = [M[0][2], M[1][2], M[2][2]], s = dot(cross(c0, c1), c2) < 0 ? -1 : 1, x = cross(c0, c1);
+    c2 = [x[0] * s, x[1] * s, x[2] * s];
+    view.M = [[c0[0], c1[0], c2[0]], [c0[1], c1[1], c2[1]], [c0[2], c1[2], c2[2]]];
+  }
+  function axisView() { return [view.M[0][1], view.M[1][1], view.M[2][1]]; }
+  function faceDir(k) { var a = (90 + 60 * k) * Math.PI / 180; return apply(view.M, [Math.cos(a), 0, Math.sin(a)]); }
+  function faceIndexNow() {
+    var best = 0, bz = -Infinity;
+    for (var k = 0; k < 6; k++) { var z = faceDir(k)[2]; if (z > bz) { bz = z; best = k; } }
+    return best;
+  }
+  // degrees to turn about the model's own axis so the nearest face looks straight at you
+  function snapAngle(k) {
+    var a = axisView(), c = [0, 0, 1], ca = dot(c, a);
+    var cp = [c[0] - ca * a[0], c[1] - ca * a[1], c[2] - ca * a[2]];
+    if (Math.hypot(cp[0], cp[1], cp[2]) < 0.2) return 0;
+    var f = faceDir(k == null ? faceIndexNow() : k);
+    return Math.atan2(dot(cross(f, cp), a), dot(f, cp)) * 180 / Math.PI;
+  }
+  view.M = fromAngles(-24, 18);
+  var lastInput = -Infinity;
+  var state;
+  function fresh() {
+    return { layer: 0, reached: { 0: true }, visited: {}, found: [], trail: [], touched: false, lastHit: -1, hitAnim: -1, sphereY: LAYER_Y[0] };
+  }
+
+  var stageEl = document.getElementById("stage");
+  var scene = document.getElementById("scene");
+  var gBack = document.getElementById("g-back");
+  var gMid = document.getElementById("g-mid");
+  var gFront = document.getElementById("g-front");
+  var note = document.getElementById("note");
+  var frameCircle = document.getElementById("frame-circle");
+  var W = 0, H = 0, SC = 1, CX = 0, CY = 0;
+
+  function resize() {
+    W = stageEl.clientWidth; H = stageEl.clientHeight;
+    scene.setAttribute("viewBox", "0 0 " + W + " " + H);
+    var narrow = W < 720;
+    // about 60% of the shorter side, a little larger on a phone where width is scarce
+    SC = Math.min(W, H) * (narrow ? 0.82 : 0.6) / 4.7;
+    CX = W / 2;
+    CY = narrow ? H * 0.41 : H * 0.45;
+    frameCircle.setAttribute("cx", CX); frameCircle.setAttribute("cy", CY); frameCircle.setAttribute("r", SC * 2.7);
+    requestFrame();
+  }
+
+  // Rotate in 3D, then lay the picture on its side so the narrow end points left.
+  function project(p) {
+    var v = apply(view.M, [p[0], p[1] - MID, p[2]]);
+    var f = D / (D - v[2]);
+    return { x: CX + SC * v[0] * f, y: CY + SC * v[1] * f, z: v[2], f: f };
+  }
+  // ---- svg helpers
+  var NS = "http://www.w3.org/2000/svg";
+  function el(name, attrs, parent) {
+    var n = document.createElementNS(NS, name);
+    for (var k in attrs) n.setAttribute(k, attrs[k]);
+    if (parent) parent.appendChild(n);
+    return n;
+  }
+  function poly(pts) {
+    return pts.map(function (p, i) { return (i ? "L" : "M") + p.x.toFixed(1) + " " + p.y.toFixed(1); }).join(" ") + " Z";
+  }
+  function setLine(n, a, b) {
+    n.setAttribute("x1", a.x); n.setAttribute("y1", a.y);
+    n.setAttribute("x2", b.x); n.setAttribute("y2", b.y);
+  }
+  function place(node, x, y) { node.style.transform = "translate(" + x.toFixed(1) + "px," + y.toFixed(1) + "px)"; }
+
+  // Build persistent nodes once, update their geometry every frame.
+  var layerNodes = [], faceNodes = [], edgeNodes = [], extNodes = [], vertexNodes = [];
+  var topDisc = el("path", { "class": "top-disc" }, gBack);
+  var axis = el("line", { "class": "axis" }, gBack);
+  LAYER_Y.forEach(function () {
+    var g = el("g", { "class": "layer" });
+    var disc = el("path", { "class": "ring-disc" }, g);
+    var back = el("path", { "class": "ring-back" }, g);
+    var front = el("path", { "class": "ring-front" }, g);
+    layerNodes.push({ g: g, disc: disc, back: back, front: front, samples: [] });
+  });
+  CORNERS.forEach(function () {
+    faceNodes.push(el("path", { "class": "face" }));
+    edgeNodes.push(el("path", { "class": "edge" }));
+    extNodes.push(el("line", { "class": "edge-ext" }, gBack));
+    vertexNodes.push(el("circle", { "class": "vertex", r: 2.2 }));
+  });
+  var tri = el("path", { "class": "tri" });
+  var farTri = el("path", { "class": "far-tri" }, gBack);
+  var sections = LAYER_Y.map(function () { return el("path", { "class": "section" }, gBack); });
+  var triDots = CORNERS.map(function () { return el("circle", { "class": "tri-dot", r: 1.8 }); });
+  var trailPath = el("path", { "class": "trail" }, gFront);
+  var trailDots = el("g", {}, gFront);
+  var hint = document.getElementById("hint");
+  var sphere = el("g", {});
+  var clip = el("clipPath", { id: "sphere-clip" }, scene);
+  var clipCircle = el("circle", {}, clip);
+  var sphereBase = el("circle", { "class": "sphere-base" }, sphere);
+  var sphereDots = el("circle", { "class": "sphere-dots", "clip-path": "url(#sphere-clip)" }, sphere);
+  var sphereRim = el("circle", { "class": "sphere-base", style: "fill:none" }, sphere);
+  var lbls = {
+    value: document.getElementById("lbl-value"),
+    legitimacy: document.getElementById("lbl-legitimacy"),
+    capacity: document.getElementById("lbl-capacity"),
+    depth: document.getElementById("lbl-depth")
+  };
+
+  // Layer buttons ride along under each ring
+  var layersEl = document.getElementById("layers");
+  var layerBtns = LAYERS.map(function (name, i) {
+    var b = document.createElement("button");
+    b.type = "button";
+    b.className = "layer-btn";
+    b.setAttribute("aria-label", name);
+    b.setAttribute("aria-label", name + ", " + PACE[i].toLowerCase());
+    b.innerHTML = "<span></span>";
+    b.querySelector("span").textContent = name;
+    b.addEventListener("click", function () { input(); touch(); setLayer(i); });
+    layersEl.appendChild(b);
+    return b;
+  });
+
+  var gScale = document.getElementById("g-scale");
+  var scaleLine = el("line", { "class": "scale-line" }, gScale);
+  var scaleHead = el("path", { "class": "scale-head" }, gScale);
+  var scaleWord = el("text", { "class": "scale-word scale-slow", "text-anchor": "middle" }, gScale);
+  scaleWord.textContent = "SLOWER";
+  var scaleTicks = LAYER_Y.map(function () { return el("line", { "class": "scale-tick" }, gScale); });
+  var scaleDots = LAYER_Y.map(function () { return el("circle", { "class": "scale-dot", r: 2.4 }, gScale); });
+  var scaleWords = PACE.map(function (w) {
+    var t = el("text", { "class": "scale-word", "text-anchor": "middle" }, gScale);
+    t.textContent = w.toUpperCase();
+    return t;
+  });
+
+  var gThreads = el("g", {}, gFront);
+  var gArcsBack = el("g", {}, gBack);
+  var scaleDecs = DECIDE.map(function (w) {
+    var t = el("text", { "class": "scale-dec", "text-anchor": "middle" }, gScale);
+    t.textContent = w;
+    return t;
+  });
+  var capDec = el("text", { "class": "scale-cap" }, gScale), capArr = el("text", { "class": "scale-cap" }, gScale);
+  capDec.textContent = "DECISIONS"; capArr.textContent = "ARRANGEMENTS";
+
+  // The selected materials as arcs on the rings they reach, lying across the part of each ring
+  // nearest the corners they pull on, with a dotted thread to each corner. With one selected, the
+  // materials it moves with show as faint dotted arcs.
+  function drawMaterials(items, tops) {
+    while (gThreads.firstChild) gThreads.removeChild(gThreads.firstChild);
+    while (gArcsBack.firstChild) gArcsBack.removeChild(gArcsBack.firstChild);
+    if (!mat.on || !mat.sel.length) return;
+    var list = mat.sel.map(function (id, i) { return { m: matById(id), cls: i ? "second" : "first" }; });
+    if (mat.sel.length === 1) list = matById(mat.sel[0]).links.map(function (id) { return { m: matById(id), cls: "dep" }; }).concat(list);
+    list.forEach(function (d) {
+      if (!d.m) return;
+      var arc = arcFor(d.m.pulls);
+      d.m.layers.forEach(function (li) {
+        var ps = arcPaths(LAYER_Y[li], arc);
+        // the half behind goes under the model, the half in front over it
+        [["back", ps.back, gArcsBack], ["front", ps.front, gThreads]].forEach(function (part) {
+          if (!part[1]) return;
+          if (d.cls !== "dep") el("path", { "class": "arc-band " + d.cls + " " + part[0], d: part[1] }, part[2]);
+          el("path", { "class": "arc-line " + d.cls + " " + part[0], d: part[1] }, part[2]);
+        });
+      });
+      if (d.cls === "dep") return;
+      var ym = LAYER_Y[d.m.layers[Math.floor(d.m.layers.length / 2)]];
+      d.m.pulls.forEach(function (id) {
+        var a = project(ringPoint(ym, corner(id).deg)), b = tops[CORNERS.indexOf(corner(id))];
+        el("line", { "class": "thread", x1: a.x, y1: a.y, x2: b.x, y2: b.y }, gThreads);
+        el("circle", { "class": "thread-end", cx: a.x, cy: a.y, r: 2.4 }, gThreads);
+      });
+    });
+    gFront.appendChild(gThreads);
+  }
+
+  function sphereRadius() { return state.found.length ? 0.16 + state.found.length * 0.042 : 0.1; }
+
+  function draw() {
+    var centreZ = project([0, MID, 0]).z;
+    var face = currentFace(), r = regime();
+    var facingSide = state.touched && r === "side";
+    var lows = [];
+
+    setLine(axis, project([0, APEX, 0]), project([0, TOP, 0]));
+    var topPts = [];
+    for (var t = 0; t < 72; t++) topPts.push(project(ringPoint(TOP, t * 5)));
+    topDisc.setAttribute("d", poly(topPts));
+
+    var apex = project([0, APEX, 0]);
+    var tops = CORNERS.map(function (c) { return project(pyrPoint(TOP, c.id)); });
+    var upper = CORNERS.map(function (c) { return project(pyrPoint(LAYER_Y[4], c.id)); });
+    var spines = CORNERS.map(function (c, i) { return [apex, upper[i]]; });
+    farTri.setAttribute("d", poly(tops));
+    LAYER_Y.forEach(function (y, i) {
+      sections[i].setAttribute("d", poly(CORNERS.map(function (c) { return project(pyrPoint(y, c.id)); })));
+      sections[i].setAttribute("class", "section" + (state.reached[i] ? " reached" : ""));
+    });
+    CORNERS.forEach(function (c, i) {
+      setLine(extNodes[i], upper[i], tops[i]);
+      edgeNodes[i].setAttribute("d", spines[i].map(function (p, k) { return (k ? "L" : "M") + p.x.toFixed(1) + " " + p.y.toFixed(1); }).join(" "));
+      edgeNodes[i].setAttribute("class", "edge" + (facingSide && face === c.id ? " facing" : ""));
+    });
+
+    // Rings, split into the half facing you and the half behind
+    LAYER_Y.forEach(function (y, i) {
+      var n = layerNodes[i], pts = [], back = "", front = "", prevBack = null;
+      var cz = project([0, y, 0]).z;
+      for (var s = 0; s <= 72; s++) {
+        var p = project(ringPoint(y, s * 5));
+        pts.push(p);
+        var isBack = p.z < cz - 1e-4;
+        var cmd = (prevBack === isBack) ? "L" : "M";
+        if (prevBack !== null && prevBack !== isBack) {
+          var q = pts[pts.length - 2];
+          if (isBack) back += "M" + q.x.toFixed(1) + " " + q.y.toFixed(1);
+          else front += "M" + q.x.toFixed(1) + " " + q.y.toFixed(1);
+          cmd = "L";
+        }
+        var seg = cmd + p.x.toFixed(1) + " " + p.y.toFixed(1);
+        if (isBack) back += seg; else front += seg;
+        prevBack = isBack;
+      }
+      n.samples = pts;
+      n.back.setAttribute("d", back);
+      n.front.setAttribute("d", front);
+      n.disc.setAttribute("d", poly(pts.slice(0, 72)));
+      var cls = i === state.layer ? "active" : state.reached[i] ? "reached" : "unreached";
+      var reach = matReach();
+      n.g.setAttribute("class", "layer " + cls + (reach ? (reach[i] ? " inside" : " outside") : "") + (state.hitAnim === i ? " hit" : ""));
+
+      var low = pts[0];
+      for (var k = 1; k < pts.length; k++) if (pts[k].y > low.y) low = pts[k];
+      lows[i] = low;
+      var b = layerBtns[i];
+      place(b, low.x - b.offsetWidth / 2, low.y + 8);
+      b.setAttribute("aria-pressed", String(i === state.layer));
+    });
+
+    // The pace scale: a ruler just below the drawing, a little wider than the cone, read from the
+    // citizen end towards the slow end. It stays still while the model turns, and fades once the
+    // layers stack up end on. The gaps widen a little towards the slow end.
+    var baseY = CY + SC * SCALE_AT;
+    var vis = Math.max(0, Math.min(1, ((lows[4].x - lows[0].x) / (SC * 2.4) - 0.3) / 0.35));
+    gScale.style.opacity = vis;
+    var start = Math.max(64, CX - SC * 2.45), end = Math.min(W - 64, CX + SC * 2.45);
+    var GAPS = [1, 1.1, 1.25, 1.4], total = 4.75, tx = [start];
+    GAPS.forEach(function (g) { tx.push(tx[tx.length - 1] + (end - start) * g / total); });
+    scaleLine.setAttribute("x1", start - 10); scaleLine.setAttribute("y1", baseY);
+    scaleLine.setAttribute("x2", end + 28); scaleLine.setAttribute("y2", baseY);
+    scaleHead.setAttribute("d", "M" + (end + 28) + " " + baseY + " l-8 -3.5 l0 7 Z");
+    scaleWord.setAttribute("x", (tx[3] + tx[4]) / 2); scaleWord.setAttribute("y", baseY - 10);
+    // with materials on, a second track above the line: how fast a decision can be taken, which
+    // is not the same as how fast the arrangement under it changes
+    scaleWord.style.display = mat.on ? "none" : "";
+    capDec.style.display = capArr.style.display = mat.on && W >= 720 ? "" : "none";
+    capDec.setAttribute("x", end + 96); capDec.setAttribute("y", baseY - 10);
+    capArr.setAttribute("x", end + 96); capArr.setAttribute("y", baseY + 20);
+    var reachS = matReach();
+    tx.forEach(function (x, i) {
+      scaleTicks[i].setAttribute("x1", x); scaleTicks[i].setAttribute("y1", baseY - 4);
+      scaleTicks[i].setAttribute("x2", x); scaleTicks[i].setAttribute("y2", baseY + 4);
+      scaleDots[i].setAttribute("cx", x); scaleDots[i].setAttribute("cy", baseY);
+      scaleDots[i].setAttribute("r", i === state.layer ? 3.6 : 2.4);
+      scaleDots[i].setAttribute("class", "scale-dot" + (state.reached[i] ? " reached" : ""));
+      scaleWords[i].setAttribute("x", x); scaleWords[i].setAttribute("y", baseY + 20);
+      scaleWords[i].setAttribute("class", "scale-word" + (i === state.layer ? " on" : ""));
+      scaleDecs[i].setAttribute("x", x); scaleDecs[i].setAttribute("y", baseY - 10);
+      scaleDecs[i].setAttribute("class", "scale-dec" + (i === state.layer ? " on" : ""));
+      scaleDecs[i].style.display = mat.on ? "" : "none";
+      if (reachS && reachS[i]) scaleDots[i].setAttribute("class", scaleDots[i].getAttribute("class") + " reach");
+      // names on the rings stack up end on, so they go when the ruler goes
+      var b = layerBtns[i];
+      b.style.opacity = vis;
+      b.style.pointerEvents = vis < 0.3 ? "none" : "";
+      b.tabIndex = vis < 0.3 ? -1 : 0;
+      b.classList.toggle("outside", !!reachS && !reachS[i]);
+    });
+
+    // Faces, edges, the sphere and the active triangle, painted back to front
+    var items = [];
+    CORNERS.forEach(function (c, i) {
+      var j = (i + 1) % 3;
+      faceNodes[i].setAttribute("d", poly([apex, upper[i], upper[j]]));
+      var pairKey = [c.id, CORNERS[j].id].sort().join("|");
+      faceNodes[i].setAttribute("class", "face" + (facingSide && face === pairKey ? " facing" : ""));
+      items.push({ z: (apex.z + upper[i].z + upper[j].z) / 3, node: faceNodes[i] });
+      items.push({ z: (apex.z + upper[i].z) / 2, node: edgeNodes[i] });
+    });
+    var sc = project([0, state.sphereY, 0]);
+    var sr = sphereRadius() * SC * sc.f;
+    [sphereBase, sphereDots, sphereRim].forEach(function (n) {
+      n.setAttribute("cx", sc.x); n.setAttribute("cy", sc.y); n.setAttribute("r", sr);
+    });
+    clipCircle.setAttribute("cx", sc.x + sr * 0.42); clipCircle.setAttribute("cy", sc.y + sr * 0.42); clipCircle.setAttribute("r", sr * 1.02);
+    items.push({ z: sc.z, node: sphere });
+
+    var ly = LAYER_Y[state.layer];
+    var triPts = CORNERS.map(function (c) { return project(pyrPoint(ly, c.id)); });
+    tri.setAttribute("d", poly(triPts));
+    triPts.forEach(function (p, i) { triDots[i].setAttribute("cx", p.x); triDots[i].setAttribute("cy", p.y); });
+    items.push({ z: sc.z + 0.001, node: tri });
+    drawMaterials(items, tops);
+
+    items.sort(function (a, b) { return a.z - b.z; });
+    while (gMid.firstChild) gMid.removeChild(gMid.firstChild);
+    LAYER_Y.forEach(function (y, i) { gBack.appendChild(layerNodes[i].g); });
+    gBack.appendChild(gArcsBack);
+    items.forEach(function (it) { gMid.appendChild(it.node); });
+    CORNERS.forEach(function (c, i) {
+      vertexNodes[i].setAttribute("cx", tops[i].x); vertexNodes[i].setAttribute("cy", tops[i].y);
+      gFront.appendChild(vertexNodes[i]);
+    });
+    gFront.appendChild(layerNodes[state.layer].g);
+    triDots.forEach(function (n) { gFront.appendChild(n); });
+
+    // The trail of where the experiment has settled, drawn on the model so it turns with it
+    var tp = state.trail.map(function (t) { return project(facePoint(t.y, t.k)); });
+    trailPath.setAttribute("d", tp.length > 1 ? tp.map(function (p, k) { return (k ? "L" : "M") + p.x.toFixed(1) + " " + p.y.toFixed(1); }).join(" ") : "");
+    while (trailDots.childNodes.length < tp.length) el("circle", { "class": "trail-dot", r: 2.2 }, trailDots);
+    for (var d = 0; d < trailDots.childNodes.length; d++) {
+      var dot = trailDots.childNodes[d];
+      if (d < tp.length) {
+        dot.setAttribute("cx", tp[d].x); dot.setAttribute("cy", tp[d].y);
+        dot.setAttribute("class", "trail-dot" + (d === tp.length - 1 ? " last" : ""));
+        dot.style.display = "";
+      } else dot.style.display = "none";
+    }
+    gFront.appendChild(trailPath); gFront.appendChild(trailDots);
+    place(hint, CX + SC * 1.98 - 23, CY + SC * 1.98 - 23);
+
+    // Corner labels sit just beyond each far vertex, kept on screen
+    CORNERS.forEach(function (c) {
+      var p = project(pyrPoint(TOP + 0.12, c.id).map(function (v, k) { return k === 1 ? v : v * 1.1; }));
+      var l = lbls[c.id];
+      var w = l.offsetWidth, half = w / 2 + 8;
+      var lx = Math.max(half, Math.min(W - half, p.x));
+      // never let a corner label sit on the pace scale
+      var ly = Math.min(p.y - l.firstChild.offsetHeight / 2, CY + SC * SCALE_AT - l.offsetHeight - 26);
+      // end on, the questions show too, so the label steps clear of its corner
+      if (state.touched && r === "end") {
+        var v = tops[CORNERS.indexOf(c)];
+        lx = Math.max(half, Math.min(W - half, v.x));
+        ly = v.y > CY ? v.y + 10 : v.y - l.offsetHeight - 8;
+      }
+      place(l, lx - w / 2, ly);
+      l.classList.toggle("behind", p.z < centreZ - 0.6);
+      l.classList.toggle("facing", facingSide && face === c.id);
+      l.classList.toggle("asked", state.touched && r === "end");
+      l.classList.toggle("pulled", matPulls(c.id));
+    });
+    var dl = lbls.depth;
+    dl.textContent = state.found.length ? "Depth · " + state.found.length : "Depth";
+    place(dl, sc.x - dl.offsetWidth / 2, sc.y - sr - dl.offsetHeight - 4);
+
+    drawLeader();
+  }
+
+  // ---- what the view means
+  function mod(n, m) { return ((n % m) + m) % m; }
+  function currentFace() { return FACES[faceIndexNow()]; }
+  function regime() {
+    var z = axisView()[2];
+    if (z > 0.85) return "end";
+    if (z < -0.85) return "citizen";
+    return "side";
+  }
+  function corner(id) { return CORNERS.filter(function (c) { return c.id === id; })[0]; }
+
+  function focusPoint() {
+    var r = regime();
+    if (mat.on && mat.sel.length) {
+      var m = matById(mat.sel[0]), arc = arcFor(m.pulls);
+      var ym = LAYER_Y[m.layers[Math.floor(m.layers.length / 2)]];
+      var deg = m.pulls.length >= 3 ? 90 + 60 * faceIndexNow() : (arc[0] + arc[1]) / 2;
+      return project(ringPoint(ym, deg));
+    }
+    if (mat.on || !state.touched) return project([0, state.sphereY, 0]);
+    if (r === "end") return project([0, LAYER_Y[state.layer], 0]);
+    if (r === "citizen") return project([0, APEX, 0]);
+    return project(facePoint(LAYER_Y[state.layer], faceIndexNow()));
+  }
+
+  var leaderPath = document.getElementById("leader-path");
+  var leaderDots = [document.getElementById("leader-pin"), document.getElementById("leader-ring")];
+  function drawLeader() {
+    var sr = stageEl.getBoundingClientRect(), nr = note.getBoundingClientRect();
+    var fp = focusPoint();
+    // leave the note from its top edge, step up, then run to the point
+    var ax = nr.left - sr.left + Math.min(nr.width - 12, Math.max(12, fp.x - (nr.left - sr.left)));
+    var ay = nr.top - sr.top - 10;
+    var bend = Math.min(ay - 16, fp.y + (ay - fp.y) * 0.5);
+    var d = "M" + ax.toFixed(1) + " " + ay.toFixed(1) + " V" + bend.toFixed(1) + " L" + fp.x.toFixed(1) + " " + fp.y.toFixed(1);
+    leaderPath.setAttribute("d", d);
+    leaderDots.forEach(function (n) { n.setAttribute("cx", fp.x); n.setAttribute("cy", fp.y); });
+  }
+
+  var lastKey = "";
+  function annotate() {
+    if (mat.on) { renderMat(); return; }
+    var r = regime(), where, text, key;
+    if (!state.touched) { where = VIEWS.intro.where; text = VIEWS.intro.q; key = "intro"; }
+    else if (r !== "side") { where = VIEWS[r].where; text = VIEWS[r].q; key = r; }
+    else {
+      var face = currentFace();
+      if (face.indexOf("|") < 0) {
+        where = LAYERS[state.layer] + " · " + corner(face).name;
+        text = CELLS[face][state.layer].q;
+      } else {
+        where = LAYERS[state.layer];
+        text = BETWEEN[face];
+      }
+      key = face + state.layer;
+    }
+    if (key === lastKey) return;
+    lastKey = key;
+    document.getElementById("where").textContent = where;
+    document.getElementById("question").textContent = text;
+    document.getElementById("newlayer").hidden = !(state.touched && r === "side" && state.lastHit === state.layer && state.layer > 0);
+    document.querySelectorAll("[data-view]").forEach(function (b) {
+      b.setAttribute("aria-pressed", String(state.touched && b.dataset.view === r));
+    });
+  }
+
+  // ---- materials: the note, the list and what you can do with them
+  var matKeyLast = "";
+  var noteExtra = document.getElementById("mat-extra");
+  function names(list) {
+    if (list.length < 2) return list.join("");
+    return list.slice(0, -1).join(", ") + " and " + list[list.length - 1];
+  }
+  function layerNames(ls) { return names(ls.map(function (i) { return LAYERS[i].toLowerCase(); })); }
+  function pullNames(ps) { return names(ps.map(function (id) { return corner(id).name.toLowerCase(); })); }
+  function h(tag, cls, txt) { var n = document.createElement(tag); if (cls) n.className = cls; if (txt != null) n.textContent = txt; return n; }
+  function chip(label, act, id) { var b = h("button", "chip", label); b.type = "button"; b.dataset.act = act; if (id) b.dataset.id = id; return b; }
+  function rows(pairs) {
+    var dl = h("dl", "mrows");
+    pairs.forEach(function (p) { dl.appendChild(h("dt", "", p[0])); dl.appendChild(h("dd", "", p[1])); });
+    return dl;
+  }
+  function renderMat() {
+    var key = mat.sel.join("+") + "|" + mat.step + "|" + Object.keys(mat.learned).join(",");
+    if (key === matKeyLast) return;
+    matKeyLast = key;
+    var whereEl = document.getElementById("where"), qEl = document.getElementById("question");
+    document.getElementById("newlayer").hidden = true;
+    document.getElementById("turned").hidden = true;
+    noteExtra.innerHTML = "";
+    var act;
+
+    if (mat.step >= 0 && SCEN) {
+      var st = SCEN.steps[mat.step];
+      whereEl.textContent = "Example · " + (mat.step + 1) + " of " + SCEN.steps.length;
+      qEl.textContent = st.text;
+      if (st.select.length) noteExtra.appendChild(rows([["Materials", names(st.select.map(function (id) { return matById(id).name.toLowerCase(); }))]]));
+      act = h("div", "mact");
+      if (mat.step > 0) act.appendChild(chip("Back", "back"));
+      act.appendChild(chip(mat.step < SCEN.steps.length - 1 ? "Next" : "Finish", "next"));
+      act.appendChild(chip("Leave the example", "leave"));
+      noteExtra.appendChild(act);
+      return;
+    }
+
+    if (!mat.sel.length) {
+      whereEl.textContent = "Materials";
+      qEl.textContent = "Pick a material to see which layers it reaches, which tensions it pulls on and what changing it would take.";
+      if (SCEN) { act = h("div", "mact"); act.appendChild(chip("Walk through an example", "walk")); noteExtra.appendChild(act); }
+      return;
+    }
+
+    if (mat.sel.length === 1) {
+      var m = matById(mat.sel[0]);
+      whereEl.textContent = m.name + " · " + (mat.learned[m.id] ? "Learned about" : "Encountered");
+      qEl.textContent = m.why;
+      noteExtra.appendChild(rows([["What", m.what], ["Reaches", layerNames(m.layers)], ["Pulls on", pullNames(m.pulls)], ["Pace", m.pace]]));
+      noteExtra.appendChild(h("p", "mask", m.probe));
+      if (mat.learned[m.id]) {
+        var rv = h("p", "mreveal");
+        rv.appendChild(h("b", "", "Turned up · " + (KIND_LABEL[m.reveal.kind] || m.reveal.kind)));
+        rv.appendChild(document.createTextNode(m.reveal.text));
+        noteExtra.appendChild(rv);
+        var ch = h("p", "mchange");
+        ch.appendChild(h("i", "", "Changing it would need "));
+        ch.appendChild(document.createTextNode(m.change.charAt(0).toLowerCase() + m.change.slice(1) + " Learning this hasn't changed it."));
+        noteExtra.appendChild(ch);
+      }
+      act = h("div", "mact");
+      if (!mat.learned[m.id]) act.appendChild(chip("Probe it", "probe", m.id));
+      act.appendChild(h("span", "lead", "Moves with"));
+      m.links.forEach(function (id) { var o = matById(id); if (o) act.appendChild(chip(o.name, "compare", id)); });
+      noteExtra.appendChild(act);
+      return;
+    }
+
+    var a = matById(mat.sel[0]), b = matById(mat.sel[1]);
+    whereEl.textContent = a.name + " + " + b.name;
+    var shared = a.layers.filter(function (i) { return b.layers.indexOf(i) >= 0; });
+    var sharedPull = a.pulls.filter(function (id) { return b.pulls.indexOf(id) >= 0; });
+    var pairNote = PAIRS[[a.id, b.id].sort().join("|")];
+    if (!pairNote) {
+      pairNote = shared.length
+        ? "Both reach " + layerNames(shared) + ". " + (sharedPull.length ? "Both pull on " + pullNames(sharedPull) + ", so a change to one tends to land on the other." : "They pull on different corners, so moving one can unsettle the other.")
+        : "They sit at different layers. A change to one reaches the other only through the people and processes in between.";
+    }
+    qEl.textContent = pairNote;
+    noteExtra.appendChild(rows([["Overlap", shared.length ? layerNames(shared) : "no shared layer"], ["Shared pull", sharedPull.length ? pullNames(sharedPull) : "none"]]));
+    act = h("div", "mact");
+    [a, b].forEach(function (m) { if (!mat.learned[m.id]) act.appendChild(chip("Probe " + m.name.toLowerCase(), "probe", m.id)); });
+    act.appendChild(chip("Just " + a.name.toLowerCase(), "focus", a.id));
+    act.appendChild(chip("Just " + b.name.toLowerCase(), "focus", b.id));
+    noteExtra.appendChild(act);
+  }
+
+  var matsEl = document.getElementById("mats"), matToggle = document.getElementById("mat-toggle");
+  var matBtns = {};
+  MATS.forEach(function (m) {
+    var li = document.createElement("li");
+    var b = h("button", "mat");
+    b.type = "button";
+    b.appendChild(h("span", "mk"));
+    b.appendChild(h("span", "", m.name));
+    b.addEventListener("click", function () { pickMat(m.id); });
+    li.appendChild(b);
+    document.getElementById("mat-list").appendChild(li);
+    matBtns[m.id] = b;
+  });
+  function refreshList() {
+    MATS.forEach(function (m) {
+      var b = matBtns[m.id], mk = b.firstChild;
+      b.setAttribute("aria-pressed", String(mat.sel.indexOf(m.id) >= 0));
+      mk.className = "mk" + (mat.learned[m.id] ? " learned" : mat.seen[m.id] ? " seen" : "");
+      b.setAttribute("aria-label", m.name + (mat.learned[m.id] ? ", learned about" : mat.seen[m.id] ? ", encountered" : ""));
+    });
+  }
+  // One selected and you pick another, they're compared. Pick a selected one again to put it down.
+  function pickMat(id) {
+    mat.step = -1;
+    var i = mat.sel.indexOf(id);
+    if (i >= 0) mat.sel.splice(i, 1);
+    else if (mat.sel.length === 1) mat.sel.push(id);
+    else mat.sel = [id];
+    showSelection();
+  }
+  function showSelection() {
+    input(); touch();
+    mat.sel.forEach(function (x) { mat.seen[x] = true; });
+    if (mat.sel.length) {
+      var m = matById(mat.sel[0]);
+      setLayer(m.layers[Math.floor(m.layers.length / 2)]);
+      if (m.pulls.length < 3) { var arc = arcFor(m.pulls); faceToward((arc[0] + arc[1]) / 2); }
+      else if (regime() !== "side") look("side");
+    }
+    refreshList();
+    requestFrame();
+  }
+  function faceToward(deg) {
+    var k = mod(Math.round((deg - 90) / 60), 6);
+    view.coasting = false;
+    if (regime() !== "side") { view.align = SIDE; view.pendingFace = k; }
+    else view.spin = snapAngle(k);
+    requestFrame();
+  }
+  function probeMat(id) {
+    var m = matById(id);
+    if (!m || mat.learned[id]) return;
+    input();
+    mat.learned[id] = mat.seen[id] = true;
+    state.found.push({ kind: m.reveal.kind, f: m.reveal.text });
+    refreshList();
+    requestFrame();
+  }
+  function walk(step) {
+    if (!SCEN) return;
+    if (step < 0 || step >= SCEN.steps.length) { mat.step = -1; mat.sel = []; refreshList(); requestFrame(); return; }
+    mat.step = step;
+    var st = SCEN.steps[step];
+    mat.sel = st.select.slice();
+    input(); touch();
+    mat.sel.forEach(function (x) { mat.seen[x] = true; });
+    setLayer(st.layer);
+    if (mat.sel.length && matById(mat.sel[0]).pulls.length < 3) { var arc = arcFor(matById(mat.sel[0]).pulls); faceToward((arc[0] + arc[1]) / 2); }
+    refreshList();
+    requestFrame();
+  }
+  function setMatMode(on) {
+    mat.on = on;
+    matToggle.setAttribute("aria-pressed", String(on));
+    matsEl.hidden = !on;
+    note.classList.toggle("mat-on", on);
+    if (!on) { mat.sel = []; mat.step = -1; noteExtra.innerHTML = ""; lastKey = ""; }
+    matKeyLast = "";
+    refreshList();
+    requestFrame();
+  }
+  matToggle.addEventListener("click", function () { setMatMode(!mat.on); });
+  document.getElementById("mat-walk").addEventListener("click", function () { walk(0); });
+  note.addEventListener("click", function (e) {
+    var b = e.target.closest("[data-act]");
+    if (!b) return;
+    var act = b.dataset.act, id = b.dataset.id;
+    if (act === "probe") probeMat(id);
+    else if (act === "compare") { mat.step = -1; mat.sel = [mat.sel[0], id]; showSelection(); }
+    else if (act === "focus") { mat.step = -1; mat.sel = [id]; showSelection(); }
+    else if (act === "walk") walk(0);
+    else if (act === "next") walk(mat.step + 1);
+    else if (act === "back") walk(mat.step - 1);
+    else if (act === "leave") walk(-1);
+  });
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape" && mat.on && (mat.sel.length || mat.step >= 0)) { mat.sel = []; mat.step = -1; refreshList(); requestFrame(); }
+  });
+
+  // Record what this experiment turned up once the view comes to rest on a question.
+  function settle() {
+    if (mat.on) return; // in materials mode, learning comes from probing a material
+    if (!state.touched || regime() !== "side") return;
+    var k = faceIndexNow(), face = FACES[k];
+    var here = { y: LAYER_Y[state.layer], k: k }, prev = state.trail[state.trail.length - 1];
+    if (!prev || prev.y !== here.y || prev.k !== here.k) {
+      state.trail.push(here);
+      if (state.trail.length > 40) state.trail.shift();
+      requestFrame();
+    }
+    if (face.indexOf("|") >= 0) return;
+    var key = face + state.layer;
+    if (state.visited[key]) return;
+    state.visited[key] = true;
+    warp.ringT[state.layer] = Math.min(0.32, warp.ringT[state.layer] + 0.08);
+    warp.cornerT[face] = Math.min(0.2, warp.cornerT[face] + 0.05);
+    var cell = CELLS[face][state.layer];
+    state.found.push(cell);
+    var turned = document.getElementById("turned");
+    turned.innerHTML = "<b></b><span></span>";
+    turned.querySelector("b").textContent = "Turned up · " + KIND_LABEL[cell.kind];
+    turned.querySelector("span").textContent = cell.f;
+    turned.hidden = false;
+    requestFrame();
+  }
+
+  function setLayer(layer) {
+    layer = Math.max(0, Math.min(4, layer));
+    if (layer === state.layer) return;
+    var hit = false;
+    var lo = Math.min(layer, state.layer), hi = Math.max(layer, state.layer);
+    for (var i = lo; i <= hi; i++) if (!state.reached[i]) { state.reached[i] = true; hit = true; }
+    state.lastHit = hit ? layer : -1;
+    state.hitAnim = hit ? layer : -1;
+    state.layer = layer;
+    lastKey = "";
+    if (!busy() && !dragging) settle();
+    requestFrame();
+  }
+
+  // ---- motion
+  var frameReq = null, lastT = 0;
+  function requestFrame() { if (!frameReq) frameReq = requestAnimationFrame(tick); }
+  function idle(now) { return !reduced && !dragging && now - lastInput > IDLE_MS && !document.hidden; }
+  function tick(t) {
+    frameReq = null;
+    var dt = lastT ? Math.min(50, t - lastT) : 16;
+    lastT = t;
+    var moving = false;
+    var now = performance.now();
+
+    var ease = reduced ? 1 : 1 - Math.pow(0.86, dt / 16);
+
+    if (view.coasting && !dragging) {
+      // a flick keeps tumbling and slows down, then the nearest face comes round
+      dragRotate(view.vx * dt, view.vy * dt);
+      var decay = Math.pow(0.93, dt / 16);
+      view.vx *= decay; view.vy *= decay;
+      moving = true;
+      if (Math.hypot(view.vx, view.vy) < 0.03) { view.coasting = false; land(); }
+    }
+    if (view.align) {
+      var a = axisView(), ang = Math.acos(Math.max(-1, Math.min(1, dot(a, view.align)))) * 180 / Math.PI;
+      if (ang < 0.1) { view.align = null; view.spin = snapAngle(view.pendingFace); view.pendingFace = null; }
+      else {
+        var ax = cross(a, view.align);
+        if (Math.hypot(ax[0], ax[1], ax[2]) < 1e-4) ax = [0, 1, 0];
+        turnBy(ax, ang * ease);
+      }
+      moving = true;
+    }
+    if (!view.align && Math.abs(view.spin) > 0.05) {
+      var step = view.spin * ease;
+      turnBy(axisView(), step);
+      view.spin -= step;
+      moving = true;
+      if (Math.abs(view.spin) <= 0.05) { turnBy(axisView(), view.spin); view.spin = 0; settle(); }
+    }
+    if (idle(now) && !busy()) {
+      // drift about its own axis when nobody is touching it, easing in so it never jerks into motion
+      var since = now - lastInput - IDLE_MS;
+      var ramp = state.touched ? Math.min(1, since / 2000) : 1;
+      turnBy(axisView(), dt * DRIFT * ramp);
+      moving = true;
+    }
+    tidy();
+
+    for (var w = 0; w < 5; w++) {
+      var dw = warp.ringT[w] - warp.ring[w];
+      if (Math.abs(dw) > 0.0005) { warp.ring[w] += dw * ease * 0.35; moving = true; } else warp.ring[w] = warp.ringT[w];
+    }
+    CORNERS.forEach(function (c) {
+      var dc = warp.cornerT[c.id] - warp.corner[c.id];
+      if (Math.abs(dc) > 0.0005) { warp.corner[c.id] += dc * ease * 0.35; moving = true; } else warp.corner[c.id] = warp.cornerT[c.id];
+    });
+    var ds = LAYER_Y[state.layer] - state.sphereY;
+    if (Math.abs(ds) > 0.002) { state.sphereY += ds * ease; moving = true; }
+    else state.sphereY = LAYER_Y[state.layer];
+
+    draw();
+    annotate();
+    if (moving) requestFrame(); else lastT = 0;
+  }
+
+  var idleTimer = null;
+  function input() {
+    lastInput = performance.now();
+    clearTimeout(idleTimer);
+    if (!reduced) idleTimer = setTimeout(requestFrame, IDLE_MS + 20);
+  }
+  function busy() { return view.coasting || !!view.align || Math.abs(view.spin) > 0.05; }
+  function touch() {
+    if (!state.touched) {
+      state.touched = true;
+      view.spin = snapAngle();
+      lastKey = "";
+    }
+  }
+  // after a drag or a flick: square up to an end view if it's close, otherwise bring a face round
+  function land() {
+    var z = axisView()[2];
+    if (Math.abs(z) > 0.94) view.align = [0, 0, z > 0 ? 1 : -1];
+    else view.spin = snapAngle();
+    requestFrame();
+  }
+  function turn(steps) {
+    input(); touch();
+    hint.classList.add("gone");
+    view.coasting = false;
+    view.spin = (busy() ? view.spin : snapAngle()) + steps * 60;
+    requestFrame();
+  }
+  var SIDE = unit([Math.cos(14 * Math.PI / 180), 0, Math.sin(14 * Math.PI / 180)]);
+  function look(which) {
+    input(); touch();
+    view.coasting = false; view.spin = 0;
+    view.align = which === "end" ? [0, 0, 1] : which === "citizen" ? [0, 0, -1] : SIDE;
+    requestFrame();
+  }
+
+  // ---- pointer. A trackball: the model turns whichever way you drag it, all the way round.
+  var dragging = false, last = null, moved = 0;
+  function dragRotate(dx, dy) {
+    var len = Math.hypot(dx, dy);
+    if (len < 1e-6) return;
+    var k = 300 / Math.max(300, SC * 4.7);
+    turnBy([-dy, dx, 0], len * k);
+  }
+  function nearRing(e, best) {
+    var r = stageEl.getBoundingClientRect();
+    var x = e.clientX - r.left, y = e.clientY - r.top, pick = -1;
+    layerNodes.forEach(function (n, i) {
+      n.samples.forEach(function (p) {
+        var d = Math.hypot(p.x - x, p.y - y);
+        if (d < best) { best = d; pick = i; }
+      });
+    });
+    return pick;
+  }
+  stageEl.addEventListener("pointerdown", function (e) {
+    if (e.button !== 0) return;
+    input(); touch();
+    dragging = true; moved = 0;
+    last = { x: e.clientX, y: e.clientY, t: performance.now() };
+    view.coasting = false; view.align = null; view.spin = 0; view.vx = 0; view.vy = 0;
+    stageEl.setPointerCapture(e.pointerId);
+    stageEl.classList.add("dragging");
+  });
+  stageEl.addEventListener("pointermove", function (e) {
+    if (!dragging) {
+      if (e.pointerType === "mouse") stageEl.classList.toggle("over-ring", nearRing(e, 14) >= 0);
+      return;
+    }
+    input();
+    var now = performance.now();
+    var dx = e.clientX - last.x, dy = e.clientY - last.y;
+    moved += Math.abs(dx) + Math.abs(dy);
+    if (moved > 8) hint.classList.add("gone");
+    var dt = Math.max(1, now - last.t);
+    dragRotate(dx, dy);
+    view.vx = 0.7 * view.vx + 0.3 * (dx / dt);
+    view.vy = 0.7 * view.vy + 0.3 * (dy / dt);
+    last = { x: e.clientX, y: e.clientY, t: now };
+    requestFrame();
+  });
+  function endDrag(e) {
+    if (!dragging) return;
+    dragging = false;
+    input();
+    stageEl.classList.remove("dragging");
+    if (moved < 6 && e.type === "pointerup") { var pick = nearRing(e, 26); if (pick >= 0) setLayer(pick); }
+    var live = performance.now() - last.t <= 80 && Math.hypot(view.vx, view.vy) > 0.15;
+    if (live && !reduced) view.coasting = true; else land();
+    requestFrame();
+  }
+  stageEl.addEventListener("pointerup", endDrag);
+  stageEl.addEventListener("pointercancel", endDrag);
+  stageEl.addEventListener("pointerleave", function () { stageEl.classList.remove("over-ring"); });
+
+  // ---- keyboard and buttons
+  stageEl.addEventListener("keydown", function (e) {
+    var handled = true;
+    switch (e.key) {
+      case "ArrowUp": turn(-1); break;
+      case "ArrowDown": turn(1); break;
+      case "ArrowRight": input(); touch(); setLayer(state.layer + 1); break;
+      case "ArrowLeft": input(); touch(); setLayer(state.layer - 1); break;
+      case "PageUp": look("end"); break;
+      case "PageDown": look("citizen"); break;
+      case "Home": look("side"); break;
+      default: handled = false;
+    }
+    if (handled) e.preventDefault();
+  });
+  document.getElementById("spin-up").addEventListener("click", function () { turn(-1); });
+  document.getElementById("spin-down").addEventListener("click", function () { turn(1); });
+  document.querySelectorAll("[data-view]").forEach(function (b) {
+    b.addEventListener("click", function () { look(b.dataset.view); });
+  });
+  document.getElementById("reset").addEventListener("click", function () {
+    state = fresh();
+    view.coasting = false; view.spin = 0; view.align = unit([Math.cos(18 * Math.PI / 180), 0, Math.sin(18 * Math.PI / 180)]);
+    lastKey = "";
+    warp.ringT = [0, 0, 0, 0, 0];
+    warp.cornerT = { value: 0, legitimacy: 0, capacity: 0 };
+    document.getElementById("turned").hidden = true;
+    mat.sel = []; mat.seen = {}; mat.learned = {}; mat.step = -1; matKeyLast = "";
+    refreshList();
+    lastInput = -Infinity;
+    requestFrame();
+  });
+  document.addEventListener("visibilitychange", requestFrame);
+
+  if (window.ResizeObserver) new ResizeObserver(resize).observe(stageEl);
+  window.addEventListener("resize", resize);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(requestFrame);
+
+  state = fresh();
+  setMatMode(true);
+  resize();
+})();
+</script>
+</body>
+</html>
