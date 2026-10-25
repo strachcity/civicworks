@@ -6,6 +6,9 @@
 //   PROBES.weaveBeforeAfter(svg, { pull: 0.85 })       A, before and after, with arrows
 //   PROBES.mobile(svg, { weight: 0.85, ghost: true })    B, rebalance the mobile
 //   PROBES.treacle(svg, { seed: 7, reveal: 1 })          C, taste the treacle
+//   PROBES.beneath(svg, { pull: 0.8, arrows: true })    D, reach beneath the service
+//   PROBES.rearrange(svg, { shift: 1, arrows: true })   E, rearrange the pieces
+//   PROBES.push(svg, { depth: 0.9 })                    F, push through the layers
 // Colours are written in, not taken from CSS, so a drawing can be lifted out as a standalone SVG.
 (function () {
   "use strict";
@@ -388,5 +391,234 @@
     return marks;
   }
 
-  window.PROBES = { weave: weave, weaveBeforeAfter: weaveBeforeAfter, mobile: mobile, treacle: treacle, size: { width: W, height: H } };
+  // a strand or block in a material's texture, used by D, E and F
+  function textured(g, url, attrs, m, width) {
+    function a(extra) { var o = {}; for (var k in attrs) o[k] = attrs[k]; for (k in extra) o[k] = extra[k]; return o; }
+    if (width) {
+      el("path", a({ fill: "none", stroke: INK, "stroke-width": width, "stroke-linecap": "butt" }), g);
+      el("path", a({ fill: "none", stroke: PAPER, "stroke-width": width - 1.6, "stroke-linecap": "butt" }), g);
+      if (m.fill === "tint") el("path", a({ fill: "none", stroke: TINT, "stroke-width": width - 1.6 }), g);
+      else if (m.fill !== "blank") el("path", a({ fill: "none", stroke: url(m.fill), "stroke-width": width - 1.6 }), g);
+      else el("path", a({ fill: "none", stroke: INK, "stroke-width": .6, "stroke-dasharray": "1 3.5", "stroke-linecap": "round" }), g);
+      return;
+    }
+    var tag = attrs.d ? "path" : "rect";
+    el(tag, a({ fill: m.fill === "tint" ? TINT : PAPER, stroke: "none" }), g);
+    if (m.fill !== "tint" && m.fill !== "blank") el(tag, a({ fill: url(m.fill), stroke: "none" }), g);
+    el(tag, a({ fill: "none", stroke: INK, "stroke-width": .75, "stroke-linejoin": "round" }), g);
+  }
+  function halo(g, d, w) { el("path", { d: d, fill: "none", stroke: PAPER, "stroke-width": w, "stroke-linecap": "round" }, g); }
+
+  // ---- D. Reach beneath the service.
+  // The service is a surface. Under it the materials lie as threads, tied to each other by short
+  // stitches. The experiment reaches through and lifts one thread, the threads tied to it come up
+  // too, and the arrangement shows around the place it pulled.
+  var BENEATH = [
+    { name: "Interpretation", fill: "hatch" },
+    { name: "Operations", fill: "stipple" },
+    { name: "Relationships", fill: "blank" },
+    { name: "Decision rights", fill: "cross" },
+    { name: "Legislation", fill: "tint", stiff: true }
+  ];
+  function beneath(svg, opts) {
+    var p = opts && opts.pull != null ? opts.pull : 0.8, arrows = !!(opts && opts.arrows);
+    var url = start(svg, "bn", "An experiment reaches beneath the surface of a service and lifts one thread of the materials underneath, bringing the threads tied to it into view");
+    var cx = 728, xa = 300, xb = 1170, B = 15, k, i;
+    var ly = [300, 358, 416, 474, 532];
+    function surf(x) { return 200 + 30 * Math.pow((x - cx) / 470, 2); }
+    function lift(k) { var l = 74 * p * Math.pow(0.52, k); return BENEATH[k].stiff ? l * 0.45 : l; }
+    function sig(k) { return 110 + 50 * k; }
+    function rise(k, x) { return lift(k) * Math.exp(-(x - cx) * (x - cx) / (2 * sig(k) * sig(k))); }
+    function rest(k, x) { return ly[k] + 3 * Math.sin(x / 41 + k * 1.9); }
+    function y(k, x) { return rest(k, x) - rise(k, x); }
+    function pts(k) { var a = []; for (var x = xa; x <= xb + 0.1; x += 5) a.push([x, y(k, x)]); return a; }
+    var hy = y(0, cx), py = 128 - 30 * p;
+
+    // what's beneath shows most around the pull, and only faintly further off
+    var defs = svg.querySelector("defs");
+    var rg = el("radialGradient", { id: "bn-glow", cx: cx, cy: hy + 70, r: 40 + 540 * p, gradientUnits: "userSpaceOnUse" }, defs);
+    el("stop", { offset: 0, "stop-color": "#fff" }, rg);
+    el("stop", { offset: .45, "stop-color": "#fff" }, rg);
+    el("stop", { offset: 1, "stop-color": "#2b2b2b" }, rg);
+    var mk = el("mask", { id: "bn-mask", maskUnits: "userSpaceOnUse", x: 0, y: 0, width: W, height: H }, defs);
+    el("rect", { width: W, height: H, fill: "url(#bn-glow)" }, mk);
+
+    // the experiment, above the surface, and its line down through it
+    el("path", { d: line([[cx, py + 15], [cx, surf(cx)]]), stroke: INK, "stroke-width": .9, "stroke-dasharray": "2 4", "stroke-linecap": "round", fill: "none" }, svg);
+    el("path", { d: line([[cx, surf(cx)], [cx, hy + B / 2 + 3]]), stroke: INK, "stroke-width": 1.1, fill: "none" }, svg);
+
+    var g = el("g", { mask: "url(#bn-mask)" }, svg);
+    // stitches tie each thread to the next, so lifting one lifts the others
+    var r = rng(11);
+    for (k = 0; k < 4; k++) {
+      var xs = [cx + (k % 2 ? 34 : -40)];
+      for (i = 0; i < 6; i++) xs.push(xa + 50 + (xb - xa - 100) * (i + 0.2 + r() * 0.6) / 6);
+      xs.forEach(function (x) {
+        if (Math.abs(x - cx) < 20) return;
+        var x2 = x + (r() - 0.5) * 34, a = [x, y(k, x) + B / 2], b = [x2, y(k + 1, x2) - B / 2];
+        el("path", { d: line([a, b]), stroke: INK, "stroke-width": .75, fill: "none" }, g);
+        el("circle", { cx: a[0], cy: a[1], r: 1.8, fill: INK }, g);
+        el("circle", { cx: b[0], cy: b[1], r: 1.8, fill: INK }, g);
+      });
+    }
+    for (k = BENEATH.length - 1; k >= 0; k--) textured(g, url, { d: line(pts(k)) }, BENEATH[k], B);
+    // the hook, under the thread it lifts
+    var hb = hy + B / 2 + 3;
+    el("path", { d: "M" + cx + " " + hb.toFixed(1) + " C " + cx + " " + (hb + 9).toFixed(1) + " " + (cx - 13) + " " + (hb + 9).toFixed(1) + " " + (cx - 13) + " " + (hb - 1).toFixed(1), stroke: INK, "stroke-width": 1.1, "stroke-linecap": "round", fill: "none" }, svg);
+
+    // the surface of the service, drawn last so it sits on top
+    var sp = []; for (var x = xa - 60; x <= xb + 60.1; x += 6) sp.push([x, surf(x)]);
+    el("path", { d: line(sp), stroke: INK, "stroke-width": 1.1, fill: "none" }, svg);
+    el("circle", { cx: cx, cy: surf(cx), r: 3.6, fill: PAPER, stroke: INK, "stroke-width": .9 }, svg);
+    label(svg, "The visible service", xa - 60, surf(xa - 60) - 34, "start");
+    probe(svg, cx, py);
+    label(svg, "The experiment", cx + 28, py + 5, "start", true);
+    BENEATH.forEach(function (m, k) {
+      leader(svg, 285, rest(k, xa), xa - 8, rest(k, xa));
+      label(svg, m.name, 270, rest(k, xa) + 5, "end");
+    });
+    label(svg, "The materials behind it", cx, 600, "middle", true);
+
+    if (arrows && p > 0) {
+      arrow(svg, cx - 30, py + 22, cx - 30, py - 20, 1.1, 8);
+      // where each thread came up from, in the space it left behind
+      for (k = 0; k < BENEATH.length; k++) [-1, 1].forEach(function (side) {
+        var x = cx + side * (64 + 22 * k), d = rise(k, x);
+        if (d < 9) return;
+        var y0 = rest(k, x) + B / 2 + 1, y1 = y(k, x) + B / 2 + 4;
+        arrow(svg, x, y0, x, y1, 1, 5 + Math.min(3, d * 0.05));
+      });
+    }
+  }
+
+  // ---- E. Rearrange the pieces.
+  // The materials as pieces fitted together in rows. As things stand the experiment can't find a
+  // way through. Swap two pieces in two rows and the gaps line up into a route. Legislation
+  // stays as it was, and already had a gap in the right place.
+  var ROWS = [
+    { name: "Interpretation", fill: "hatch", joints: [520, 700, 880] },
+    { name: "Operations", fill: "stipple", joints: [610, 740, 960] },
+    { name: "Decision rights", fill: "cross", joints: [470, 600, 900, 1010], swap: 1 },
+    { name: "Relationships", fill: "blank", joints: [560, 690, 880, 990], swap: 2 },
+    { name: "Legislation", fill: "tint", joints: [520, 780, 940] }
+  ];
+  function rearrange(svg, opts) {
+    var t = opts && opts.shift != null ? opts.shift : 1, arrows = !!(opts && opts.arrows);
+    var url = start(svg, "ra", "Institutional materials as pieces fitted together in rows. Two pieces swap places in two rows, and the gaps line up into a route the experiment can follow");
+    var xa = 400, xb = 1080, RH = 60, GAP = 12, top = 140, STEP = 50, k;
+    function rowTop(k) { return top + k * (RH + GAP); }
+    function ease(v) { v = Math.max(0, Math.min(1, v)); return v * v * (3 - 2 * v); }
+    var g = el("g", {}, svg), joints = [], moved = [];
+    ROWS.forEach(function (row, k) {
+      var b = [xa].concat(row.joints, [xb]), pieces = [];
+      for (var i = 0; i < b.length - 1; i++) pieces.push({ x: b[i] + (i ? GAP / 2 : 0), w: b[i + 1] - b[i] - (i ? GAP / 2 : 0) - (i < b.length - 2 ? GAP / 2 : 0), dy: 0 });
+      var tk = row.swap == null ? 0 : ease(k === 2 ? t * 2 : t * 2 - 1), js = row.joints.slice();
+      if (row.swap != null) {
+        var A = pieces[row.swap], Bp = pieces[row.swap + 1], S = A.x;
+        var ax = S + Bp.w + GAP, bx = S, lift = 7 * Math.sin(Math.PI * tk);
+        moved.push({ k: k, from: [A.x + A.w / 2, Bp.x + Bp.w / 2], to: [ax + A.w / 2, bx + Bp.w / 2], tk: tk, old: row.joints[row.swap] });
+        A.x += (ax - A.x) * tk; A.dy = -lift;
+        Bp.x += (bx - Bp.x) * tk; Bp.dy = lift;
+        if (tk >= 1) js[row.swap] = S + Bp.w + GAP / 2;
+        else if (tk > 0) js.splice(row.swap, 1);
+      }
+      joints.push(js);
+      // the moving pieces go on top
+      pieces.slice().sort(function (p, q) { return (p.dy ? 1 : 0) - (q.dy ? 1 : 0); }).forEach(function (pc) {
+        textured(g, url, { x: pc.x.toFixed(1), y: (rowTop(k) + pc.dy).toFixed(1), width: pc.w.toFixed(1), height: RH, rx: 3 }, row);
+        if (row.fill === "blank") el("rect", { x: (pc.x + 5).toFixed(1), y: rowTop(k) + pc.dy + 5, width: Math.max(0, pc.w - 10).toFixed(1), height: RH - 10, rx: 2, fill: "none", stroke: INK, "stroke-width": .6, "stroke-dasharray": "1 3.5", "stroke-linecap": "round" }, g);
+      });
+    });
+
+    // the experiment looks for a way down through the gaps, and stops where none lines up
+    var x = 700, pts = [[x, 96]], through = true;
+    for (k = 0; k < ROWS.length; k++) {
+      var best = null;
+      joints[k].forEach(function (j) { if (Math.abs(j - x) <= STEP && (best == null || Math.abs(j - x) < Math.abs(best - x))) best = j; });
+      var gy = rowTop(k) - GAP / 2;
+      if (best == null) { pts.push([x, gy]); through = false; break; }
+      pts.push([x, gy], [best, gy], [best, rowTop(k) + RH + GAP / 2]);
+      x = best;
+    }
+    var tx = 780, ty = 562;
+    if (through) pts.push([x, ty]);
+    el("path", { d: line(pts), stroke: INK, "stroke-width": 1.1, "stroke-dasharray": "1 4.5", "stroke-linecap": "round", "stroke-linejoin": "round", fill: "none" }, svg);
+    el("circle", { cx: tx, cy: ty, r: 18, fill: "none", stroke: INK, "stroke-width": .75, "stroke-dasharray": "1.5 3", "stroke-linecap": "round" }, svg);
+    label(svg, "Another route", tx + 30, ty + 5, "start", true);
+    el("circle", { cx: 700, cy: 96, r: 3.6, fill: PAPER, stroke: INK, "stroke-width": .9 }, svg);
+    var end = pts[pts.length - 1];
+    probe(svg, end[0], end[1]);
+    label(svg, "The experiment", 724, 101, "start", true);
+    ROWS.forEach(function (row, k) {
+      var yy = rowTop(k) + RH / 2;
+      leader(svg, 345, yy, xa - 8, yy);
+      label(svg, row.name, 330, yy + 5, "end");
+    });
+
+    if (arrows) moved.forEach(function (m) {
+      if (m.tk < 1) return;
+      var yy = rowTop(m.k) + RH / 2;
+      // where the gap used to be
+      el("path", { d: line([[m.old, rowTop(m.k) + 6], [m.old, rowTop(m.k) + RH - 6]]), stroke: INK, "stroke-width": .9, "stroke-dasharray": "1 3.5", "stroke-linecap": "round" }, svg);
+      // one arrow each way, a little apart, so they read as a swap
+      [0, 1].forEach(function (i) {
+        var ay = yy + (i ? 11 : -11), a = m.from[i], b = m.to[i], d = line([[a, ay], [b, ay]]);
+        halo(svg, d, 7);
+        arrow(svg, a, ay, b, ay, 1.1, 7);
+      });
+    });
+  }
+
+  // ---- F. Push through the layers.
+  // C turned on its side, with the materials named. The probe pushes down and drags each layer
+  // with it, more where it's sticky, and its marks bunch up where it slowed. It stops at
+  // legislation, which dents and holds.
+  var LAYERS = [
+    { name: "Interpretation", fill: "hatch", stick: .25 },
+    { name: "Operations", fill: "stipple", stick: .55 },
+    { name: "Relationships", fill: "blank", stick: .95 },
+    { name: "Decision rights", fill: "cross", stick: .7 },
+    { name: "Legislation", fill: "tint", firm: true }
+  ];
+  function push(svg, opts) {
+    var d = opts && opts.depth != null ? opts.depth : 1;
+    var url = start(svg, "pu", "A probe pushed down through layered institutional materials, dragging each layer with it, most where it's sticky, until it stops at legislation");
+    var cx = 700, xa = 300, xb = 1160, HB = 11, k;
+    var ly = [190, 270, 350, 430, 510];
+    var yt = 112 + d * (ly[4] - HB - 3 - 112);
+    function drag(k, x) {
+      var m = LAYERS[k], yl = ly[k], dx = x - cx;
+      if (m.firm) return 9 * Math.max(0, Math.min(1, (yt - (yl - HB - 40)) / 37)) * Math.exp(-dx * dx / (2 * 60 * 60));
+      if (yt < yl - 60) return 0;
+      if (yt < yl) return 14 * (yt - (yl - 60)) / 60 * Math.exp(-dx * dx / (2 * Math.pow(50 + 80 * m.stick, 2)));
+      return (14 + 46 * m.stick * Math.min(1, (yt - yl) / 150)) * Math.exp(-Math.abs(dx) / (25 + 90 * m.stick));
+    }
+    function yy(k, x, side) { return ly[k] + 4 * Math.sin(x / 53 + k * 2.3) + drag(k, x) + side * HB; }
+    function sticky(y) {
+      for (var k = 0; k < 4; k++) if (y > ly[k] - HB && y < yy(k, cx, 1)) return LAYERS[k].stick;
+      return 0;
+    }
+    var g = el("g", {}, svg);
+    LAYERS.forEach(function (m, k) {
+      var tp = [], bt = [];
+      for (var x = xa; x <= xb + 0.1; x += 4) { tp.push([x, yy(k, x, -1)]); bt.push([x, yy(k, x, 1)]); }
+      textured(g, url, { d: line(tp.concat(bt.reverse())) + " Z" }, m);
+      if (m.fill === "blank") { var mid = []; for (x = xa; x <= xb + 0.1; x += 4) mid.push([x, yy(k, x, 0)]); el("path", { d: line(mid), stroke: INK, "stroke-width": .6, "stroke-dasharray": "1 3.5", "stroke-linecap": "round", fill: "none" }, g); }
+    });
+    // the rod, and a mark for each moment, so they bunch where it went slowly
+    var rod = line([[cx, 70], [cx, yt]]);
+    halo(svg, rod, 6);
+    el("path", { d: rod, stroke: INK, "stroke-width": 1.1, fill: "none" }, svg);
+    for (var y = 84; y < yt - 16; y += 24 / (1 + 9 * sticky(y))) el("path", { d: line([[cx - 6, y], [cx + 6, y]]), stroke: INK, "stroke-width": .75 }, svg);
+    probe(svg, cx, yt);
+    label(svg, "The experiment", cx + 26, 80, "start", true);
+    LAYERS.forEach(function (m, k) {
+      var y0 = yy(k, xa, 0);
+      leader(svg, 285, y0, xa - 8, y0);
+      label(svg, m.name, 270, y0 + 5, "end");
+    });
+    if (d > 0.95) label(svg, "Holds", cx + 30, ly[4] + 40, "start", true);
+  }
+
+  window.PROBES = { weave: weave, weaveBeforeAfter: weaveBeforeAfter, beneath: beneath, rearrange: rearrange, push: push, mobile: mobile, treacle: treacle, size: { width: W, height: H } };
 })();
