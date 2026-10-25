@@ -623,16 +623,16 @@
 
   // ---- G. Bring it into view.
   // After the sketch of an experiment that looks small on the surface. The whole system is a
-  // circle, and its top edge is the visible service. The experiment reaches through and opens a
-  // window onto one slice of it. Inside, the relationships draw out one by one, each one fine line
-  // passing over or under the others where they cross. Outside, hatching marks what hasn't been
-  // looked at yet, with more materials faintly underneath.
+  // circle, and its top edge is the visible service. Where the experiment goes in, a spotlight
+  // opens into the system and widens as more comes into view. In the light, the relationships draw
+  // out one by one, each one fine line passing over or under the others where they cross. The rest
+  // is hatched, the service's dark matter, with more materials faintly in it.
   var NODES = {
     I: { name: "Interpretation", fill: "hatch", x: 728, y: 252, side: 1 },
-    L: { name: "Legislation", fill: "tint", x: 630, y: 318, side: -1 },
-    O: { name: "Operations", fill: "stipple", x: 826, y: 318, side: 1 },
-    D: { name: "Decision rights", fill: "cross", x: 670, y: 412, side: -1 },
-    R: { name: "Relationships", fill: "blank", x: 786, y: 412, side: 1 }
+    L: { name: "Legislation", fill: "tint", x: 644, y: 322, side: -1 },
+    O: { name: "Operations", fill: "stipple", x: 812, y: 322, side: 1 },
+    D: { name: "Decision rights", fill: "cross", x: 676, y: 416, side: -1 },
+    R: { name: "Relationships", fill: "blank", x: 780, y: 416, side: 1 }
   };
   // from, to, bend, and when it draws out. Listed in the order they're drawn, which decides
   // which line passes over which where they cross.
@@ -641,14 +641,18 @@
     ["I", "D", 5, .16, .50], ["O", "D", -12, .70, 1], ["L", "R", 12, .66, .95], ["I", "R", -5, .20, .52], ["D", "R", 9, .62, .86]
   ];
   // the rest of the system, not looked at: materials and the lines that run out to them
-  var BEYOND = [[548, 262], [520, 400], [584, 520], [728, 560], [872, 520], [936, 400], [908, 262]];
+  var BEYOND = [[556, 258], [528, 404], [566, 528], [728, 572], [890, 528], [928, 404], [900, 258]];
   var BEYOND_TIES = [["L", 0], ["L", 1], ["D", 1], ["D", 2], ["D", 3], ["R", 3], ["R", 4], ["O", 5], ["O", 6], ["I", 6], [0, 1], [2, 3], [4, 5]];
   function reveal(svg, opts) {
     var r = opts && opts.reveal != null ? opts.reveal : 1;
-    var url = start(svg, "rv", "The whole system as a circle whose top edge is the visible service. An experiment reaches through it and opens a window onto one slice, where five materials and the relationships between them come into view. Hatching covers the rest of the system, where more materials lie unexamined");
-    var SX = 728, SY = 372, SR = 236, WX = 728, WY = 334, NR = 17, cx = 728;
+    var url = start(svg, "rv", "The whole system as a circle whose top edge is the visible service. Where an experiment goes in, a spotlight opens into the system, and five materials and the relationships between them come into view. Hatching covers the rest, the service's dark matter, where more materials lie unseen");
+    var SX = 728, SY = 372, SR = 236, NR = 17, cx = 728;
     function clamp(v) { return Math.max(0, Math.min(1, v)); }
-    var wr = 44 + 112 * Math.pow(clamp(r * 1.15), 0.8);
+    // the spotlight opens from where the experiment goes in, widening and reaching further as it looks
+    var k = Math.pow(clamp(r / 0.45), 0.8), half = (5 + 28 * k) * Math.PI / 180, reach = 150 + 200 * k;
+    var ax = SX, ay = SY - SR;
+    var beam = "M" + ax + " " + ay + " L " + (ax - reach * Math.sin(half)).toFixed(1) + " " + (ay + reach * Math.cos(half)).toFixed(1) +
+      " A " + reach + " " + reach + " 0 0 0 " + (ax + reach * Math.sin(half)).toFixed(1) + " " + (ay + reach * Math.cos(half)).toFixed(1) + " Z";
     function shown(id) {
       if (id === "I") return clamp(r / 0.05);
       var v = 0;
@@ -676,18 +680,24 @@
       var a = typeof t[0] === "number" ? BEYOND[t[0]] : pos(t[0]), b = BEYOND[t[1]];
       el("path", Object.assign({ d: line(curve(a, b, 0, typeof t[0] === "number" ? 18 : NR + 10, 18)) }, faint), under);
     });
-    // hatching everywhere in the system except the window
+    // the dark matter: hatching everywhere in the system outside the light
     var defs = svg.querySelector("defs");
-    var hp = el("pattern", { id: "rv-out", width: 6, height: 6, patternUnits: "userSpaceOnUse", patternTransform: "rotate(-45)" }, defs);
-    el("line", { x1: 0, y1: 0, x2: 0, y2: 6, stroke: INK, "stroke-width": .5, opacity: .55 }, hp);
-    el("path", { d: circ(SX, SY, SR) + " " + circ(WX, WY, wr), "fill-rule": "evenodd", fill: PAPER, opacity: .3 }, svg);
-    el("path", { d: circ(SX, SY, SR) + " " + circ(WX, WY, wr), "fill-rule": "evenodd", fill: "url(#rv-out)" }, svg);
+    var hp = el("pattern", { id: "rv-out", width: 4.5, height: 4.5, patternUnits: "userSpaceOnUse", patternTransform: "rotate(-45)" }, defs);
+    el("line", { x1: 0, y1: 0, x2: 0, y2: 4.5, stroke: INK, "stroke-width": .5, opacity: .7 }, hp);
+    el("clipPath", { id: "rv-sys" }, defs).appendChild(el("path", { d: circ(SX, SY, SR) }));
+    var dark = el("g", { "clip-path": "url(#rv-sys)" }, svg);
+    el("path", { d: "M0 0 H" + W + " V" + H + " H0 Z " + beam, "fill-rule": "evenodd", fill: PAPER, opacity: .3 }, dark);
+    el("path", { d: "M0 0 H" + W + " V" + H + " H0 Z " + beam, "fill-rule": "evenodd", fill: "url(#rv-out)" }, dark);
+    el("path", { d: beam, fill: PAPER, stroke: "none" }, dark);
+    // the edges of the light, and how far it reaches
+    var e = Math.min(reach, 2 * SR * Math.cos(half) - 1);
+    [-1, 1].forEach(function (sd) { el("path", { d: line([[ax, ay], [ax + sd * e * Math.sin(half), ay + e * Math.cos(half)]]), stroke: INK, "stroke-width": .75, fill: "none" }, dark); });
+    el("path", Object.assign({ d: "M" + (ax - reach * Math.sin(half)).toFixed(1) + " " + (ay + reach * Math.cos(half)).toFixed(1) + " A " + reach + " " + reach + " 0 0 0 " + (ax + reach * Math.sin(half)).toFixed(1) + " " + (ay + reach * Math.cos(half)).toFixed(1) }, { stroke: INK, "stroke-width": .6, "stroke-dasharray": "1 3.5", "stroke-linecap": "round", fill: "none" }), dark);
     el("circle", { cx: SX, cy: SY, r: SR, fill: "none", stroke: INK, "stroke-width": .5 }, svg);
-    el("circle", { cx: WX, cy: WY, r: wr, fill: PAPER, stroke: INK, "stroke-width": .75 }, svg);
 
-    // inside the window
+    // in the light
     var g = el("g", {}, svg);
-    el("clipPath", { id: "rv-win" }, defs).appendChild(el("circle", { cx: WX, cy: WY, r: wr - 1 }));
+    el("clipPath", { id: "rv-win" }, defs).appendChild(el("path", { d: beam }));
     g.setAttribute("clip-path", "url(#rv-win)");
     BEYOND_TIES.forEach(function (t) {
       if (typeof t[0] === "number") return;
@@ -742,7 +752,7 @@
       var n = NODES[id];
       if (shown(id) > 0.5) tag(n.name, n.x + n.side * (NR + 9), n.y, n.side);
     });
-    tag("Not looked at yet", SX + SR * Math.cos(25 * Math.PI / 180) - 30, SY + SR * Math.sin(25 * Math.PI / 180), 1, true);
+    tag("Dark matter", SX + SR * Math.cos(25 * Math.PI / 180) - 30, SY + SR * Math.sin(25 * Math.PI / 180), 1);
   }
 
   window.PROBES = { reveal: reveal, weave: weave, weaveBeforeAfter: weaveBeforeAfter, beneath: beneath, rearrange: rearrange, push: push, mobile: mobile, treacle: treacle, size: { width: W, height: H } };
