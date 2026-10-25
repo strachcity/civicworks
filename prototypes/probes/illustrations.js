@@ -623,101 +623,84 @@
 
   // ---- G. Bring it into view.
   // After the sketch of an experiment that looks small on the surface. It touches one material
-  // under the service, and from there the relationships draw out one by one, each a few strands
-  // twisted together, crossing over and under each other, until the arrangement is in view.
+  // under the service, and from there the relationships draw out one by one until the arrangement
+  // is in view. Each relationship is one fine line; where two cross, one passes over the other.
   // Anything not found yet is a faint dotted outline.
   var NODES = {
-    I: { name: "Interpretation", fill: "hatch", x: 728, y: 292 },
-    L: { name: "Legislation", fill: "tint", x: 392, y: 330 },
-    O: { name: "Operations", fill: "stipple", x: 1064, y: 330 },
-    D: { name: "Decision rights", fill: "cross", x: 528, y: 492 },
-    R: { name: "Relationships", fill: "blank", x: 928, y: 492 }
+    I: { name: "Interpretation", fill: "hatch", x: 728, y: 300 },
+    L: { name: "Legislation", fill: "tint", x: 404, y: 338 },
+    O: { name: "Operations", fill: "stipple", x: 1052, y: 338 },
+    D: { name: "Decision rights", fill: "cross", x: 540, y: 492 },
+    R: { name: "Relationships", fill: "blank", x: 916, y: 492 }
   };
-  // from, to, strands, bend, and when it draws out
+  // from, to, bend, and when it draws out. Listed in the order they're drawn, which decides
+  // which line passes over which where they cross.
   var TIES = [
-    ["I", "L", 3, 34, .08, .40], ["I", "O", 2, -34, .12, .44], ["I", "D", 2, 26, .16, .50], ["I", "R", 3, -26, .20, .52],
-    ["L", "D", 3, -30, .54, .76], ["O", "R", 2, 30, .56, .78], ["D", "R", 3, 34, .62, .86], ["L", "R", 2, 46, .66, .95], ["O", "D", 2, -46, .70, 1]
+    ["I", "L", 16, .08, .40], ["I", "O", -16, .12, .44], ["L", "D", -14, .54, .76], ["O", "R", 14, .56, .78],
+    ["I", "D", 10, .16, .50], ["O", "D", -26, .70, 1], ["L", "R", 26, .66, .95], ["I", "R", -10, .20, .52], ["D", "R", 18, .62, .86]
   ];
   function reveal(svg, opts) {
     var r = opts && opts.reveal != null ? opts.reveal : 1;
-    var url = start(svg, "rv", "An experiment touches one material beneath the surface of a service, and the materials and the twisted relationships between them come into view");
-    var NR = 42, cx = 728;
+    var url = start(svg, "rv", "An experiment touches one material beneath the surface of a service, and the other materials and the relationships between them come into view");
+    var NR = 30, cx = 728, N = 120;
     function clamp(v) { return Math.max(0, Math.min(1, v)); }
     function surf(x) { return 176 + 28 * Math.pow((x - cx) / 520, 2); }
     function shown(id) {
       if (id === "I") return clamp(r / 0.05);
       var v = 0;
-      TIES.forEach(function (t) { if (t[1] === id) v = Math.max(v, clamp((r - t[5] + 0.04) / 0.04)); });
+      TIES.forEach(function (t) { if (t[1] === id) v = Math.max(v, clamp((r - t[4] + 0.04) / 0.04)); });
       return v;
     }
-    // a gently bent path between two materials, starting and ending just clear of each
+    // a gently bent line between two materials, starting and ending just clear of each
     function curve(a, b, bend) {
-      var mx = (a.x + b.x) / 2, my = (a.y + b.y) / 2, dx = b.x - a.x, dy = b.y - a.y, len = Math.hypot(dx, dy);
-      var qx = mx - dy / len * bend, qy = my + dx / len * bend;
+      var dx = b.x - a.x, dy = b.y - a.y, len = Math.hypot(dx, dy);
+      var qx = (a.x + b.x) / 2 - dy / len * bend, qy = (a.y + b.y) / 2 + dx / len * bend;
       function at(t) { var u = 1 - t; return [u * u * a.x + 2 * u * t * qx + t * t * b.x, u * u * a.y + 2 * u * t * qy + t * t * b.y]; }
-      var t0 = 0, t1 = 1;
-      while (Math.hypot(at(t0)[0] - a.x, at(t0)[1] - a.y) < NR + 6) t0 += 0.002;
-      while (Math.hypot(at(t1)[0] - b.x, at(t1)[1] - b.y) < NR + 6) t1 -= 0.002;
-      return { len: len, at: function (s) { var t = t0 + (t1 - t0) * s, p = at(t), q = at(Math.min(1, t + 0.001)), e = at(Math.max(0, t - 0.001)), nx = -(q[1] - e[1]), ny = q[0] - e[0], nl = Math.hypot(nx, ny) || 1; return [p[0], p[1], nx / nl, ny / nl]; } };
+      var t0 = 0, t1 = 1, gap = NR + 12;
+      while (Math.hypot(at(t0)[0] - a.x, at(t0)[1] - a.y) < gap) t0 += 0.002;
+      while (Math.hypot(at(t1)[0] - b.x, at(t1)[1] - b.y) < gap) t1 -= 0.002;
+      var pts = []; for (var i = 0; i <= N; i++) pts.push(at(t0 + (t1 - t0) * i / N));
+      return pts;
     }
 
-    // the materials not yet found, as faint outlines
-    var under = el("g", { opacity: .55 }, svg);
+    var g = el("g", {}, svg);
+    // materials not found yet, as faint outlines
     Object.keys(NODES).forEach(function (id) {
       var n = NODES[id];
-      if (shown(id) < 1) el("circle", { cx: n.x, cy: n.y, r: NR, fill: "none", stroke: INK, "stroke-width": .6, "stroke-dasharray": "1 3.5", "stroke-linecap": "round" }, under);
+      if (shown(id) < 1) el("circle", { cx: n.x, cy: n.y, r: NR, fill: "none", stroke: INK, "stroke-width": .6, "stroke-dasharray": "1 3.5", "stroke-linecap": "round", opacity: .5 }, g);
     });
-    // the relationships: what's found is twisted strands, what isn't yet is a faint dotted line
-    var segs = [], strands = [];
-    TIES.forEach(function (t, ti) {
-      var c = curve(NODES[t[0]], NODES[t[1]], t[3]), f = clamp((r - t[4]) / (t[5] - t[4])), m = t[2];
-      var twists = Math.max(2, Math.round(c.len / 80)), N = 90;
-      if (f < 1) {
-        var ghost = []; for (var i = Math.floor(f * N); i <= N; i++) { var g0 = c.at(i / N); ghost.push(g0); }
-        if (ghost.length > 1) el("path", { d: line(ghost), stroke: INK, "stroke-width": .6, "stroke-dasharray": "1 4", "stroke-linecap": "round", fill: "none", opacity: .55 }, under);
-      }
-      if (f <= 0) return;
-      for (var k = 0; k < m; k++) {
-        var pts = [];
-        for (i = 0; i <= Math.round(f * N); i++) {
-          var s = i / N, p = c.at(s), env = Math.sin(Math.PI * s), o = 8 * env * Math.sin(Math.PI * twists * s + 2 * Math.PI * k / m);
-          pts.push([p[0] + p[2] * o, p[1] + p[3] * o]);
-        }
-        strands.push(pts);
-        // every other stretch of a strand is laid over the others, so they go over and under
-        var per = Math.ceil(N / (twists * 2));
-        for (var a = 0, n = 0; a < pts.length - 1; a += per, n++) if ((k + n) % m === 0) segs.push(pts.slice(a, Math.min(pts.length, a + per + 1)));
-      }
+    TIES.forEach(function (t) {
+      var pts = curve(NODES[t[0]], NODES[t[1]], t[2]), f = clamp((r - t[3]) / (t[4] - t[3])), cut = Math.round(f * N);
+      var w = t[0] === "I" ? 1.1 : .75;
+      if (cut < N) el("path", { d: line(pts.slice(cut)), stroke: INK, "stroke-width": .6, "stroke-dasharray": "1 4", "stroke-linecap": "round", fill: "none", opacity: .5 }, g);
+      if (cut < 1) return;
+      var seen = pts.slice(0, cut + 1);
+      // a band of paper under the middle of the line, so it passes cleanly over anything drawn before it
+      var mid = seen.slice(Math.round(N * 0.1), Math.min(seen.length, Math.round(N * 0.9)));
+      if (mid.length > 1) el("path", { d: line(mid), stroke: PAPER, "stroke-width": 7, fill: "none" }, g);
+      el("path", { d: line(seen), stroke: INK, "stroke-width": w, "stroke-linecap": "round", fill: "none" }, g);
     });
-    var ties = el("g", {}, svg);
-    function ink(pts) { el("path", { d: line(pts), stroke: INK, "stroke-width": .95, "stroke-linecap": "round", "stroke-linejoin": "round", fill: "none" }, ties); }
-    strands.forEach(ink);
-    segs.forEach(function (pts) {
-      if (pts.length > 4) el("path", { d: line(pts.slice(1, -1)), stroke: PAPER, "stroke-width": 3.4, "stroke-linecap": "butt", fill: "none" }, ties);
-      ink(pts);
-    });
-    // the materials that have come into view
+    // the materials in view
     Object.keys(NODES).forEach(function (id) {
       var n = NODES[id], v = shown(id);
       if (v <= 0) return;
-      var g = el("g", { opacity: v.toFixed(2) }, svg);
-      textured(g, url, { d: "M" + (n.x - NR) + " " + n.y + " a " + NR + " " + NR + " 0 1 0 " + 2 * NR + " 0 a " + NR + " " + NR + " 0 1 0 " + -2 * NR + " 0 Z" }, n);
-      if (n.fill === "blank") el("circle", { cx: n.x, cy: n.y, r: NR - 6, fill: "none", stroke: INK, "stroke-width": .6, "stroke-dasharray": "1 3.5", "stroke-linecap": "round" }, g);
-      var pos = { I: [n.x + NR + 16, n.y - NR + 4, "start"], L: [n.x - NR - 16, n.y + 5, "end"], O: [n.x + NR + 16, n.y + 5, "start"], D: [n.x, n.y + NR + 30, "middle"], R: [n.x, n.y + NR + 30, "middle"] }[id];
-      var tx = label(g, n.name, pos[0], pos[1], pos[2]);
-      tx.setAttribute("stroke", PAPER); tx.setAttribute("stroke-width", 6); tx.setAttribute("paint-order", "stroke"); tx.setAttribute("stroke-linejoin", "round");
+      var ng = el("g", { opacity: v.toFixed(2) }, svg);
+      el("circle", { cx: n.x, cy: n.y, r: NR + 8, fill: "none", stroke: INK, "stroke-width": .5 }, ng);
+      textured(ng, url, { d: "M" + (n.x - NR) + " " + n.y + " a " + NR + " " + NR + " 0 1 0 " + 2 * NR + " 0 a " + NR + " " + NR + " 0 1 0 " + -2 * NR + " 0 Z" }, n);
+      if (n.fill === "blank") el("circle", { cx: n.x, cy: n.y, r: NR - 5, fill: "none", stroke: INK, "stroke-width": .6, "stroke-dasharray": "1 3.5", "stroke-linecap": "round" }, ng);
+      var pos = { I: [n.x + NR + 34, n.y - 18, "start"], L: [n.x - NR - 24, n.y + 5, "end"], O: [n.x + NR + 24, n.y + 5, "start"], D: [n.x, n.y + NR + 36, "middle"], R: [n.x, n.y + NR + 36, "middle"] }[id];
+      label(ng, n.name, pos[0], pos[1], pos[2]);
     });
 
-    // where the experiment touched
-    if (r > 0.03) el("circle", { cx: NODES.I.x, cy: NODES.I.y, r: NR + 11, fill: "none", stroke: INK, "stroke-width": .75, "stroke-dasharray": "1.5 3", "stroke-linecap": "round", opacity: clamp(r / 0.05) }, svg);
     // the experiment, the surface it starts from, and its line down to the first material it touches
-    var py = 92, top = NODES.I.y - NR;
-    el("path", { d: line([[cx, py + 15], [cx, surf(cx)]]), stroke: INK, "stroke-width": .9, "stroke-dasharray": "2 4", "stroke-linecap": "round", fill: "none" }, svg);
-    el("path", { d: line([[cx, surf(cx)], [cx, surf(cx) + (top - 11 - surf(cx)) * clamp(r / 0.05)]]), stroke: INK, "stroke-width": 1.1, fill: "none" }, svg);
+    var py = 92, ring = NR + 18, top = NODES.I.y - ring;
+    if (r > 0.03) el("circle", { cx: NODES.I.x, cy: NODES.I.y, r: ring, fill: "none", stroke: INK, "stroke-width": .75, "stroke-dasharray": "1.5 3", "stroke-linecap": "round", opacity: clamp(r / 0.05) }, svg);
+    el("path", { d: line([[cx, py + 15], [cx, surf(cx)]]), stroke: INK, "stroke-width": .75, "stroke-dasharray": "1 3.5", "stroke-linecap": "round", fill: "none" }, svg);
+    el("path", { d: line([[cx, surf(cx)], [cx, surf(cx) + (top - surf(cx)) * clamp(r / 0.05)]]), stroke: INK, "stroke-width": 1.1, fill: "none" }, svg);
     var sp = []; for (var x = 220; x <= 1236.1; x += 6) sp.push([x, surf(x)]);
-    el("path", { d: line(sp), stroke: INK, "stroke-width": 1.1, fill: "none" }, svg);
+    el("path", { d: line(sp), stroke: INK, "stroke-width": .75, fill: "none" }, svg);
     el("circle", { cx: cx, cy: surf(cx), r: 3.6, fill: PAPER, stroke: INK, "stroke-width": .9 }, svg);
-    label(svg, "The visible service", 220, surf(220) - 30, "start");
+    label(svg, "The visible service", 220, surf(220) - 24, "start");
     probe(svg, cx, py);
     label(svg, "The experiment", cx + 28, py + 5, "start", true);
     if (r >= 0.95) label(svg, "Institutional materials and their relationships", cx, 614, "middle", true);
