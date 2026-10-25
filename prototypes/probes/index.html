@@ -4,8 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Experimentation as probes</title>
-<meta name="description" content="Three directions for an editorial illustration in Tasting the organisational treacle. A working page.">
-<meta name="robots" content="noindex">
+<meta name="description" content="Seven directions for an editorial illustration in Tasting the organisational treacle. A working page.">
 <link rel="icon" href="/favicon.ico" sizes="32x32">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
@@ -65,8 +64,10 @@
   button.t:focus-visible, input:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
 
   .notes { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 12px 32px; margin-top: 16px; }
-  .notes h3 { font-size: 11px; font-weight: 500; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-text); margin: 0 0 4px; }
-  .notes p { margin: 0; font-size: 13.5px; color: var(--muted); max-width: 60ch; }
+  .stills { margin-top: 28px; }
+  .stills .frame { margin-top: 12px; }
+  .notes h3, .stills h3 { font-size: 11px; font-weight: 500; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-text); margin: 0 0 4px; }
+  .notes p, .stills p { margin: 0; font-size: 13.5px; color: var(--muted); max-width: 60ch; }
 
   .compare { margin-top: 64px; padding-top: 20px; border-top: 1.1px solid var(--ink); }
   .compare h2 { margin-bottom: 12px; }
@@ -86,7 +87,7 @@
   <header>
     <div>
       <h1>Experimentation as probes</h1>
-      <p>Three directions for one small illustration in Tasting the organisational treacle. A working page, not yet in the essay. Each one works as a still; the controls are there to play with.</p>
+      <p>Seven directions for one small illustration in Tasting the organisational treacle. A working page, not yet in the essay. Each one works as a still; the controls are there to play with.</p>
     </div>
     <div class="meta">
       <button type="button" class="t" id="phone" aria-pressed="false">Phone width</button>
@@ -117,6 +118,12 @@
         <h3>What it loses</h3>
         <p>A weave is regular and an institution isn't. It reads as everything touching everything in a tidy grid, and it can suggest the thread comes out cleanly. It says little about room to rearrange, only about connection.</p>
       </div>
+    </div>
+    <div class="stills">
+      <h3>As a still for the essay</h3>
+      <p>Two ways to show the movement without the slider. Arrows on the pulled cloth, or the cloth before and after with the arrows on the second. Both follow the pull above.</p>
+      <div class="frame"><svg id="svg-a-arrows" role="img" aria-label="The woven cloth with one thread pulled out to an experiment. Small arrows in the gaps of the cloth show the threads it crosses dragged towards the pull and its neighbours gathering in. Legislation bends least."></svg></div>
+      <div class="frame"><svg id="svg-a-ba" role="img" aria-label="The woven cloth twice. Before, the threads lie straight. After one thread is pulled out to an experiment, the threads it crosses are dragged towards the pull, shown by small arrows, and legislation bends least."></svg></div>
     </div>
   </section>
 
@@ -164,6 +171,94 @@
     </div>
   </section>
 
+  <section class="concept" aria-labelledby="d-h">
+    <div class="head">
+      <h2 id="d-h"><span class="letter">D</span>Reach beneath the service</h2>
+    </div>
+    <p class="says">A small experiment on the surface pulls you into the arrangements behind a service.</p>
+    <div class="frame"><svg id="svg-d" role="img" aria-label="A curved line for the visible service, with an experiment above it. Its line reaches down through the surface and hooks a thread of interpretation, lifting it. Beneath lie threads of operations, relationships, decision rights and legislation, tied to each other by short stitches, so the threads below come up too. They show most clearly around the place it pulled."></svg></div>
+    <div class="controls">
+      <label for="reach">Pull <input type="range" id="reach" min="0" max="1" step="0.01" value="0.8"></label>
+      <label for="d-arrows"><input type="checkbox" id="d-arrows"> Arrows</label>
+    </div>
+    <div class="notes">
+      <div>
+        <h3>What it shows</h3>
+        <p>The service as a surface, with its materials lying underneath, out of sight. The experiment reaches through and lifts one thread, the threads tied to it come up too, and the arrangement shows around the place it pulled. It puts A's threads into the layers of the place drawing, and legislation, deepest, moves least.</p>
+      </div>
+      <div>
+        <h3>What it loses</h3>
+        <p>Putting materials beneath the service can suggest they're hidden on purpose, or that deeper means more important, and the order of the layers is a choice. The reveal works best moving, so as a still it leans on the arrows.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="concept" aria-labelledby="e-h">
+    <div class="head">
+      <h2 id="e-h"><span class="letter">E</span>Rearrange the pieces</h2>
+    </div>
+    <p class="says">Sometimes a different service becomes possible by moving what's already there.</p>
+    <div class="frame"><svg id="svg-e" role="img" aria-label="Five rows of pieces fitted together, one row for each material, interpretation, operations, decision rights, relationships and legislation. An experiment looks for a way down through the gaps. Two pieces swap places in decision rights and two in relationships, the gaps line up, and the route reaches another route at the bottom. Legislation stays as it was."></svg></div>
+    <div class="controls">
+      <label for="shift">Rearrange <input type="range" id="shift" min="0" max="1" step="0.01" value="1"></label>
+      <label for="e-arrows"><input type="checkbox" id="e-arrows" checked> Arrows</label>
+    </div>
+    <div class="notes">
+      <div>
+        <h3>What it shows</h3>
+        <p>Materials as pieces fitted together, a row for each. As things stand the experiment can't find a way through. Swap two pieces in two rows and the gaps line up into a route, while legislation stays as it was and already had a gap in the right place. It shows designing with the materials as well as finding them.</p>
+      </div>
+      <div>
+        <h3>What it loses</h3>
+        <p>Pieces have clean edges and slide freely, and institutions don't. It can make rearranging look like a puzzle with one answer, and it says little about how the experiment found out which pieces to move.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="concept" aria-labelledby="f-h">
+    <div class="head">
+      <h2 id="f-h"><span class="letter">F</span>Push through the layers</h2>
+    </div>
+    <p class="says">An experiment learns where an institution resists by pushing into it.</p>
+    <div class="frame"><svg id="svg-f" role="img" aria-label="A probe on a rod pushed down through layers of interpretation, operations, relationships and decision rights. Each layer is dragged down where the rod passes, most in relationships, and the marks on the rod bunch up where it went slowly. It stops at legislation, which dents and holds."></svg></div>
+    <div class="controls">
+      <label for="depth">Push <input type="range" id="depth" min="0" max="1" step="0.01" value="1"></label>
+    </div>
+    <div class="notes">
+      <div>
+        <h3>What it shows</h3>
+        <p>C turned on its side, with the materials named. The probe pushes down and drags each layer with it, more where it's sticky, and the marks on the rod bunch where it slowed. It stops at legislation, which dents and holds, so a legitimate constraint reads differently from friction.</p>
+      </div>
+      <div>
+        <h3>What it loses</h3>
+        <p>Depth reads as hierarchy again, and a push says more about resistance than rearrangement. One straight line is less playful than C's wandering path, and it's close to a diagram.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="concept" aria-labelledby="g-h">
+    <div class="head">
+      <h2 id="g-h"><span class="letter">G</span>Bring it into view</h2>
+    </div>
+    <p class="says">A small intervention brings existing arrangements into view. The connections between materials matter as much as the materials themselves.</p>
+    <div class="frame"><svg id="svg-g" role="img" aria-label="An experiment on the left shines a spotlight across into a circle, the whole system, whose near edge is the visible service. The light reaches the far side. In it, interpretation, legislation, operations, decision rights and relationships, each joined to the others by a fine line, with more dotted connections showing wherever they cross the light. The rest of the circle is hatched and labelled dark matter, and nothing in it can be seen."></svg></div>
+    <div class="controls">
+      <label for="light">Width of the light <input type="range" id="light" min="0" max="1" step="0.01" value="0.64"></label>
+      <label for="aim">Aim <input type="range" id="aim" min="-1" max="1" step="0.01" value="0"></label>
+      <button type="button" class="t" id="play-g">Play the experiment</button>
+    </div>
+    <div class="notes">
+      <div>
+        <h3>What it shows</h3>
+        <p>The whole system is a circle, and the edge facing the experiment is the visible service. From the experiment, a spotlight shines across into the system. In the light, it touches one material, the relationships draw out one at a time, and the materials at their ends appear, passing over and under each other where they cross. Everything outside the light is hatched, the service's dark matter, and stays hidden. Other connections show only where they cross the light, as dotted lines, so the slice reads as a slice of something much more connected. Widen, narrow or aim the light and other materials come out of the dark, contracts, funding, standards, review cycles and assurance, while the ones it leaves go back into it.</p>
+      </div>
+      <div>
+        <h3>What it loses</h3>
+        <p>A circle makes the system look bounded and knowable, which it isn't, and five materials all joined to each other is tidier than any real institution. A spotlight suggests the experiment chooses where to look, when often it's led. It sits close to a diagram, and leans on the hatching and textures to stay an illustration.</p>
+      </div>
+    </div>
+  </section>
+
   <section class="compare" aria-labelledby="cmp-h">
     <h2 id="cmp-h">How they compare</h2>
     <p><b>Does it show something the prose doesn't?</b> C does most clearly. The paragraph after the slot says what an institution is made of, and C gives the feel of moving through it instead. A shows connection, which the prose implies but doesn't show. B shows rearrangement, which the next paragraph names.</p>
@@ -172,11 +267,13 @@
     <p><b>Legitimate constraints as well as friction.</b> B and C both build this in, B with the fixed joint and C with rings against tangles. A only hints at it, through the stiffer legislation threads.</p>
     <p><b>Next to the navigation model.</b> C complements it best, since it's the treacle itself rather than another structure. A sits closest to the Materials prototype, and its threads are not far from those arcs. B introduces a second mechanical object, which competes a little.</p>
     <p><b>On a phone.</b> All three shrink to about a quarter of their size, and the small labels go below reading size. C loses nothing, because it never relied on words. B still reads as a mobile tipping. A turns into a fine grid, and without its labels it's the hardest to read at that size.</p>
+    <p><b>D, E and F.</b> These came after A, B and C, from a sketch of an experiment that looks small on the surface and exposes much more underneath. D does that most directly, and mixes A's threads with the layers, so it keeps A's named materials and adds the sense of reaching in. E is the only one that shows designing with the materials, which is the essay's next step. F is C with names, clearer and less distinctive.</p>
+    <p><b>G.</b> The closest to the sketch of an experiment that looks small on the surface and exposes much more underneath. It names the materials like A, keeps the surface from D, and is the only one where the relationships are as much the subject as the materials. It's also the only one that shows the slice as a slice, a spotlight into the service's dark matter. It works as a still at the end, or partway, with the rest still dotted.</p>
     <p><b>Worth the space?</b> C is the most distinctive and the most CIVICWORKS. A is the clearest to a first-time reader. B is the most playful but the least likely to survive as a still.</p>
   </section>
 
   <footer>
-    <p>Drawn in code from <a href="illustrations.js">illustrations.js</a>, so any of the three can be lifted into the essay. Back to the <a href="../">experiments</a>.</p>
+    <p>Drawn in code from <a href="illustrations.js">illustrations.js</a>, so any of them can be lifted into the essay. Back to the <a href="../">experiments</a>.</p>
   </footer>
 </div>
 
@@ -186,11 +283,42 @@
   "use strict";
   var P = window.PROBES;
   var reduced = !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
-  var svgA = document.getElementById("svg-a"), svgB = document.getElementById("svg-b"), svgC = document.getElementById("svg-c");
+  var svgA = document.getElementById("svg-a"), svgAr = document.getElementById("svg-a-arrows"), svgAba = document.getElementById("svg-a-ba"), svgB = document.getElementById("svg-b"), svgC = document.getElementById("svg-c"),
+      svgD = document.getElementById("svg-d"), svgE = document.getElementById("svg-e"), svgF = document.getElementById("svg-f"), svgG = document.getElementById("svg-g");
   var pull = document.getElementById("pull"), weight = document.getElementById("weight"), ghost = document.getElementById("ghost");
 
-  function drawA() { P.weave(svgA, { pull: +pull.value }); }
+  function drawA() {
+    P.weave(svgA, { pull: +pull.value });
+    P.weave(svgAr, { pull: +pull.value, arrows: true });
+    P.weaveBeforeAfter(svgAba, { pull: +pull.value });
+  }
   function drawB() { P.mobile(svgB, { weight: +weight.value, ghost: ghost.checked }); }
+  var reach = document.getElementById("reach"), dArrows = document.getElementById("d-arrows");
+  var shift = document.getElementById("shift"), eArrows = document.getElementById("e-arrows"), depth = document.getElementById("depth");
+  function drawD() { P.beneath(svgD, { pull: +reach.value, arrows: dArrows.checked }); }
+  function drawE() { P.rearrange(svgE, { shift: +shift.value, arrows: eArrows.checked }); }
+  function drawF() { P.push(svgF, { depth: +depth.value }); }
+  reach.addEventListener("input", drawD); dArrows.addEventListener("change", drawD);
+  shift.addEventListener("input", drawE); eArrows.addEventListener("change", drawE);
+  depth.addEventListener("input", drawF);
+  // G opens on the essay's still. Widen, narrow or aim the light and whatever it falls on shows;
+  // play runs the experiment finding things, from nothing to everything in view, about four seconds.
+  var light = document.getElementById("light"), aim = document.getElementById("aim"), gAnim = null;
+  function drawG(v) { P.reveal(svgG, v == null ? { reveal: 1 } : { reveal: v }); }
+  function holdG() { cancelAnimationFrame(gAnim); P.reveal(svgG, { width: +light.value, aim: +aim.value }); }
+  light.addEventListener("input", holdG);
+  aim.addEventListener("input", holdG);
+  document.getElementById("play-g").addEventListener("click", function () {
+    cancelAnimationFrame(gAnim);
+    light.value = 0.64; aim.value = 0;
+    if (reduced) { drawG(1); return; }
+    var t0 = performance.now();
+    (function step(now) {
+      var v = Math.min(1, (now - t0) / 4200);
+      drawG(v);
+      if (v < 1) gAnim = requestAnimationFrame(step);
+    })(t0);
+  });
   pull.addEventListener("input", drawA);
   weight.addEventListener("input", drawB);
   ghost.addEventListener("change", drawB);
@@ -223,8 +351,8 @@
     phone.setAttribute("aria-pressed", String(on));
   });
 
-  drawA(); drawB(); drawC();
-  if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { drawA(); drawB(); });
+  drawA(); drawB(); drawC(); drawD(); drawE(); drawF(); drawG();
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { drawA(); drawB(); drawD(); drawE(); drawF(); drawG(); });
 })();
 </script>
 </body>
