@@ -11,7 +11,8 @@ const out = process.argv[2] || __dirname;
 const SHOTS = [['svg-a', 'probe-a-weave'], ['svg-a-arrows', 'probe-a-weave-arrows'], ['svg-a-ba', 'probe-a-weave-before-after'], ['svg-b', 'probe-b-mobile'], ['svg-c', 'probe-c-treacle'],
   ['svg-d', 'probe-d-beneath'], ['svg-d', 'probe-d-beneath-arrows', "document.getElementById('d-arrows').click()"],
   ['svg-e', 'probe-e-rearrange'], ['svg-f', 'probe-f-push'],
-  ['svg-g', 'probe-g-reveal'], ['svg-g', 'probe-g-reveal-partway', "(function () { var r = document.getElementById('seen'); r.value = 0.38; r.dispatchEvent(new Event('input')); })()"]];
+  ['svg-g', 'probe-g-reveal', "PROBES.reveal(document.getElementById('svg-g'), { reveal: 1 })"],
+  ['svg-g', 'probe-g-reveal-partway', "PROBES.reveal(document.getElementById('svg-g'), { reveal: 0.38 })"]];
 (async () => {
   const exe = fs.existsSync('/opt/pw-browsers/chromium') ? '/opt/pw-browsers/chromium' : undefined;
   const b = await chromium.launch({ executablePath: exe });

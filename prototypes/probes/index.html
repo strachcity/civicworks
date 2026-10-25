@@ -243,13 +243,14 @@
     <p class="says">A small intervention brings existing arrangements into view. The connections between materials matter as much as the materials themselves.</p>
     <div class="frame"><svg id="svg-g" role="img" aria-label="An experiment on the left shines a spotlight across into a circle, the whole system, whose near edge is the visible service. The light reaches the far side. In it, interpretation, legislation, operations, decision rights and relationships, each joined to the others by a fine line, with more dotted connections showing wherever they cross the light. The rest of the circle is hatched and labelled dark matter, and nothing in it can be seen."></svg></div>
     <div class="controls">
-      <label for="seen">Into view <input type="range" id="seen" min="0" max="1" step="0.01" value="1"></label>
+      <label for="light">Width of the light <input type="range" id="light" min="0" max="1" step="0.01" value="0.64"></label>
+      <label for="aim">Aim <input type="range" id="aim" min="-1" max="1" step="0.01" value="0"></label>
       <button type="button" class="t" id="play-g">Play the experiment</button>
     </div>
     <div class="notes">
       <div>
         <h3>What it shows</h3>
-        <p>The whole system is a circle, and its top edge is the visible service. From the experiment, a spotlight shines across through the visible service, widening and reaching further as more comes into view until it reaches the far side. In the light, it touches one material, the relationships draw out one at a time, and the materials at their ends appear, passing over and under each other where they cross. Everything outside the light is hatched, the service's dark matter, and stays hidden. Other connections show only where they cross the light, as dotted lines, so the slice reads as a slice of something much more connected.</p>
+        <p>The whole system is a circle, and the edge facing the experiment is the visible service. From the experiment, a spotlight shines across into the system. In the light, it touches one material, the relationships draw out one at a time, and the materials at their ends appear, passing over and under each other where they cross. Everything outside the light is hatched, the service's dark matter, and stays hidden. Other connections show only where they cross the light, as dotted lines, so the slice reads as a slice of something much more connected. Widen, narrow or aim the light and other materials come out of the dark, contracts, funding, standards, review cycles and assurance, while the ones it leaves go back into it.</p>
       </div>
       <div>
         <h3>What it loses</h3>
@@ -300,17 +301,21 @@
   reach.addEventListener("input", drawD); dArrows.addEventListener("change", drawD);
   shift.addEventListener("input", drawE); eArrows.addEventListener("change", drawE);
   depth.addEventListener("input", drawF);
-  // G plays from nothing to everything in view, about four seconds
-  var seen = document.getElementById("seen"), gAnim = null;
-  function drawG() { P.reveal(svgG, { reveal: +seen.value }); }
-  seen.addEventListener("input", function () { cancelAnimationFrame(gAnim); drawG(); });
+  // G opens on the essay's still. Widen, narrow or aim the light and whatever it falls on shows;
+  // play runs the experiment finding things, from nothing to everything in view, about four seconds.
+  var light = document.getElementById("light"), aim = document.getElementById("aim"), gAnim = null;
+  function drawG(v) { P.reveal(svgG, v == null ? { reveal: 1 } : { reveal: v }); }
+  function holdG() { cancelAnimationFrame(gAnim); P.reveal(svgG, { width: +light.value, aim: +aim.value }); }
+  light.addEventListener("input", holdG);
+  aim.addEventListener("input", holdG);
   document.getElementById("play-g").addEventListener("click", function () {
     cancelAnimationFrame(gAnim);
-    if (reduced) { seen.value = 1; drawG(); return; }
+    light.value = 0.64; aim.value = 0;
+    if (reduced) { drawG(1); return; }
     var t0 = performance.now();
     (function step(now) {
       var v = Math.min(1, (now - t0) / 4200);
-      seen.value = v; drawG();
+      drawG(v);
       if (v < 1) gAnim = requestAnimationFrame(step);
     })(t0);
   });
