@@ -622,88 +622,127 @@
   }
 
   // ---- G. Bring it into view.
-  // After the sketch of an experiment that looks small on the surface. It touches one material
-  // under the service, and from there the relationships draw out one by one until the arrangement
-  // is in view. Each relationship is one fine line; where two cross, one passes over the other.
-  // Anything not found yet is a faint dotted outline.
+  // After the sketch of an experiment that looks small on the surface. The whole system is a
+  // circle, and its top edge is the visible service. The experiment reaches through and opens a
+  // window onto one slice of it. Inside, the relationships draw out one by one, each one fine line
+  // passing over or under the others where they cross. Outside, hatching marks what hasn't been
+  // looked at yet, with more materials faintly underneath.
   var NODES = {
-    I: { name: "Interpretation", fill: "hatch", x: 728, y: 300 },
-    L: { name: "Legislation", fill: "tint", x: 404, y: 338 },
-    O: { name: "Operations", fill: "stipple", x: 1052, y: 338 },
-    D: { name: "Decision rights", fill: "cross", x: 540, y: 492 },
-    R: { name: "Relationships", fill: "blank", x: 916, y: 492 }
+    I: { name: "Interpretation", fill: "hatch", x: 728, y: 252, side: 1 },
+    L: { name: "Legislation", fill: "tint", x: 630, y: 318, side: -1 },
+    O: { name: "Operations", fill: "stipple", x: 826, y: 318, side: 1 },
+    D: { name: "Decision rights", fill: "cross", x: 670, y: 412, side: -1 },
+    R: { name: "Relationships", fill: "blank", x: 786, y: 412, side: 1 }
   };
   // from, to, bend, and when it draws out. Listed in the order they're drawn, which decides
   // which line passes over which where they cross.
   var TIES = [
-    ["I", "L", 16, .08, .40], ["I", "O", -16, .12, .44], ["L", "D", -14, .54, .76], ["O", "R", 14, .56, .78],
-    ["I", "D", 10, .16, .50], ["O", "D", -26, .70, 1], ["L", "R", 26, .66, .95], ["I", "R", -10, .20, .52], ["D", "R", 18, .62, .86]
+    ["I", "L", 8, .08, .40], ["I", "O", -8, .12, .44], ["L", "D", -7, .54, .76], ["O", "R", 7, .56, .78],
+    ["I", "D", 5, .16, .50], ["O", "D", -12, .70, 1], ["L", "R", 12, .66, .95], ["I", "R", -5, .20, .52], ["D", "R", 9, .62, .86]
   ];
+  // the rest of the system, not looked at: materials and the lines that run out to them
+  var BEYOND = [[548, 262], [520, 400], [584, 520], [728, 560], [872, 520], [936, 400], [908, 262]];
+  var BEYOND_TIES = [["L", 0], ["L", 1], ["D", 1], ["D", 2], ["D", 3], ["R", 3], ["R", 4], ["O", 5], ["O", 6], ["I", 6], [0, 1], [2, 3], [4, 5]];
   function reveal(svg, opts) {
     var r = opts && opts.reveal != null ? opts.reveal : 1;
-    var url = start(svg, "rv", "An experiment touches one material beneath the surface of a service, and the other materials and the relationships between them come into view");
-    var NR = 30, cx = 728, N = 120;
+    var url = start(svg, "rv", "The whole system as a circle whose top edge is the visible service. An experiment reaches through it and opens a window onto one slice, where five materials and the relationships between them come into view. Hatching covers the rest of the system, where more materials lie unexamined");
+    var SX = 728, SY = 372, SR = 236, WX = 728, WY = 334, NR = 17, cx = 728;
     function clamp(v) { return Math.max(0, Math.min(1, v)); }
-    function surf(x) { return 176 + 28 * Math.pow((x - cx) / 520, 2); }
+    var wr = 44 + 112 * Math.pow(clamp(r * 1.15), 0.8);
     function shown(id) {
       if (id === "I") return clamp(r / 0.05);
       var v = 0;
       TIES.forEach(function (t) { if (t[1] === id) v = Math.max(v, clamp((r - t[4] + 0.04) / 0.04)); });
       return v;
     }
-    // a gently bent line between two materials, starting and ending just clear of each
-    function curve(a, b, bend) {
-      var dx = b.x - a.x, dy = b.y - a.y, len = Math.hypot(dx, dy);
-      var qx = (a.x + b.x) / 2 - dy / len * bend, qy = (a.y + b.y) / 2 + dx / len * bend;
-      function at(t) { var u = 1 - t; return [u * u * a.x + 2 * u * t * qx + t * t * b.x, u * u * a.y + 2 * u * t * qy + t * t * b.y]; }
-      var t0 = 0, t1 = 1, gap = NR + 12;
-      while (Math.hypot(at(t0)[0] - a.x, at(t0)[1] - a.y) < gap) t0 += 0.002;
-      while (Math.hypot(at(t1)[0] - b.x, at(t1)[1] - b.y) < gap) t1 -= 0.002;
+    function curve(a, b, bend, gapA, gapB) {
+      var dx = b[0] - a[0], dy = b[1] - a[1], len = Math.hypot(dx, dy), N = 80;
+      var qx = (a[0] + b[0]) / 2 - dy / len * bend, qy = (a[1] + b[1]) / 2 + dx / len * bend;
+      function at(t) { var u = 1 - t; return [u * u * a[0] + 2 * u * t * qx + t * t * b[0], u * u * a[1] + 2 * u * t * qy + t * t * b[1]]; }
+      var t0 = 0, t1 = 1;
+      while (Math.hypot(at(t0)[0] - a[0], at(t0)[1] - a[1]) < gapA) t0 += 0.002;
+      while (Math.hypot(at(t1)[0] - b[0], at(t1)[1] - b[1]) < gapB) t1 -= 0.002;
       var pts = []; for (var i = 0; i <= N; i++) pts.push(at(t0 + (t1 - t0) * i / N));
       return pts;
     }
+    function circ(x, y, rr) { return "M" + (x - rr) + " " + y + " a " + rr + " " + rr + " 0 1 0 " + 2 * rr + " 0 a " + rr + " " + rr + " 0 1 0 " + -2 * rr + " 0 Z"; }
+    function pos(id) { return [NODES[id].x, NODES[id].y]; }
+    var faint = { stroke: INK, "stroke-width": .6, "stroke-dasharray": "1 3.5", "stroke-linecap": "round", fill: "none" };
 
+    // the rest of the system, faint, under the hatching
+    var under = el("g", { opacity: .6 }, svg);
+    BEYOND.forEach(function (p) { el("circle", { cx: p[0], cy: p[1], r: 12, fill: PAPER, stroke: INK, "stroke-width": .6 }, under); });
+    BEYOND_TIES.forEach(function (t) {
+      var a = typeof t[0] === "number" ? BEYOND[t[0]] : pos(t[0]), b = BEYOND[t[1]];
+      el("path", Object.assign({ d: line(curve(a, b, 0, typeof t[0] === "number" ? 18 : NR + 10, 18)) }, faint), under);
+    });
+    // hatching everywhere in the system except the window
+    var defs = svg.querySelector("defs");
+    var hp = el("pattern", { id: "rv-out", width: 6, height: 6, patternUnits: "userSpaceOnUse", patternTransform: "rotate(-45)" }, defs);
+    el("line", { x1: 0, y1: 0, x2: 0, y2: 6, stroke: INK, "stroke-width": .5, opacity: .55 }, hp);
+    el("path", { d: circ(SX, SY, SR) + " " + circ(WX, WY, wr), "fill-rule": "evenodd", fill: PAPER, opacity: .3 }, svg);
+    el("path", { d: circ(SX, SY, SR) + " " + circ(WX, WY, wr), "fill-rule": "evenodd", fill: "url(#rv-out)" }, svg);
+    el("circle", { cx: SX, cy: SY, r: SR, fill: "none", stroke: INK, "stroke-width": .5 }, svg);
+    el("circle", { cx: WX, cy: WY, r: wr, fill: PAPER, stroke: INK, "stroke-width": .75 }, svg);
+
+    // inside the window
     var g = el("g", {}, svg);
-    // materials not found yet, as faint outlines
+    el("clipPath", { id: "rv-win" }, defs).appendChild(el("circle", { cx: WX, cy: WY, r: wr - 1 }));
+    g.setAttribute("clip-path", "url(#rv-win)");
+    BEYOND_TIES.forEach(function (t) {
+      if (typeof t[0] === "number") return;
+      el("path", Object.assign({ d: line(curve(pos(t[0]), BEYOND[t[1]], 0, NR + 10, 18)) }, faint, { opacity: .6 }), g);
+    });
     Object.keys(NODES).forEach(function (id) {
-      var n = NODES[id];
-      if (shown(id) < 1) el("circle", { cx: n.x, cy: n.y, r: NR, fill: "none", stroke: INK, "stroke-width": .6, "stroke-dasharray": "1 3.5", "stroke-linecap": "round", opacity: .5 }, g);
+      if (shown(id) < 1) el("circle", Object.assign({ cx: NODES[id].x, cy: NODES[id].y, r: NR }, faint, { opacity: .5 }), g);
     });
     TIES.forEach(function (t) {
-      var pts = curve(NODES[t[0]], NODES[t[1]], t[2]), f = clamp((r - t[3]) / (t[4] - t[3])), cut = Math.round(f * N);
-      var w = t[0] === "I" ? 1.1 : .75;
-      if (cut < N) el("path", { d: line(pts.slice(cut)), stroke: INK, "stroke-width": .6, "stroke-dasharray": "1 4", "stroke-linecap": "round", fill: "none", opacity: .5 }, g);
+      var pts = curve(pos(t[0]), pos(t[1]), t[2], NR + 10, NR + 10), N = pts.length - 1;
+      var f = clamp((r - t[3]) / (t[4] - t[3])), cut = Math.round(f * N), w = t[0] === "I" ? .95 : .7;
+      if (cut < N) el("path", Object.assign({ d: line(pts.slice(cut)) }, faint, { opacity: .5 }), g);
       if (cut < 1) return;
       var seen = pts.slice(0, cut + 1);
       // a band of paper under the middle of the line, so it passes cleanly over anything drawn before it
-      var mid = seen.slice(Math.round(N * 0.1), Math.min(seen.length, Math.round(N * 0.9)));
-      if (mid.length > 1) el("path", { d: line(mid), stroke: PAPER, "stroke-width": 7, fill: "none" }, g);
+      var mid = seen.slice(Math.round(N * 0.15), Math.min(seen.length, Math.round(N * 0.85)));
+      if (mid.length > 1) el("path", { d: line(mid), stroke: PAPER, "stroke-width": 5, fill: "none" }, g);
       el("path", { d: line(seen), stroke: INK, "stroke-width": w, "stroke-linecap": "round", fill: "none" }, g);
     });
-    // the materials in view
     Object.keys(NODES).forEach(function (id) {
       var n = NODES[id], v = shown(id);
       if (v <= 0) return;
-      var ng = el("g", { opacity: v.toFixed(2) }, svg);
-      el("circle", { cx: n.x, cy: n.y, r: NR + 8, fill: "none", stroke: INK, "stroke-width": .5 }, ng);
-      textured(ng, url, { d: "M" + (n.x - NR) + " " + n.y + " a " + NR + " " + NR + " 0 1 0 " + 2 * NR + " 0 a " + NR + " " + NR + " 0 1 0 " + -2 * NR + " 0 Z" }, n);
-      if (n.fill === "blank") el("circle", { cx: n.x, cy: n.y, r: NR - 5, fill: "none", stroke: INK, "stroke-width": .6, "stroke-dasharray": "1 3.5", "stroke-linecap": "round" }, ng);
-      var pos = { I: [n.x + NR + 34, n.y - 18, "start"], L: [n.x - NR - 24, n.y + 5, "end"], O: [n.x + NR + 24, n.y + 5, "start"], D: [n.x, n.y + NR + 36, "middle"], R: [n.x, n.y + NR + 36, "middle"] }[id];
-      label(ng, n.name, pos[0], pos[1], pos[2]);
+      var ng = el("g", { opacity: v.toFixed(2) }, g);
+      el("circle", { cx: n.x, cy: n.y, r: NR + 5, fill: PAPER, stroke: INK, "stroke-width": .5 }, ng);
+      textured(ng, url, { d: circ(n.x, n.y, NR) }, n);
+      if (n.fill === "blank") el("circle", Object.assign({ cx: n.x, cy: n.y, r: NR - 4 }, faint), ng);
     });
 
-    // the experiment, the surface it starts from, and its line down to the first material it touches
-    var py = 92, ring = NR + 18, top = NODES.I.y - ring;
+    // the experiment, through the visible service and the unexamined system, to what it touches
+    var py = 64, sTop = SY - SR, ring = NR + 10, top = NODES.I.y - ring;
     if (r > 0.03) el("circle", { cx: NODES.I.x, cy: NODES.I.y, r: ring, fill: "none", stroke: INK, "stroke-width": .75, "stroke-dasharray": "1.5 3", "stroke-linecap": "round", opacity: clamp(r / 0.05) }, svg);
-    el("path", { d: line([[cx, py + 15], [cx, surf(cx)]]), stroke: INK, "stroke-width": .75, "stroke-dasharray": "1 3.5", "stroke-linecap": "round", fill: "none" }, svg);
-    el("path", { d: line([[cx, surf(cx)], [cx, surf(cx) + (top - surf(cx)) * clamp(r / 0.05)]]), stroke: INK, "stroke-width": 1.1, fill: "none" }, svg);
-    var sp = []; for (var x = 220; x <= 1236.1; x += 6) sp.push([x, surf(x)]);
-    el("path", { d: line(sp), stroke: INK, "stroke-width": .75, fill: "none" }, svg);
-    el("circle", { cx: cx, cy: surf(cx), r: 3.6, fill: PAPER, stroke: INK, "stroke-width": .9 }, svg);
-    label(svg, "The visible service", 220, surf(220) - 24, "start");
+    el("path", Object.assign({ d: line([[cx, py + 15], [cx, sTop]]) }, faint, { "stroke-width": .75 }), svg);
+    var shaft = line([[cx, sTop], [cx, sTop + (top - sTop) * clamp(r / 0.05)]]);
+    halo(svg, shaft, 4);
+    el("path", { d: shaft, stroke: INK, "stroke-width": 1.1, fill: "none" }, svg);
+    // the top of the system is the visible service
+    var arc = []; for (var a = -150; a <= -30.1; a += 2) arc.push([SX + SR * Math.cos(a * Math.PI / 180), SY + SR * Math.sin(a * Math.PI / 180)]);
+    el("path", { d: line(arc), stroke: INK, "stroke-width": 1.1, fill: "none" }, svg);
+    el("circle", { cx: cx, cy: sTop, r: 3.6, fill: PAPER, stroke: INK, "stroke-width": .9 }, svg);
     probe(svg, cx, py);
     label(svg, "The experiment", cx + 28, py + 5, "start", true);
-    if (r >= 0.95) label(svg, "Institutional materials and their relationships", cx, 614, "middle", true);
+
+    // labels sit outside the system, on leaders, the way the navigation model labels its rings
+    var LX = SX - SR - 70, RX = SX + SR + 70;
+    function tag(text, x, y, side, muted) {
+      leader(svg, side < 0 ? LX + 12 : RX - 12, y, x, y);
+      label(svg, text, side < 0 ? LX : RX, y + 5, side < 0 ? "end" : "start", muted);
+    }
+    var vs = [SX + SR * Math.cos(-140 * Math.PI / 180), SY + SR * Math.sin(-140 * Math.PI / 180)];
+    tag("The visible service", vs[0] - 4, vs[1], -1);
+    Object.keys(NODES).forEach(function (id) {
+      var n = NODES[id];
+      if (shown(id) > 0.5) tag(n.name, n.x + n.side * (NR + 9), n.y, n.side);
+    });
+    tag("Not looked at yet", SX + SR * Math.cos(25 * Math.PI / 180) - 30, SY + SR * Math.sin(25 * Math.PI / 180), 1, true);
   }
 
   window.PROBES = { reveal: reveal, weave: weave, weaveBeforeAfter: weaveBeforeAfter, beneath: beneath, rearrange: rearrange, push: push, mobile: mobile, treacle: treacle, size: { width: W, height: H } };
