@@ -73,6 +73,13 @@
   .emph .base-ground { fill: var(--tint); fill-opacity: .35; }
   .base-ground { fill: none; }
   .muted { opacity: .38; }
+  .motif-thin { fill: none; stroke: var(--ink); stroke-width: .5; stroke-linecap: round; }
+  .motif-dot { fill: var(--ink); }
+  .motif-route { fill: none; stroke: var(--ink); stroke-width: .75; stroke-dasharray: 1 3.5; stroke-linecap: round; }
+  .motif-gate { fill: none; stroke: var(--ink); stroke-width: .75; stroke-linecap: round; }
+  .motif-cell { fill: var(--paper); stroke: var(--ink); stroke-width: .5; stroke-linejoin: round; }
+  .motif-cell.on { fill: var(--tint); }
+  .motif-stratum { fill: none; stroke: var(--ink); stroke-width: .5; stroke-dasharray: 1 3; stroke-linecap: round; }
 
   .leader { stroke: var(--ink); stroke-width: .5; stroke-dasharray: 1 3; stroke-linecap: round; fill: none; }
   .pin { fill: var(--paper); stroke: var(--ink); stroke-width: .75; }
@@ -163,8 +170,8 @@
 <body>
 <main class="screen" id="screen">
   <div class="sr-only" id="desc">
-    <p>An organisation drawn as five stacked layers, after the neighbourhood layers in the author's thesis. From the top, social infrastructure, governance, physical infrastructure and culture sit above the place of work at the base, where each of these comes together and becomes lived experience for the people doing the work.</p>
-    <p>Side by side, a neighbourhood drawn with the same five layers sits on the left. Nature becomes culture, and the neighbourhood scale becomes the place of work.</p>
+    <p>An organisation drawn as five stacked layers, after the neighbourhood layers in the author's thesis. From the top, social infrastructure, drawn as people and the relationships between them, governance, drawn as a route through gates, operational infrastructure, drawn as modules, and culture, drawn as slow strata, sit above the place of work at the base, where these arrangements meet.</p>
+    <p>Side by side, a neighbourhood drawn with the same five layers sits on the left. Physical infrastructure becomes operational infrastructure, nature becomes culture, and the neighbourhood scale becomes the place of work.</p>
   </div>
 
   <div class="stage" id="stage" role="img" aria-labelledby="fig-title" aria-describedby="desc">
@@ -178,7 +185,7 @@
   </header>
 
   <div class="meta">
-    <span class="v">v0.2.0</span>
+    <span class="v">v0.3.0</span>
     <button type="button" class="t" id="theme">Dark</button>
   </div>
 
@@ -192,7 +199,7 @@
     <div class="panel">
       <p>A working drawing from <a href="https://www.civicworks.co/">CIVICWORKS</a>, to sit alongside <a href="https://www.civicworks.co/">Tasting the organisational treacle</a>, next to <a href="../navigation/">Experimentation as navigation</a>.</p>
       <p>Adapted from the author's thesis, after Pagh and Cook (2023).</p>
-      <p>v0.2.0</p>
+      <p>v0.3.0. Earlier versions are kept at <a href="v0.2.0/">v0.2.0</a> and <a href="v0.1.0/">v0.1.0</a>, and there's an <a href="planes/">alternative drawn as separate planes</a>.</p>
     </div>
   </details>
 </main>
@@ -203,11 +210,11 @@
 
   // ---- copy. Swap labels here. No colons or em dashes.
   var LAYERS = [
-    { place: "Social infrastructure", org: "Social infrastructure", desc: "The relationships, networks and communities of practice that people lean on to get things done together", shifts: false },
-    { place: "Governance", org: "Governance", desc: "The rules, decision rights and assurance that decide what can change, and who gets to say so", shifts: false },
-    { place: "Physical infrastructure", org: "Physical infrastructure", desc: "The systems, tools, documents and offices that the everyday work flows through", shifts: false },
-    { place: "Nature", org: "Culture", desc: "The habits, history and language an organisation grows from. The slowest ground of all", shifts: true },
-    { place: "The neighbourhood scale", org: "The place of work", desc: "Where each of these comes together and becomes lived experience for the people doing the work", shifts: true }
+    { place: "Social infrastructure", org: "Social infrastructure", desc: "Working relationships across teams, built by trying to make something happen together", shifts: false },
+    { place: "Governance", org: "Governance", desc: "The routes through assurance and approval, and how the next experiment might be governed", shifts: false },
+    { place: "Physical infrastructure", org: "Operational infrastructure", desc: "The capabilities, systems and tools the work runs on, ready for the next team to build on", shifts: true },
+    { place: "Nature", org: "Culture", desc: "The confidence, habits and history that shape what people feel able to change. The slowest ground of all", shifts: true },
+    { place: "The neighbourhood scale", org: "The place of work", desc: "Where these arrangements meet, and somewhere tangible to look for what an experiment leaves behind", shifts: true }
   ];
   // On its own, the organisation keeps one emphasis, on the layer where the work is lived
   var SINGLE_EMPH = [4];
@@ -278,8 +285,60 @@
     el("circle", { cx: 3, cy: 3, r: .5, style: "fill:var(--ink)" }, s);
   }
 
+  // ---- what each layer is made of, drawn on the layer itself rather than as a plain texture.
+  // Each motif works in the layer's own plane, x and z from the centre, then goes through the
+  // same projection as the stack.
+  function at(x, y, z, o) { return project([x, y, z], o); }
+  function line(pts) { return pts.map(function (p, i) { return (i ? "L" : "M") + p.x.toFixed(1) + " " + p.y.toFixed(1); }).join(" "); }
+  function sq(h, y, o) { return [[-h, -h], [h, -h], [h, h], [-h, h]].map(function (q) { return at(q[0], y, q[1], o); }); }
+  // a point a fraction t of the way round a square of half side h, starting at one corner
+  function round(h, t) {
+    var s = (t % 1 + 1) % 1 * 4, k = Math.floor(s), f = s - k;
+    return [[-h + 2 * h * f, -h], [h, -h + 2 * h * f], [h - 2 * h * f, h], [-h, h - 2 * h * f]][k];
+  }
+  var MOTIFS = [
+    // social infrastructure: people, and the working relationships between them
+    function (g, h, hi, y, o) {
+      var P = [[-.55, -.3], [.12, -.62], [.62, -.12], [.32, .56], [-.42, .48], [.02, .02]];
+      [[0, 1], [1, 2], [2, 3], [3, 4], [4, 0], [5, 0], [5, 2], [5, 3], [1, 4]].forEach(function (e) {
+        var a = at(P[e[0]][0] * h, y, P[e[0]][1] * h, o), b = at(P[e[1]][0] * h, y, P[e[1]][1] * h, o);
+        el("path", { d: line([a, b]), "class": "motif-thin" }, g);
+      });
+      P.forEach(function (q) { var c = at(q[0] * h, y, q[1] * h, o); el("circle", { cx: c.x.toFixed(1), cy: c.y.toFixed(1), r: 2.2, "class": "motif-dot" }, g); });
+    },
+    // governance: a route round the layer, with gates to pass through, one of them open
+    function (g, h, hi, y, o) {
+      var m = (h + hi) / 2, pts = [];
+      for (var t = 0; t <= 1.0001; t += 0.01) { var q = round(m, t); pts.push(at(q[0], y, q[1], o)); }
+      el("path", { d: line(pts), "class": "motif-route" }, g);
+      [0.07, 0.2, 0.32, 0.45, 0.57, 0.7, 0.82, 0.95].forEach(function (t, n) {
+        var a = round(hi + (h - hi) * 0.18, t), b = round(h - (h - hi) * 0.18, t);
+        var p1 = at(a[0], y, a[1], o), p2 = at(b[0], y, b[1], o);
+        if (n === 5) { var mid = { x: (p1.x + p2.x) / 2, y: (p1.y + p2.y) / 2 }; el("path", { d: line([p1, { x: p1.x + (mid.x - p1.x) * .55, y: p1.y + (mid.y - p1.y) * .55 }]), "class": "motif-gate" }, g); }
+        else el("path", { d: line([p1, p2]), "class": "motif-gate" }, g);
+      });
+    },
+    // operational infrastructure: capabilities as modules laid round the layer, a few of them built on
+    function (g, h, hi, y, o) {
+      var w = (h - hi), n = Math.round(2 * h / w), c = 2 * h / n, i, j, k = 0;
+      for (i = 0; i < n; i++) for (j = 0; j < n; j++) {
+        var x0 = -h + i * c, z0 = -h + j * c;
+        if (x0 >= -hi - 1e-6 && x0 + c <= hi + 1e-6 && z0 >= -hi - 1e-6 && z0 + c <= hi + 1e-6) continue;
+        var pad = c * 0.14, cell = [[x0 + pad, z0 + pad], [x0 + c - pad, z0 + pad], [x0 + c - pad, z0 + c - pad], [x0 + pad, z0 + c - pad]].map(function (q) { return at(q[0], y, q[1], o); });
+        k++;
+        el("path", { d: line(cell) + " Z", "class": (k === 3 || k === 11 || k === 16) ? "motif-cell on" : "motif-cell" }, g);
+      }
+    },
+    // culture: slow strata, laid down one after another
+    function (g, h, hi, y, o) {
+      [0.2, 0.4, 0.6, 0.8].forEach(function (f, n) {
+        el("path", { d: line(sq(hi + (h - hi) * f, y, o)) + " Z", "class": n % 2 ? "motif-thin" : "motif-stratum" }, g);
+      });
+    }
+  ];
+
   // ---- one stack
-  function stack(o, emph, parent) {
+  function stack(o, emph, parent, motifs) {
     var g = el("g", {}, parent);
     var ys = LAYERS.map(function (_, i) { return (2 - i) * o.gap; });
     // vertical guides through every corner, top layer to base
@@ -295,7 +354,10 @@
       var outer = square(SIZES[i], ys[i], o), inner = i ? square(SIZES[i - 1], ys[i], o) : null;
       var d = path(outer) + (inner ? " " + path(inner) : "");
       el("path", { d: d, "fill-rule": "evenodd", "class": "ring-ground" }, lg);
-      el("path", { d: d, "fill-rule": "evenodd", fill: "url(#" + FILLS[i] + ")", "class": "ring" }, lg);
+      if (motifs) {
+        el("path", { d: d, "fill-rule": "evenodd", fill: "none", "class": "ring" }, lg);
+        MOTIFS[i](lg, SIZES[i] / Math.SQRT2, i ? SIZES[i - 1] / Math.SQRT2 : 0, ys[i], o);
+      } else el("path", { d: d, "fill-rule": "evenodd", fill: "url(#" + FILLS[i] + ")", "class": "ring" }, lg);
       out.push(corners(outer));
     }
     // the base, where they all meet
@@ -352,7 +414,7 @@
       var cx = narrow ? W - 16 - r * 1.02 : lx + colW + 56 + r * 1.02;
       var o = { cx: cx, cy: top + avail / 2 + gap * 0.1, r: r, lift: 1, colW: colW, cap: cap, desc: desc, lh: lh, pin: 3.2 };
       o.gap = gap / (r * Math.cos(view.pitch * Math.PI / 180));
-      var c = stack(o, SINGLE_EMPH);
+      var c = stack(o, SINGLE_EMPH, null, true);
       LAYERS.forEach(function (layer, i) { label(c[i], "left", lx, layer.org, layer.desc, o, SINGLE_EMPH.indexOf(i) >= 0); });
       if (capture) text(CREDIT_SINGLE, lx, H - 28, "credit", narrow ? 10 : 11.5);
       scene.setAttribute("viewBox", "0 0 " + W + " " + H);
@@ -371,7 +433,7 @@
       var oR = Object.assign({}, oL, { cx: mid + d });
       var gL = el("g", { "class": "muted" });
       var cL = stack(oL, [], gL);
-      var cR = stack(oR, emph);
+      var cR = stack(oR, emph, null, true);
       // each heading sits just above the open top of its column
       var headY = cR[0].left.y - rP * Math.sin(view.pitch * Math.PI / 180) - 30;
       text("A NEIGHBOURHOOD", oL.cx, headY, "panel-head", 11, "middle", gL);
@@ -407,7 +469,7 @@
     el("path", { d: "M" + o1.cx + " " + (o1.cy + g2 * 2 + r2 * 0.5 + 14) + " L" + o1.cx + " " + (headY - 18), "class": "join" });
     el("path", { d: "M" + o1.cx + " " + (headY - 10) + " l-3 -7 l6 0 Z", "class": "head-mark", opacity: .6 });
     text("AN ORGANISATION", 16, headY, "panel-head", 10.5);
-    var c2 = stack(o2, emph);
+    var c2 = stack(o2, emph, null, true);
     LAYERS.forEach(function (layer, i) { label(c2[i], "left", 16, layer.org, layer.desc, o2, layer.shifts); });
     var Ht = o2.cy + g2b * 2 + r2b * 0.5 + (capture ? 140 : 120);
     if (capture) text(CREDIT_PAIR.replace("Left", "Top").replace("Right", "Bottom"), 16, Ht - 30, "credit", 10);

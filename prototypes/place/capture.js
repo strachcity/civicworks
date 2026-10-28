@@ -2,7 +2,8 @@
 //   NODE_PATH=$(npm root -g) node capture.js [outdir]
 // Needs Playwright with Chromium. Writes place-diagram-single, place-diagram (side by side) and
 // place-diagram-mobile (stacked for phones), each as a 1456 px wide PNG on white and as an
-// editable SVG with real text and its colours written in.
+// editable SVG with real text and its colours written in. Also writes the alternative drawn as
+// separate planes, planes/place-planes.png and .svg.
 const { chromium } = require('playwright');
 const path = require('path');
 const out = process.argv[2] || __dirname;
@@ -44,5 +45,23 @@ const SHOTS = [
     require('fs').writeFileSync(path.join(out, s.file.replace('.png', '.svg')), svg);
     await p.close();
   }
+  // the alternative drawn as separate planes, a fixed 1456 wide drawing on its own page
+  const pp = await b.newPage({ viewport: { width: 1456, height: 1480 }, colorScheme: 'light' });
+  await pp.goto('file://' + path.join(__dirname, 'planes', 'index.html') + '?capture');
+  await pp.evaluate(() => document.fonts.ready);
+  await pp.waitForTimeout(400);
+  const planesOut = process.argv[2] ? out : path.join(__dirname, 'planes');
+  await (await pp.$('#scene')).screenshot({ path: path.join(planesOut, 'place-planes.png') });
+  const planesSvg = await pp.evaluate(() => {
+    const src = document.getElementById('scene'), copy = src.cloneNode(true);
+    const props = ['fill', 'fill-opacity', 'stroke', 'stroke-width', 'stroke-dasharray', 'stroke-linecap', 'stroke-linejoin', 'opacity', 'font-family', 'font-size', 'font-weight', 'letter-spacing'];
+    const a = src.querySelectorAll('*'), c = copy.querySelectorAll('*');
+    a.forEach((el, i) => { const cs = getComputedStyle(el); c[i].setAttribute('style', props.map(k => k + ':' + cs.getPropertyValue(k)).join(';')); c[i].removeAttribute('class'); });
+    copy.setAttribute('xmlns', 'http://www.w3.org/2000/svg'); copy.setAttribute('width', '1456'); copy.setAttribute('height', '1480');
+    copy.removeAttribute('id'); copy.removeAttribute('role');
+    copy.insertAdjacentHTML('afterbegin', '<style>@import url("https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500&amp;display=swap");</style><rect width="100%" height="100%" fill="#ffffff"/>');
+    return copy.outerHTML;
+  });
+  require('fs').writeFileSync(path.join(planesOut, 'place-planes.svg'), planesSvg);
   await b.close();
 })();
