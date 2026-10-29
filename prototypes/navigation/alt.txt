@@ -12,3 +12,6 @@ A five second clip of the interactive model. It's flicked and spins round its le
 
 navigation-showcase-10s.mp4
 A ten second clip of the interactive model being used. Left alone, it drifts. A cursor arrives and drags it slowly round, and it settles side on with a question and what that turned up. The cursor picks the organisational priorities layer, which lights up, then turns the model end on so the layers collapse into the three questions, and back to the side.
+
+navigation-thumbnail-light.png and navigation-thumbnail-dark.png
+The navigation model at an angle, a cone lying on its side with five ringed layers from citizen interaction to political and strategic support. A triangle inside it reaches to value, legitimacy and capacity, one ring is drawn heavier, and a dotted trail runs back through the layers. One version is on white, the other on near black.
