@@ -9,3 +9,6 @@ The cone seen side on, with each of its five layers labelled from citizen intera
 
 navigation-showcase.mp4
 A five second clip of the interactive model. It's flicked and spins round its length, then settles side on with a question and what that turned up. It turns to the edge between legitimacy and capacity, steps down to cross-institutional arrangements, then swings end on so the layers collapse and the three questions appear under their corners.
+
+navigation-showcase-10s.mp4
+A ten second clip of the interactive model being used. Left alone, it drifts. A cursor arrives and drags it slowly round, and it settles side on with a question and what that turned up. The cursor picks the organisational priorities layer, which lights up, then turns the model end on so the layers collapse into the three questions, and back to the side.
