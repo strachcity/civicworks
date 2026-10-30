@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Experimentation as navigation, playing itself</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="/favicon.ico" sizes="32x32">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<style>
+  /* The live navigation page, used by a drawn cursor so it can be watched or screen recorded.
+     The model isn't copied: the page in the frame is the real one, and play.js uses it the way a
+     person would, through the same pointer and buttons. Ten seconds, then it goes round again. */
+  html, body { margin: 0; height: 100%; background: #fff; overflow: hidden; }
+  iframe { position: fixed; inset: 0; width: 100%; height: 100%; border: 0; }
+</style>
+</head>
+<body>
+<iframe id="model" src="../" title="Experimentation as navigation"></iframe>
+<script src="play.js"></script>
+<script>
+  var frame = document.getElementById("model");
+  frame.addEventListener("load", function () {
+    var doc = frame.contentDocument;
+    var go = function () { NavShowcase.start({ doc: doc, host: document, loop: true }); };
+    if (doc.fonts && doc.fonts.ready) doc.fonts.ready.then(function () { setTimeout(go, 600); }); else setTimeout(go, 600);
+  });
+</script>
+</body>
+</html>

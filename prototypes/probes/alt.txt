@@ -1,0 +1,5 @@
+probe-g-reveal.png
+A large circle stands for the whole system, and its near edge is the visible service. From an experiment on the left, a spotlight shines across the circle to the far side. In the light are five materials, interpretation, legislation, operations, decision rights and relationships. Fine lines join each to the others, and fainter dotted connections show only where they cross the beam. Everything outside the light is hatched and labelled dark matter.
+
+probe-g-reveal-partway.png
+The same spotlight earlier on, narrower and not yet reaching the far side. Interpretation has been found, and lines are drawing out from it to the other materials, which are still faint dotted outlines. Most of the system stays hatched as dark matter.

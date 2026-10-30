@@ -1,0 +1,298 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>An organisation in layers</title>
+<meta name="description" content="An alternative drawing of an organisation as layers, each its own plane with a small scene on it. A companion to Tasting the organisational treacle on CIVICWORKS.">
+<meta property="og:title" content="An organisation in layers">
+<meta property="og:description" content="Social infrastructure, operational infrastructure, governance and culture, meeting in the place of work.">
+<meta property="og:image" content="https://experiments.civicworks.co/place/planes/place-planes.png">
+<meta property="og:url" content="https://experiments.civicworks.co/place/planes/">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/favicon.ico" sizes="32x32">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@300;400;500&display=swap">
+<style>
+  /* An alternative to the stacked rings on the page above: the same layers as separate planes,
+     pulled apart and staggered, each with a small scene drawn on it. Same family as the other
+     prototypes. One ink, a tint, line weights 0.5 structure, 0.75 form, 1.1 emphasis. */
+  :root {
+    --paper: #ffffff;
+    --ink: #d63c23;
+    --ink-text: #a92c17;
+    --muted: #93402f;
+    --tint: #f6c6b8;
+    --tint-faint: #fdf0ec;
+    --focus: #1f3fd6;
+    --font: "Hanken Grotesk", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper: #120d0c; --ink: #ff7457; --ink-text: #ffa48f; --muted: #d88f7f;
+      --tint: #4e241c; --tint-faint: #24130f; --focus: #9db4ff;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper: #120d0c; --ink: #ff7457; --ink-text: #ffa48f; --muted: #d88f7f;
+    --tint: #4e241c; --tint-faint: #24130f; --focus: #9db4ff;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--paper); color: var(--ink-text);
+    font-family: var(--font); font-size: 14px; line-height: 1.45; -webkit-font-smoothing: antialiased;
+  }
+  .page { max-width: 1180px; margin: 0 auto; padding: max(24px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) 40px max(16px, env(safe-area-inset-left, 0px)); }
+  header { display: flex; justify-content: space-between; gap: 16px; align-items: flex-start; }
+  h1 { font-size: 20px; font-weight: 400; letter-spacing: -.005em; line-height: 1.2; margin: 0; }
+  header p { font-size: 13px; color: var(--muted); margin: 6px 0 0; max-width: 46ch; }
+  .meta { display: flex; gap: 12px; align-items: center; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); white-space: nowrap; }
+  button.t {
+    font: inherit; font-size: 12.5px; letter-spacing: normal; text-transform: none; color: var(--ink-text);
+    background: transparent; border: 0; border-radius: 999px; padding: 6px 12px; min-height: 36px; cursor: pointer;
+  }
+  button.t:hover { background: var(--tint-faint); }
+  button.t:focus-visible, a:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; border-radius: 4px; }
+  figure { margin: 24px 0 0; }
+  figure svg { display: block; width: 100%; height: auto; }
+  footer { font-size: 12.5px; color: var(--muted); margin-top: 24px; }
+  footer a, header a { color: var(--ink-text); }
+
+  /* drawing */
+  .plane { stroke: var(--ink); stroke-width: .75; stroke-linejoin: round; }
+  .plane-ground { fill: var(--paper); }
+  .plane { fill: var(--paper); }
+  .plane.base { fill: var(--tint-faint); }
+  .solid { fill: var(--paper); stroke: var(--ink); stroke-width: .75; stroke-linejoin: round; stroke-linecap: round; }
+  .solid.top { fill: var(--tint); }
+  .solid.on { fill: var(--tint); }
+  .thin { fill: none; stroke: var(--ink); stroke-width: .5; stroke-linecap: round; }
+  .dotted { fill: none; stroke: var(--ink); stroke-width: .75; stroke-dasharray: 1 3.5; stroke-linecap: round; }
+  .route { fill: none; stroke: var(--ink); stroke-width: 1.1; stroke-dasharray: 1 4; stroke-linecap: round; }
+  .post { fill: none; stroke: var(--ink); stroke-width: 1.1; stroke-linecap: round; }
+  .leader { stroke: var(--ink); stroke-width: .75; stroke-dasharray: 1 3; stroke-linecap: round; fill: none; }
+  .pin { fill: var(--paper); stroke: var(--ink); stroke-width: .75; }
+  .emph .pin { fill: var(--ink); }
+  .emph .leader { stroke-dasharray: none; }
+  .cap { font-family: var(--font); font-weight: 500; letter-spacing: .14em; fill: var(--ink-text); }
+  .cap-rule { stroke: var(--ink); stroke-width: .75; }
+  .desc { font-family: var(--font); font-weight: 400; fill: var(--muted); }
+  .credit { font-family: var(--font); font-weight: 400; fill: var(--muted); }
+
+  .capture header, .capture footer { display: none; }
+  .capture .page { max-width: none; padding: 0; }
+  .capture figure { margin: 0; }
+</style>
+</head>
+<body>
+<div class="page">
+  <header>
+    <div>
+      <h1>An organisation in layers</h1>
+      <p>An alternative to <a href="../">the stacked rings</a>. The same layers pulled apart, each with what it's made of drawn on it.</p>
+    </div>
+    <div class="meta"><span class="v">Planes v0.1.0</span><button type="button" class="t" id="theme">Dark</button></div>
+  </header>
+  <figure>
+    <svg id="scene" viewBox="0 0 1456 1480" role="img" aria-labelledby="fig-t fig-d">
+      <title id="fig-t">An organisation in layers</title>
+      <desc id="fig-d">Five planes pulled apart and staggered, each with a small scene. At the top, social infrastructure, people in two groups joined by dotted lines across them. Then operational infrastructure, modules laid out in a grid, a few of them built on. Then governance, a route crossing the plane through gates, one of them open. Then culture, a long-standing building with people of different generations on slow strata. At the base, the place of work, desks and people where these arrangements meet.</desc>
+    </svg>
+  </figure>
+  <footer><p>Drawn in code, like <a href="../">the stacked version</a> and <a href="../../navigation/">Experimentation as navigation</a>. Back to the <a href="../../">experiments</a>.</p></footer>
+</div>
+<script>
+(function () {
+  "use strict";
+
+  // ---- copy. Swap labels here. No colons or em dashes.
+  var LAYERS = [
+    { name: "Social infrastructure", desc: "Working relationships across teams, built by trying to make something happen together" },
+    { name: "Operational infrastructure", desc: "The capabilities, systems and tools the work runs on, ready for the next team to build on" },
+    { name: "Governance", desc: "The routes through assurance and approval, and how the next experiment might be governed" },
+    { name: "Culture", desc: "The confidence, habits and history that shape what people feel able to change. The slowest ground of all" },
+    { name: "The place of work", desc: "Where these arrangements meet, and somewhere tangible to look for what an experiment leaves behind", emph: true }
+  ];
+  var CREDIT = "Adapted from the author's thesis, after Pagh & Cook (2023).";
+
+  var W = 1456, H = 1480, NS = "http://www.w3.org/2000/svg", scene = document.getElementById("scene");
+  // seen from a corner and a little above; each plane is a square of half side 1
+  var view = { yaw: 45, pitch: 30 }, R = 212;
+  function P(x, y, z, o) {
+    var a = view.yaw * Math.PI / 180, t = view.pitch * Math.PI / 180;
+    var x1 = x * Math.cos(a) - z * Math.sin(a), z1 = x * Math.sin(a) + z * Math.cos(a);
+    return { x: o.cx + R * x1, y: o.cy + R * (z1 * Math.sin(t) - y * Math.cos(t)) };
+  }
+  function el(name, attrs, parent) {
+    var n = document.createElementNS(NS, name);
+    for (var k in attrs) n.setAttribute(k, attrs[k]);
+    (parent || scene).appendChild(n);
+    return n;
+  }
+  function d(pts, close) { return pts.map(function (p, i) { return (i ? "L" : "M") + p.x.toFixed(1) + " " + p.y.toFixed(1); }).join(" ") + (close ? " Z" : ""); }
+  var measure = document.createElement("canvas").getContext("2d");
+  function wrap(str, width, size) {
+    measure.font = "400 " + size + "px Hanken Grotesk, Helvetica, Arial, sans-serif";
+    var lines = [], line = "";
+    str.split(" ").forEach(function (w) {
+      var t = line ? line + " " + w : w;
+      if (line && measure.measureText(t).width > width) { lines.push(line); line = w; } else line = t;
+    });
+    return lines.concat([line]);
+  }
+
+  // ---- things that stand on a plane. Each returns a depth, so a plane's scene can be drawn back to front.
+  // a box from (x, z), w along x, dpt along z, standing hgt tall; only the faces towards us are drawn
+  function box(x, z, w, dpt, hgt, cls) {
+    return { depth: x + w / 2 + z + dpt / 2, draw: function (g, o) {
+      var a = P(x, hgt, z, o), b = P(x + w, hgt, z, o), c = P(x + w, hgt, z + dpt, o), e = P(x, hgt, z + dpt, o);
+      var b0 = P(x + w, 0, z, o), c0 = P(x + w, 0, z + dpt, o), e0 = P(x, 0, z + dpt, o);
+      el("path", { d: d([b, c, c0, b0], true), "class": "solid" }, g);
+      el("path", { d: d([e, c, c0, e0], true), "class": "solid" }, g);
+      el("path", { d: d([a, b, c, e], true), "class": "solid top" + (cls ? " " + cls : "") }, g);
+      return { b: b, c: c, e: e, b0: b0, c0: c0, e0: e0 };
+    } };
+  }
+  // a person, upright, drawn as a body and a head; small for a child
+  function person(x, z, s) {
+    s = s || 1;
+    return { depth: x + z, at: [x, z], draw: function (g, o) {
+      var p = P(x, 0, z, o), bh = 17 * s, bw = 6 * s;
+      el("path", { d: "M" + (p.x - bw / 2) + " " + p.y + " L" + (p.x - bw / 2) + " " + (p.y - bh + bw / 2) + " A " + bw / 2 + " " + bw / 2 + " 0 0 1 " + (p.x + bw / 2) + " " + (p.y - bh + bw / 2) + " L" + (p.x + bw / 2) + " " + p.y + " Z", "class": "solid" }, g);
+      el("circle", { cx: p.x, cy: p.y - bh - 4.2 * s, r: 3.6 * s, "class": "solid" }, g);
+      return { head: { x: p.x, y: p.y - bh - 4.2 * s } };
+    } };
+  }
+  function drawAll(items, g, o) { return items.slice().sort(function (a, b) { return a.depth - b.depth; }).map(function (it) { return it.draw(g, o); }); }
+
+  // ---- the scenes, in each plane's own coordinates, x and z from -1 to 1
+  function link(A, B, g, o) { el("path", { d: d([P(A[0], 0, A[1], o), P(B[0], 0, B[1], o)]), "class": "dotted" }, g); }
+  var SCENES = [
+    // social infrastructure: two groups, and the relationships that cross between them
+    function (g, o) {
+      var at = [[-.55, -.25], [-.3, -.55], [-.62, .15], [.45, .1], [.62, -.25], [.35, .45], [-.02, .62]];
+      [[0, 3], [1, 4], [2, 5], [6, 2], [6, 3], [1, 3]].forEach(function (e) { link(at[e[0]], at[e[1]], g, o); });
+      [[0, 1], [0, 2], [3, 4], [3, 5]].forEach(function (e) {
+        el("path", { d: d([P(at[e[0]][0], 0, at[e[0]][1], o), P(at[e[1]][0], 0, at[e[1]][1], o)]), "class": "thin" }, g);
+      });
+      drawAll(at.map(function (q) { return person(q[0], q[1], 1.95); }), g, o);
+    },
+    // operational infrastructure: capabilities as modules, a few of them built on, linked on the ground
+    function (g, o) {
+      var items = [], H = [.08, .14, .08, .2, .08, .1, .16, .08, .08], k = 0;
+      [-.43, .17].forEach(function (v) {
+        el("path", { d: d([P(-.8, 0, v, o), P(.8, 0, v, o)]) + " " + d([P(v, 0, -.8, o), P(v, 0, .8, o)]), "class": "thin" }, g);
+      });
+      for (var i = 0; i < 3; i++) for (var j = 0; j < 3; j++, k++) items.push(box(-.73 + i * .6, -.73 + j * .6, .3, .3, H[k], k === 3 || k === 7 ? "on" : ""));
+      items.push(person(.62, .78, 1.95));
+      drawAll(items, g, o);
+    },
+    // governance: a route across the plane, through gates, one of them left open
+    function (g, o) {
+      function rp(t) { return [-.85 + 1.7 * t, .45 * Math.sin(t * Math.PI * 2) * .8]; } // x, z in the plane
+      var route = []; for (var t = 0; t <= 1.0001; t += 0.02) route.push(rp(t));
+      el("path", { d: d(route.map(function (q) { return P(q[0], 0, q[1], o); })), "class": "route" }, g);
+      var items = [];
+      [.22, .5, .78].forEach(function (t, n) {
+        var a = rp(t - .01), b = rp(t + .01), tx = b[0] - a[0], tz = b[1] - a[1], tl = Math.hypot(tx, tz), nx = -tz / tl * .15, nz = tx / tl * .15, q = rp(t);
+        items.push({ depth: q[0] + q[1], draw: function (g, o) {
+          var l0 = P(q[0] - nx, 0, q[1] - nz, o), r0 = P(q[0] + nx, 0, q[1] + nz, o), l1 = P(q[0] - nx, .22, q[1] - nz, o), r1 = P(q[0] + nx, .22, q[1] + nz, o);
+          // a frame across the route, with a barrier; the middle one stands open, its barrier raised
+          el("path", { d: d([l0, l1, r1, r0]), "class": "post" }, g);
+          var lb = P(q[0] - nx, .09, q[1] - nz, o);
+          if (n === 1) el("path", { d: d([lb, P(q[0] - nx * .45, .3, q[1] - nz * .45, o)]), "class": "post" }, g);
+          else el("path", { d: d([lb, P(q[0] + nx, .09, q[1] + nz, o)]), "class": "post" }, g);
+        } });
+      });
+      var w = rp(.6); items.push(person(w[0], w[1], 1.95));
+      drawAll(items, g, o);
+    },
+    // culture: a building that has been there a long time, people of more than one generation, on slow strata
+    function (g, o) {
+      [.5, .66, .82].forEach(function (z) {
+        var pts = []; for (var x = -.95; x <= .951; x += .05) pts.push(P(x, 0, z + .03 * Math.sin(x * 4 + z * 9), o));
+        el("path", { d: d(pts), "class": "thin" }, g);
+      });
+      var bx = -.75, bz = -.7, bw = 1.1, bd = .5, bh = .32;
+      var items = [box(bx, bz, bw, bd, bh), person(.45, .12, 1.95), person(.62, .2, 1.3), person(.25, .32, 1.95)];
+      drawAll(items, g, o);
+      // windows on the long face, the mark of somewhere built to last
+      for (var r = 0; r < 2; r++) for (var c = 0; c < 7; c++) {
+        var xc = bx + (c + .5) * bw / 7, yc = bh * (.3 + r * .4);
+        el("path", { d: d([P(xc - .045, yc - .05, bz + bd, o), P(xc + .045, yc - .05, bz + bd, o), P(xc + .045, yc + .05, bz + bd, o), P(xc - .045, yc + .05, bz + bd, o)], true), "class": "thin" }, g);
+      }
+    },
+    // the place of work: desks and people, where the rest meet
+    function (g, o) {
+      for (var i = -2; i <= 2; i++) {
+        el("path", { d: d([P(i * .38, 0, -.95, o), P(i * .38, 0, .95, o)]), "class": "thin", opacity: .4 }, g);
+        el("path", { d: d([P(-.95, 0, i * .38, o), P(.95, 0, i * .38, o)]), "class": "thin", opacity: .4 }, g);
+      }
+      var items = [box(-.62, -.55, .5, .2, .09), box(-.62, .12, .5, .2, .09), box(.12, -.55, .5, .2, .09), box(.12, .12, .5, .2, .09), box(.7, .6, .16, .16, .1, "on"),
+        person(-.37, -.2, 1.95), person(.4, -.2, 1.95), person(-.37, .46, 1.95), person(.38, .5, 1.95), person(-.75, .75, 1.95)];
+      drawAll(items, g, o);
+    }
+  ];
+
+  // ---- the planes, pulled apart, staggered left and right, labels on the side each one leans away from
+  function draw() {
+    while (scene.lastChild && scene.lastChild.nodeName !== "desc") scene.removeChild(scene.lastChild);
+    var STEP = 252, TOP = 210, SHIFT = 92, cap = 19, size = 23, lh = 31, COL = 380;
+    var planes = LAYERS.map(function (l, i) {
+      var side = i % 2 ? 1 : -1; // the plane leans away from its label
+      return { i: i, side: side, o: { cx: W / 2 - side * SHIFT, cy: TOP + i * STEP } };
+    });
+    // drawn from the base up, so each plane lies over the one below
+    planes.slice().reverse().forEach(function (pl) {
+      var o = pl.o, g = el("g", {});
+      var c = [P(-1, 0, -1, o), P(1, 0, -1, o), P(1, 0, 1, o), P(-1, 0, 1, o)];
+      el("path", { d: d(c, true), "class": "plane-ground" }, g);
+      el("path", { d: d(c, true), "class": "plane" + (pl.i === 4 ? " base" : "") }, g);
+      SCENES[pl.i](g, o);
+      pl.corners = c;
+    });
+    planes.forEach(function (pl) {
+      var L = LAYERS[pl.i], o = pl.o, g = el("g", { "class": L.emph ? "emph" : "" });
+      // the corner on the label's side
+      var pt = pl.side < 0 ? P(-1, 0, 1, o) : P(1, 0, -1, o);
+      var left = pl.side < 0, x0 = left ? 56 : W - 56 - COL;
+      var px = pt.x + (left ? 6 : -6);
+      el("path", { d: "M" + (left ? x0 + COL + 14 : x0 - 14) + " " + pt.y.toFixed(1) + " L" + px.toFixed(1) + " " + pt.y.toFixed(1), "class": "leader" }, g);
+      el("circle", { cx: px.toFixed(1), cy: pt.y.toFixed(1), r: 4.5, "class": "pin" }, g);
+      var t = el("text", { x: x0, y: (pt.y + cap * .36).toFixed(1), "class": "cap", "font-size": cap }, g);
+      t.textContent = L.name.toUpperCase();
+      if (L.emph) { var w = t.getComputedTextLength(); el("line", { x1: x0, y1: pt.y + cap * .36 + 6, x2: x0 + w, y2: pt.y + cap * .36 + 6, "class": "cap-rule" }, g); }
+      wrap(L.desc, COL, size).forEach(function (line, n) {
+        var tt = el("text", { x: x0, y: (pt.y + cap * .36 + lh * (n + 1) + 8).toFixed(1), "class": "desc", "font-size": size }, g);
+        tt.textContent = line;
+      });
+    });
+    var cr = el("text", { x: 56, y: H - 36, "class": "credit", "font-size": 17 });
+    cr.textContent = CREDIT;
+  }
+
+  // ---- theme toggle, remembered per viewer where storage allows
+  var root = document.documentElement, themeBtn = document.getElementById("theme");
+  function isDark() { var t = root.getAttribute("data-theme"); if (t) return t === "dark"; return !!(window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches); }
+  function labelTheme() { themeBtn.textContent = isDark() ? "Light" : "Dark"; themeBtn.setAttribute("aria-label", isDark() ? "Switch to light mode" : "Switch to dark mode"); }
+  try { var saved = localStorage.getItem("nav-theme"); if (saved) root.setAttribute("data-theme", saved); } catch (e) {}
+  labelTheme();
+  themeBtn.addEventListener("click", function () {
+    var next = isDark() ? "light" : "dark";
+    root.setAttribute("data-theme", next);
+    try { localStorage.setItem("nav-theme", next); } catch (e) {}
+    labelTheme();
+  });
+  if (/[?&]capture/.test(location.search)) root.classList.add("capture");
+  draw();
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(draw);
+})();
+</script>
+</body>
+</html>

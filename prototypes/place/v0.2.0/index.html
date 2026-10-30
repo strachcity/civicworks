@@ -1,0 +1,458 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>An organisation is a place too</title>
+<meta name="description" content="An organisation drawn as five layers, the same layers a neighbourhood has, in different material. A companion to Tasting the organisational treacle on CIVICWORKS.">
+<meta property="og:title" content="An organisation is a place too">
+<meta property="og:description" content="The same layers, different material.">
+<meta property="og:image" content="https://experiments.civicworks.co/place/v0.2.0/place-diagram-single.png">
+<meta property="og:url" content="https://experiments.civicworks.co/place/v0.2.0/">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/favicon.ico" sizes="32x32">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@300;400;500&display=swap">
+<style>
+  /* The navigation prototype's family. One drawing in the middle, small type at the edges, two tones.
+     Line weights: 0.5 structure, 0.75 form, 1.1 emphasis. The stack is drawn in code from a
+     projection, the same way the navigation model is, so it can turn later without a redraw. */
+  :root {
+    --paper: #ffffff;
+    --ink: #d63c23;
+    --ink-text: #a92c17;
+    --muted: #93402f;
+    --tint: #f6c6b8;
+    --tint-faint: rgba(246, 198, 184, 0.2);
+    --focus: #1f3fd6;
+    --font: "Hanken Grotesk", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper: #120d0c; --ink: #ff7457; --ink-text: #ffa48f; --muted: #d88f7f;
+      --tint: #4e241c; --tint-faint: rgba(110, 48, 36, 0.3); --focus: #9db4ff;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper: #120d0c; --ink: #ff7457; --ink-text: #ffa48f; --muted: #d88f7f;
+    --tint: #4e241c; --tint-faint: rgba(110, 48, 36, 0.3); --focus: #9db4ff;
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink-text);
+    font-family: var(--font);
+    font-size: 14px;
+    line-height: 1.45;
+    -webkit-font-smoothing: antialiased;
+  }
+  .screen { position: relative; height: 100svh; min-height: 600px; overflow: hidden; }
+  .screen.tall { height: auto; overflow: visible; }
+  .stage { position: absolute; inset: 0; }
+  .screen.tall .stage { position: relative; }
+  .stage svg { display: block; width: 100%; height: 100%; overflow: visible; }
+
+  /* drawing */
+  .guide { stroke: var(--ink); stroke-width: .5; stroke-dasharray: 1 3; stroke-linecap: round; opacity: .55; fill: none; }
+  .lid { fill: none; stroke: var(--ink); stroke-width: .5; stroke-dasharray: 1 3; stroke-linecap: round; opacity: .6; }
+  .ring { stroke: var(--ink); stroke-width: .75; stroke-linejoin: round; }
+  .ring-ground { fill: var(--tint-faint); }
+  .base { fill: none; stroke: var(--ink); stroke-width: .75; stroke-linejoin: round; }
+  .base-inner { fill: none; stroke: var(--ink); stroke-width: .5; stroke-dasharray: 1 3; stroke-linecap: round; }
+  .emph .ring, .emph .base { stroke-width: 1.1; }
+  .emph .ring-ground { fill: var(--tint); fill-opacity: .55; }
+  .emph .base-ground { fill: var(--tint); fill-opacity: .35; }
+  .base-ground { fill: none; }
+  .muted { opacity: .38; }
+
+  .leader { stroke: var(--ink); stroke-width: .5; stroke-dasharray: 1 3; stroke-linecap: round; fill: none; }
+  .pin { fill: var(--paper); stroke: var(--ink); stroke-width: .75; }
+  .emph-line .leader { stroke-dasharray: none; stroke-width: .5; }
+  .emph-line .pin { fill: var(--ink); }
+  .join { stroke: var(--ink); stroke-width: .5; stroke-dasharray: 1 3.5; stroke-linecap: round; opacity: .6; fill: none; }
+  .join.emph-join { stroke-width: .75; opacity: 1; }
+  .head-mark { fill: var(--ink); }
+
+  .cap { font-family: var(--font); font-weight: 500; letter-spacing: .14em; fill: var(--ink-text); }
+  @media (max-width: 719px) { .cap { letter-spacing: .09em; } }
+  .desc { font-family: var(--font); font-weight: 400; fill: var(--muted); }
+  .cap-rule { stroke: var(--ink); stroke-width: .75; }
+  .panel-head { font-family: var(--font); font-weight: 500; letter-spacing: .16em; fill: var(--muted); }
+  .credit { font-family: var(--font); font-weight: 400; fill: var(--muted); }
+
+  /* corner furniture, as on the navigation page */
+  .title {
+    position: absolute;
+    top: max(24px, env(safe-area-inset-top, 0px));
+    left: max(24px, env(safe-area-inset-left, 0px));
+    max-width: 320px;
+  }
+  .title h1 { font-size: 20px; font-weight: 400; letter-spacing: -.005em; line-height: 1.2; margin: 0; }
+  .title p { font-size: 13px; color: var(--muted); margin: 6px 0 0; }
+  .meta {
+    position: absolute;
+    top: max(20px, env(safe-area-inset-top, 0px));
+    right: max(20px, env(safe-area-inset-right, 0px));
+    display: flex; gap: 12px; align-items: center;
+    font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted);
+  }
+  .ctrl {
+    position: absolute; left: 50%; transform: translateX(-50%);
+    bottom: max(20px, env(safe-area-inset-bottom, 0px));
+    display: flex; gap: 2px; align-items: center;
+  }
+  button.t {
+    font: inherit; font-size: 12.5px; font-weight: 400; letter-spacing: normal; text-transform: none;
+    color: var(--ink-text); background: transparent;
+    border: 0; border-radius: 999px; padding: 6px 12px; min-height: 36px; cursor: pointer;
+  }
+  button.t:hover { background: var(--tint-faint); }
+  button.t[aria-pressed="true"] { box-shadow: inset 0 0 0 .75px var(--ink); }
+  button.t:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; }
+  .about {
+    position: absolute;
+    right: max(24px, env(safe-area-inset-right, 0px));
+    bottom: max(20px, env(safe-area-inset-bottom, 0px));
+    text-align: right;
+  }
+  .about summary { list-style: none; cursor: pointer; font-size: 12.5px; padding: 8px 4px; min-height: 36px; }
+  .about summary::-webkit-details-marker { display: none; }
+  .about summary:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; border-radius: 4px; }
+  .about .panel {
+    position: absolute; right: 0; bottom: 44px;
+    width: min(340px, calc(100vw - 48px));
+    text-align: left; background: var(--paper);
+    border: .75px solid var(--ink); padding: 14px 16px;
+    font-size: 12.5px; color: var(--muted);
+  }
+  .about .panel p { margin: 0 0 8px; }
+  .about .panel p:last-child { margin: 0; }
+  .about a { color: var(--ink-text); }
+  .screen.tall .title, .screen.tall .meta { position: absolute; }
+  .screen.tall .ctrl, .screen.tall .about { position: fixed; }
+
+  button.t { white-space: nowrap; }
+  @media (max-width: 719px) {
+    .title { left: 16px; top: max(18px, env(safe-area-inset-top, 0px)); max-width: 220px; }
+    .title h1 { font-size: 17px; }
+    .title p { font-size: 12px; }
+    .meta { right: 12px; top: max(12px, env(safe-area-inset-top, 0px)); }
+    .meta .v { display: none; }
+    .ctrl { left: 8px; transform: none; bottom: max(14px, env(safe-area-inset-bottom, 0px)); }
+    .about { right: 8px; bottom: max(14px, env(safe-area-inset-bottom, 0px)); }
+  }
+
+  /* clean frame for exporting the essay images */
+  .capture .title, .capture .meta, .capture .ctrl, .capture .about { display: none; }
+
+  .sr-only {
+    position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+    overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+  }
+</style>
+</head>
+<body>
+<main class="screen" id="screen">
+  <div class="sr-only" id="desc">
+    <p>An organisation drawn as five stacked layers, after the neighbourhood layers in the author's thesis. From the top, social infrastructure, governance, physical infrastructure and culture sit above the place of work at the base, where each of these comes together and becomes lived experience for the people doing the work.</p>
+    <p>Side by side, a neighbourhood drawn with the same five layers sits on the left. Nature becomes culture, and the neighbourhood scale becomes the place of work.</p>
+  </div>
+
+  <div class="stage" id="stage" role="img" aria-labelledby="fig-title" aria-describedby="desc">
+    <span class="sr-only" id="fig-title">An organisation is a place too</span>
+    <svg id="scene" aria-hidden="true"></svg>
+  </div>
+
+  <header class="title">
+    <h1>An organisation is a place too</h1>
+    <p>The same layers, different material.</p>
+  </header>
+
+  <div class="meta">
+    <span class="v">v0.2.0</span>
+    <button type="button" class="t" id="theme">Dark</button>
+  </div>
+
+  <div class="ctrl" role="group" aria-label="Choose a view">
+    <button type="button" class="t" data-mode="single" aria-pressed="true">An organisation</button>
+    <button type="button" class="t" data-mode="pair" aria-pressed="false">Side by side</button>
+  </div>
+
+  <details class="about">
+    <summary>About</summary>
+    <div class="panel">
+      <p>A working drawing from <a href="https://www.civicworks.co/">CIVICWORKS</a>, to sit alongside <a href="https://www.civicworks.co/">Tasting the organisational treacle</a>, next to <a href="../../navigation/">Experimentation as navigation</a>.</p>
+      <p>Adapted from the author's thesis, after Pagh and Cook (2023).</p>
+      <p>v0.2.0</p>
+    </div>
+  </details>
+</main>
+
+<script>
+(function () {
+  "use strict";
+
+  // ---- copy. Swap labels here. No colons or em dashes.
+  var LAYERS = [
+    { place: "Social infrastructure", org: "Social infrastructure", desc: "The relationships, networks and communities of practice that people lean on to get things done together", shifts: false },
+    { place: "Governance", org: "Governance", desc: "The rules, decision rights and assurance that decide what can change, and who gets to say so", shifts: false },
+    { place: "Physical infrastructure", org: "Physical infrastructure", desc: "The systems, tools, documents and offices that the everyday work flows through", shifts: false },
+    { place: "Nature", org: "Culture", desc: "The habits, history and language an organisation grows from. The slowest ground of all", shifts: true },
+    { place: "The neighbourhood scale", org: "The place of work", desc: "Where each of these comes together and becomes lived experience for the people doing the work", shifts: true }
+  ];
+  // On its own, the organisation keeps one emphasis, on the layer where the work is lived
+  var SINGLE_EMPH = [4];
+  var CREDIT_SINGLE = "Adapted from the author's thesis, after Pagh & Cook (2023).";
+  var CREDIT_PAIR = "Left adapted from Pagh & Cook (2023), illustrated by the author. Right, the author.";
+
+  // ---- the stack in world units. Each layer is a square ring lying flat; y points up.
+  // Four nested squares grow towards the base, where they all meet.
+  var SIZES = [0.25, 0.52, 0.78, 1];
+  var FILLS = ["stipple", "hatch", "hatch", "stipple"];
+
+  // Seen from a corner and a little above, so each square reads as a diamond.
+  var view = { yaw: 45, pitch: 26 };
+  function project(p, o) {
+    var a = view.yaw * Math.PI / 180, t = view.pitch * Math.PI / 180;
+    var x1 = p[0] * Math.cos(a) - p[2] * Math.sin(a);
+    var z1 = p[0] * Math.sin(a) + p[2] * Math.cos(a);
+    return { x: o.cx + o.r * x1, y: o.cy + o.r * (z1 * Math.sin(t) - p[1] * Math.cos(t) * o.lift) };
+  }
+  function square(size, y, o) {
+    var h = size / Math.SQRT2;
+    return [[-h, y, -h], [h, y, -h], [h, y, h], [-h, y, h]].map(function (p) { return project(p, o); });
+  }
+  // corners in screen order: left, right, top, bottom
+  function corners(pts) {
+    var s = pts.slice().sort(function (a, b) { return a.x - b.x; });
+    var v = pts.slice().sort(function (a, b) { return a.y - b.y; });
+    return { left: s[0], right: s[3], top: v[0], bottom: v[3] };
+  }
+
+  // ---- svg helpers
+  var NS = "http://www.w3.org/2000/svg";
+  var scene = document.getElementById("scene");
+  function el(name, attrs, parent) {
+    var n = document.createElementNS(NS, name);
+    for (var k in attrs) n.setAttribute(k, attrs[k]);
+    (parent || scene).appendChild(n);
+    return n;
+  }
+  function path(pts) { return pts.map(function (p, i) { return (i ? "L" : "M") + p.x.toFixed(1) + " " + p.y.toFixed(1); }).join(" ") + " Z"; }
+  function text(str, x, y, cls, size, anchor, parent) {
+    var t = el("text", { x: x.toFixed(1), y: y.toFixed(1), "class": cls, "font-size": size, "text-anchor": anchor || "start" }, parent);
+    t.textContent = str;
+    return t;
+  }
+  var measure = document.createElement("canvas").getContext("2d");
+  function wrap(str, width, size) {
+    measure.font = "400 " + size + "px " + getComputedStyle(document.body).fontFamily;
+    var words = str.split(" "), lines = [], line = "";
+    words.forEach(function (w) {
+      var tryLine = line ? line + " " + w : w;
+      if (line && measure.measureText(tryLine).width > width) { lines.push(line); line = w; } else line = tryLine;
+    });
+    return lines.concat([line]);
+  }
+
+  function defs() {
+    var d = el("defs", {});
+    function pattern(id, w, rot) {
+      var p = el("pattern", { id: id, width: w, height: w, patternUnits: "userSpaceOnUse" }, d);
+      if (rot) p.setAttribute("patternTransform", "rotate(" + rot + ")");
+      return p;
+    }
+    var h = pattern("hatch", 3, -45);
+    el("line", { x1: 0, y1: 0, x2: 0, y2: 3, style: "stroke:var(--ink)", "stroke-width": .4, opacity: .7 }, h);
+    var s = pattern("stipple", 4);
+    el("circle", { cx: 1, cy: 1, r: .5, style: "fill:var(--ink)" }, s);
+    el("circle", { cx: 3, cy: 3, r: .5, style: "fill:var(--ink)" }, s);
+  }
+
+  // ---- one stack
+  function stack(o, emph, parent) {
+    var g = el("g", {}, parent);
+    var ys = LAYERS.map(function (_, i) { return (2 - i) * o.gap; });
+    // vertical guides through every corner, top layer to base
+    SIZES.forEach(function (size) {
+      var top = square(size, ys[0], o), bot = square(size, ys[4], o);
+      for (var k = 0; k < 4; k++) el("line", { x1: top[k].x, y1: top[k].y, x2: bot[k].x, y2: bot[k].y, "class": "guide" }, g);
+    });
+    // the open lid of the column above the top layer
+    SIZES.slice(1).forEach(function (size) { el("path", { d: path(square(size, ys[0], o)), "class": "lid" }, g); });
+    var out = [];
+    for (var i = 0; i < 4; i++) {
+      var lg = el("g", { "class": emph.indexOf(i) >= 0 ? "emph" : "" }, g);
+      var outer = square(SIZES[i], ys[i], o), inner = i ? square(SIZES[i - 1], ys[i], o) : null;
+      var d = path(outer) + (inner ? " " + path(inner) : "");
+      el("path", { d: d, "fill-rule": "evenodd", "class": "ring-ground" }, lg);
+      el("path", { d: d, "fill-rule": "evenodd", fill: "url(#" + FILLS[i] + ")", "class": "ring" }, lg);
+      out.push(corners(outer));
+    }
+    // the base, where they all meet
+    var bg = el("g", { "class": emph.indexOf(4) >= 0 ? "emph" : "" }, g);
+    var base = square(SIZES[3], ys[4], o);
+    el("path", { d: path(base), "class": "base-ground" }, bg);
+    el("path", { d: path(base), "class": "base" }, bg);
+    SIZES.slice(0, 3).forEach(function (size) { el("path", { d: path(square(size, ys[4], o)), "class": "base-inner" }, bg); });
+    out.push(corners(base));
+    return out;
+  }
+
+  // a label hung from a layer corner by a dotted leader with a small open pin, as on the navigation page
+  function label(c, side, lx, name, desc, o, emph, parent) {
+    var g = el("g", { "class": emph ? "emph-line" : "" }, parent);
+    var pt = side === "left" ? c.left : c.right;
+    var px = pt.x + (side === "left" ? 7 : -7);
+    var end = side === "left" ? lx + o.colW + 12 : lx - 12;
+    el("path", { d: "M" + end + " " + pt.y.toFixed(1) + " L" + px.toFixed(1) + " " + pt.y.toFixed(1), "class": "leader" }, g);
+    el("circle", { cx: px.toFixed(1), cy: pt.y.toFixed(1), r: o.pin, "class": "pin" }, g);
+    var anchor = "start", tx = side === "left" ? lx : lx;
+    var cap = text(name.toUpperCase(), tx, pt.y + o.cap * .36, "cap", o.cap, anchor, g);
+    if (emph) {
+      var w = cap.getComputedTextLength();
+      el("line", { x1: tx, y1: pt.y + o.cap * .36 + 5, x2: tx + w, y2: pt.y + o.cap * .36 + 5, "class": "cap-rule" }, g);
+    }
+    if (desc) wrap(desc, o.colW, o.desc).forEach(function (line, n) {
+      text(line, tx, pt.y + o.cap * .36 + o.lh * (n + 1) + 6, "desc", o.desc, anchor, g);
+    });
+  }
+
+  // ---- layouts
+  var mode = "single";
+  var screenEl = document.getElementById("screen");
+  var stageEl = document.getElementById("stage");
+
+  function draw() {
+    while (scene.firstChild) scene.removeChild(scene.firstChild);
+    defs();
+    var W = stageEl.clientWidth, H = window.innerHeight, narrow = W < 720;
+    var cap = narrow ? 10 : 12.5, desc = narrow ? 12 : 14, lh = narrow ? 16 : 19.5;
+    var capture = document.documentElement.classList.contains("capture");
+    var top = capture ? 40 : (narrow ? 96 : 110), bottom = capture ? 70 : 90;
+
+    if (mode === "single" || !narrow) screenEl.classList.remove("tall");
+
+    if (mode === "single") {
+      // labels on the left as in the thesis original, the stack beside them, the pair centred
+      var avail = H - top - bottom;
+      var colW = narrow ? Math.min(150, W * 0.38) : Math.min(300, W * 0.36);
+      var gap = Math.min(avail / 5.6, narrow ? W * 0.34 : W * 0.15);
+      var r = gap * (narrow ? 0.72 : 1.3);
+      var lx = narrow ? 16 : Math.max(48, (W - (colW + 56 + r * 2.04)) / 2);
+      var cx = narrow ? W - 16 - r * 1.02 : lx + colW + 56 + r * 1.02;
+      var o = { cx: cx, cy: top + avail / 2 + gap * 0.1, r: r, lift: 1, colW: colW, cap: cap, desc: desc, lh: lh, pin: 3.2 };
+      o.gap = gap / (r * Math.cos(view.pitch * Math.PI / 180));
+      var c = stack(o, SINGLE_EMPH);
+      LAYERS.forEach(function (layer, i) { label(c[i], "left", lx, layer.org, layer.desc, o, SINGLE_EMPH.indexOf(i) >= 0); });
+      if (capture) text(CREDIT_SINGLE, lx, H - 28, "credit", narrow ? 10 : 11.5);
+      scene.setAttribute("viewBox", "0 0 " + W + " " + H);
+      return;
+    }
+
+    var emph = LAYERS.map(function (l, i) { return l.shifts ? i : -1; }).filter(function (i) { return i >= 0; });
+    if (!narrow) {
+      var availP = H - top - bottom - 30;
+      var gapP = Math.min(availP / 5.6, W * 0.1);
+      var rP = gapP * 0.95;
+      var colP = Math.min(250, W * 0.21);
+      var mid = W / 2, d = rP + 44;
+      var oL = { cx: mid - d, cy: top + 30 + availP / 2 + gapP * 0.1, r: rP, lift: 1, colW: colP, cap: cap, desc: desc, lh: lh, pin: 3 };
+      oL.gap = gapP / (rP * Math.cos(view.pitch * Math.PI / 180));
+      var oR = Object.assign({}, oL, { cx: mid + d });
+      var gL = el("g", { "class": "muted" });
+      var cL = stack(oL, [], gL);
+      var cR = stack(oR, emph);
+      // each heading sits just above the open top of its column
+      var headY = cR[0].left.y - rP * Math.sin(view.pitch * Math.PI / 180) - 30;
+      text("A NEIGHBOURHOOD", oL.cx, headY, "panel-head", 11, "middle", gL);
+      text("AN ORGANISATION", oR.cx, headY, "panel-head", 11, "middle");
+      LAYERS.forEach(function (layer, i) {
+        label(cL[i], "left", oL.cx - rP * 1.02 - 40 - colP, layer.place, null, oL, false, gL);
+        label(cR[i], "right", oR.cx + rP * 1.02 + 40, layer.org, layer.desc, oR, layer.shifts);
+        // matching layers joined across the clear middle
+        var y = cR[i].left.y, x1 = oL.cx + rP * 1.02 + 12, x2 = oR.cx - rP * 1.02 - 12;
+        el("path", { d: "M" + x1 + " " + y + " L" + (x2 - 6) + " " + y, "class": "join" + (layer.shifts ? " emph-join" : "") });
+        el("path", { d: "M" + x2 + " " + y + " l-7 -3 l0 6 Z", "class": "head-mark", opacity: layer.shifts ? 1 : .6 });
+      });
+      if (capture) text(CREDIT_PAIR, 48, H - 28, "credit", 11.5);
+      scene.setAttribute("viewBox", "0 0 " + W + " " + H);
+      return;
+    }
+
+    // phone, side by side becomes one above the other and the page scrolls
+    screenEl.classList.add("tall");
+    var g2 = W * 0.2, r2 = g2 * 1.05, col2 = Math.min(150, W * 0.38), cx2 = W - 16 - r2 * 1.02;
+    var block = g2 * 4 + r2 * 0.9 + 70;
+    var o1 = { cx: cx2, cy: top + 40 + block / 2 - 20, r: r2, lift: 1, colW: col2, cap: cap, desc: desc, lh: lh, pin: 3 };
+    o1.gap = g2 / (r2 * Math.cos(view.pitch * Math.PI / 180));
+    var g2b = W * 0.34, r2b = g2b * 0.72;
+    var o2 = Object.assign({}, o1, { r: r2b, cx: W - 16 - r2b * 1.02 });
+    o2.gap = g2b / (r2b * Math.cos(view.pitch * Math.PI / 180));
+    o2.cy = o1.cy + block / 2 + 70 + g2b * 2 + r2b * 0.5;
+    var gm = el("g", { "class": "muted" });
+    var c1 = stack(o1, [], gm);
+    text("A NEIGHBOURHOOD", 16, top + 4, "panel-head", 10.5, "start", gm);
+    LAYERS.forEach(function (layer, i) { label(c1[i], "left", 16, layer.place, null, o1, false, gm); });
+    var headY = o2.cy - g2b * 2 - r2b * 0.6 - 40;
+    el("path", { d: "M" + o1.cx + " " + (o1.cy + g2 * 2 + r2 * 0.5 + 14) + " L" + o1.cx + " " + (headY - 18), "class": "join" });
+    el("path", { d: "M" + o1.cx + " " + (headY - 10) + " l-3 -7 l6 0 Z", "class": "head-mark", opacity: .6 });
+    text("AN ORGANISATION", 16, headY, "panel-head", 10.5);
+    var c2 = stack(o2, emph);
+    LAYERS.forEach(function (layer, i) { label(c2[i], "left", 16, layer.org, layer.desc, o2, layer.shifts); });
+    var Ht = o2.cy + g2b * 2 + r2b * 0.5 + (capture ? 140 : 120);
+    if (capture) text(CREDIT_PAIR.replace("Left", "Top").replace("Right", "Bottom"), 16, Ht - 30, "credit", 10);
+    stageEl.style.height = Ht + "px";
+    scene.setAttribute("viewBox", "0 0 " + W + " " + Ht);
+  }
+
+  function setMode(m) {
+    mode = m === "pair" ? "pair" : "single";
+    document.querySelectorAll("[data-mode]").forEach(function (b) { b.setAttribute("aria-pressed", String(b.dataset.mode === mode)); });
+    stageEl.style.height = "";
+    draw();
+  }
+  document.querySelectorAll("[data-mode]").forEach(function (b) {
+    b.addEventListener("click", function () { setMode(b.dataset.mode); });
+  });
+
+  // ---- theme toggle, remembered per viewer where storage allows
+  var root = document.documentElement, themeBtn = document.getElementById("theme");
+  function isDark() {
+    var t = root.getAttribute("data-theme");
+    if (t) return t === "dark";
+    return !!(window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches);
+  }
+  function labelTheme() {
+    themeBtn.textContent = isDark() ? "Light" : "Dark";
+    themeBtn.setAttribute("aria-label", isDark() ? "Switch to light mode" : "Switch to dark mode");
+  }
+  try { var saved = localStorage.getItem("nav-theme"); if (saved) root.setAttribute("data-theme", saved); } catch (e) {}
+  labelTheme();
+  themeBtn.addEventListener("click", function () {
+    var next = isDark() ? "light" : "dark";
+    root.setAttribute("data-theme", next);
+    try { localStorage.setItem("nav-theme", next); } catch (e) {}
+    labelTheme();
+  });
+
+  if (window.ResizeObserver) new ResizeObserver(function () { draw(); }).observe(document.body);
+  window.addEventListener("resize", draw);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(draw);
+  window.__place = { setMode: setMode, draw: draw };
+  // ?capture drops the page furniture so the drawing can be exported as an essay image
+  if (/[?&]capture/.test(location.search)) document.documentElement.classList.add("capture");
+  setMode(location.hash === "#pair" ? "pair" : "single");
+})();
+</script>
+</body>
+</html>
