@@ -18,7 +18,7 @@ Moving sideways across disciplines and upwards through institutional layers is a
 
 ## Evidence in hand
 
-CustomerFirst, live and current, which is the only real base. Nowotny on socially robust knowledge. T's fieldwork on intermediaries performing shifting altitudes without sanction. 12's observation that the people who run the service know the workarounds because they built them. 14's claim that the bridges individuals build have to become part of the model.
+CustomerFirst, live and current, which is the only real base. 17's account of moving through the layers on one case, and its alternative to escalation: you cannot answer the slower layers' questions yourself, "but you can bring the people who might answer them close enough to see the experiment happen." That is a skill, and it is the nearest the corpus has come to describing what the people who cross well actually do. 16 asks the prompt's question in his own words: how institutions build boundary-crossing into their operating models "rather than leaving particular people to glue everything together". Nowotny on socially robust knowledge. T's fieldwork on intermediaries performing shifting altitudes without sanction. 12's observation that the people who run the service know the workarounds because they built them. 14's claim that the bridges individuals build have to become part of the model.
 
 ## What is missing
 

@@ -17,6 +17,10 @@ It is the only causal explanation in the corpus for *why* M1 persists. Every oth
 
 UN80 also proposes the fix: assess whether teams identified emerging risks early, whether partnerships improved collective response, whether interventions altered the trajectory of a known risk. Proposed, not tested.
 
+**A relative, not a third sighting.** 15 (Sept 26) makes the mirror claim: the cost of not acting is what the system cannot see. "Another 3 months understanding a service is also 3 months choosing to live with its failures", and the machinery between thinking and doing can build up "to the point where doing nothing starts to look like the responsible alternative". Not the same as prevention being invisible. Same shape, though: the accountability system registers the risk of action and not the risk of inaction.
+
+It also brings the corpus's only example of a framework changing to see something it could not. The government's [updated definition of legacy IT](https://www.gov.uk/government/publications/guidance-on-the-legacy-it-risk-assessment-framework/updated-definition-of-legacy-it) counts time spent living with a system as part of the risk, and 15 reads it that way. If the piece needs a case of an accountability framework being redesigned to count an absence, that is the place to start.
+
 ## What is missing
 
 A worked case. Ideally a real decision where prevention lost to visible activity, with the accountability trail showing why. 13's DSIT material is adjacent (reorganisation is legible, the conditions for good work are not) and could be the way in.
