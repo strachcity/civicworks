@@ -6,7 +6,7 @@ All of it is already public. Nothing unpublished goes here.
 
 ## What is here
 
-`01` to `16` are CIVICWORKS posts in publication order, exported from Substack as markdown. Piece `03` is a guest post by Jack O'Connor and is excluded from anything about voice, since the voice file describes one writer and not the publication.
+`01` to `17` are CIVICWORKS posts in publication order, exported from Substack as markdown. Piece `03` is a guest post by Jack O'Connor and is excluded from anything about voice, since the voice file describes one writer and not the publication. Pieces `01` and `16` are introductions to the publication, the second written a year in, so they say what CIVICWORKS is for rather than arguing anything.
 
 `x1` to `x3` are published elsewhere. `x1` and `x2` are machine-extracted working copies with the canonical source in their frontmatter; the extraction lost layout and figures, so quote from the source, not from these. `x3` is the author's own copy, so its text is exact, but the published page is still canonical and still the thing to link to.
 

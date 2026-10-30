@@ -1,6 +1,6 @@
 # What released capacity is for
 
-**Status:** claim in hand, evidence almost absent. Comes from a Substack note ([Aug 2026](https://substack.com/@jackstrachan/note/c-321460859)) rather than from the archive. The corpus has two passing mentions of AI across 13 pieces and no position.
+**Status:** claim in hand, evidence almost absent. Comes from a Substack note ([Aug 2026](https://substack.com/@jackstrachan/note/c-321460859)) rather than from the archive. Until Sept 26 the corpus had two passing mentions of AI and no position. 15 now has one, and it is not this prompt's claim, which changes what this piece has to do.
 
 ## The claim
 
@@ -25,6 +25,12 @@ Very little, and this is the honest limit of the prompt.
 - **CustomerFirst** is the only live case and the note does not use it.
 
 That is the whole base. Compare prompt 01, which has four independent arrivals.
+
+**Since Sept 26 there is a neighbour, and it pulls the other way.** 15 takes the corpus's first position on AI: it makes finding out cheap and leaves changing the institution as expensive as before. "The cost of finding out is falling dramatically. The cost of changing the institution around what we find out isn't." 16 repeats it as one of four open questions. That is a position on what AI does to experiments, not on what it does to the work or the people. This prompt is about released capacity, which 15 does not touch.
+
+The two together give the piece a better shape than either alone. 15 says AI makes the probe cheaper and leaves moving what it finds as hard as ever. This prompt says the transformation is what gets changed around the automation. Same structure both times: the cheap part is the technology, the expensive part is the institution. If the piece is written, 15 is its opening and this prompt is its second half.
+
+**17 ends on this prompt's sequencing question, nearly verbatim.** "How much of that future organisation can we begin to model through the experiments we're running today?" The note's version: use live service changes to test future roles, operating models and decision rights. 17 asks it and stops. It is the essay's last open question.
 
 ## What is missing
 

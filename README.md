@@ -17,9 +17,9 @@ It is wrapped in a [Claude skill](.claude/skills/voice-dna/) that drafts, redraf
 
 The idea came from [Karpathy's LLM wiki concept](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f) – an LLM that incrementally builds and maintains a persistent wiki — a structured, interlinked collection of markdown files that sits between me and the raw sources. 
 
-**[wiki/mechanisms.md](wiki/mechanisms.md)** holds the claims that recur across the writing: seven mechanisms, the positions that have moved, the framings already spent, and an honest list of what the corpus does not have. Mined from 14 CIVICWORKS pieces, the MPA thesis, the UN80 article and a GDS blog post rather than from a structure guessed in advance.
+**[wiki/mechanisms.md](wiki/mechanisms.md)** holds the claims that recur across the writing: eight mechanisms, the positions that have moved, the framings already spent, and an honest list of what the corpus does not have. Mined from 17 CIVICWORKS pieces, the MPA thesis, the UN80 article and a GDS blog post rather than from a structure guessed in advance.
 
-**[wiki/reception.md](wiki/reception.md)** is the Substack data, kept separate and read with suspicion. It says which arguments travelled, not which are right. It covers 13 pieces; the most recent post is too new to have data.
+**[wiki/reception.md](wiki/reception.md)** is the Substack data, kept separate and read with suspicion. It says which arguments travelled, not which are right. It covers 13 pieces; 14 to 17 are not in it yet.
 
 **[wiki/prompts/](wiki/prompts/)** holds articles the corpus is asking for. Each states what it would argue, the evidence in hand, what is missing, and what would make the piece fail.
 
@@ -37,7 +37,7 @@ Notes here are deliberately blunt and provisional. Prose written to essay standa
 
 The rule is pull, not push. A source earns a place here when a piece of writing needs it, not when it is found. If a wiki entry wants the deeper notes, it links out.
 
-**The archive.** [`archive/`](archive/) holds the published writing as files: 16 CIVICWORKS posts, the MPA thesis, the UN80 article and a GDS blog post. All already public, all re-minable without hunting down the originals.
+**The archive.** [`archive/`](archive/) holds the published writing as files: 17 CIVICWORKS posts, the MPA thesis, the UN80 article and a GDS blog post. All already public, all re-minable without hunting down the originals.
 
 ## Open threads
 
@@ -47,8 +47,8 @@ The rule is pull, not push. A source earns a place here when a piece of writing 
 - Single-sentence paragraphs. The file says "never stacked to manufacture punch". They are stacked, repeatedly, and it works.
 - Sentence length. The real baseline is 20 to 31 words with high variance. The file reads as though describing something more mixed.
 - "Not just X, but Y" runs to 11 in a single essay. The checker no longer treats it as a 3B violation, since it expands rather than negates, but at that rate it is a tic.
-- Hard bans and dead phrases fire inside citations and on deliberate uses. Piece 14 trips "democratising" in the title of a cited paper and "nobody" twice where it is the point of the sentence. The rules have no notion of a quoted title, and the fix is probably scope rather than vocabulary.
+- Hard bans and dead phrases fire inside citations and on deliberate uses. Piece 14 trips "democratising" in the title of a cited paper and "nobody" twice where it is the point of the sentence, and piece 15 trips "nobody" again the same way ("a decision that nobody in the team actually has the right to make"). The rules have no notion of a quoted title, and the fix is probably scope rather than vocabulary.
 
-**Splitting the wiki.** `mechanisms.md` is around 385 lines and has seven mechanisms. Still not worth splitting, and the trigger below is nowhere near: the largest single mechanism is M1 at under 40 lines, one file per mechanism buys an index to maintain and cross-links to keep correct, and nothing is currently hard to find. The trigger is a mechanism growing past roughly 60 lines on its own, or an entry needing its own sub-pages. Length alone is not the signal.
+**Splitting the wiki.** `mechanisms.md` is around 490 lines and has eight mechanisms. Still not worth splitting, though the trigger below is closer: the largest single mechanism is M1 at under 50 lines, one file per mechanism buys an index to maintain and cross-links to keep correct, and nothing is currently hard to find. The trigger is a mechanism growing past roughly 60 lines on its own, or an entry needing its own sub-pages. Length alone is not the signal.
 
 **Growing experiments.civicworks.co.** For now the site is the prototypes behind a short index. When the treacle piece is finished, it becomes the whole site: one article as the main page, with the prototypes inside it as figures. The aim is a home for articles and projects, along the lines of [UX Collective essays](https://essays.uxdesign.cc/home/), [mikebracken.com](https://mikebracken.com/) and [Made by Many's agentic](https://agentic.madebymany.com/) and [Sally by Doberman](https://sally.doberman.co/about), but it only grows towards that when the need is proven, the same rule as the wiki. The trigger is a second article that needs a home there. Until then there are no paths, no index and no navigation. When the trigger comes, the article moves to its own path (e.g. `/treacle/`) and the root becomes the list. Visual references for the site and the diagrams are in [design/references.md](design/references.md).

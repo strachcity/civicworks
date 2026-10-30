@@ -17,7 +17,8 @@ Put simply, this article is about the practice of putting something real into a 
 
 Treat this essay as version 0.1.0 alongside an interactive prototype, synthesising my experiences of experimentation as a practice in the public sector. There’s probably a chapter to be written about each of the ideas explored here, but I’m all for sharing early and often, and wanted to get this thinking into the world while we’re still developing it through practice.
 
-## Experimentation as probes\n
+## Experimentation as probes
+
 So what do we mean by an experiment? Semantics can be contentious, but for me, in the context of the test and learn approach we’re trying to kindle, experiments are deliberate attempts to learn what happens when we try something different in real conditions. We start with an idea of what might happen, decide what we’d need to see to learn from it, and try it at a scale where we can manage the uncertainty. Often that means making a small change to a live service.
 
 Take a relatively simple example from our work with DVLA. Much of the process of deciding whether someone is medically fit to drive still depends on letters travelling back and forth through the post. This can mean the wait is simply for a letter to arrive, rather than anyone making a decision. So we experimented with the ability to return information digitally. An obvious idea, in some respects, but there must be a reason why this hadn’t been delivered already, right? So, we selected a specific use case with a small sample of 100 real customers to experiment with our idea.
@@ -34,7 +35,8 @@ I’m, as ever, inspired by Dan Hill and the idea of “dark matter probes” he
 
 This is what makes experiments such good probes. They reach into parts of the organisation we might otherwise struggle to see, pulling, poking and prodding, and we get to see what gets stuck.
 
-## Experimentation as navigation\n
+## Experimentation as navigation
+
 Once an experiment like ours is live you can very quickly find yourself wading through this treacle of organisation change in several directions at once, through an organisation’s culture, its operating model and its technology estate. I see it as a kind of three-dimensional space, one an experiment lets you move through, learn from and occasionally bend, at different scales and speeds of a system.
 
 Getting a little nerdy for a moment, I think there’s something quite exciting about bringing together Mark Moore’s thinking about creating public value, Stewart Brand’s pace layers, and the way Dan Hill has stretched these ideas into strategic design practices for public purpose. Each gives us a different way of understanding what happens when we try to change something inside an institution. Put them together (as I’ve attempted to do with this interactive prototype), and I think we get a pretty rich way of seeing how experiments move through an organisation, what happens when different parts of it respond, and what we learn along the way.
@@ -73,7 +75,8 @@ Following the relationships between institutional materials, and discovering how
 
 From a practice perspective, interacting with institutional materials is what makes depth tangible. A requirement that initially appears to sit within policy might depend on how professional responsibilities have been allocated, how evidence is collected or who has authority to make a decision. Following those relationships can take an experiment across the institution, showing how its arrangements respond when we try something different and where there might be room to change them.
 
-## Experimentation as architecture\n
+## Experimentation as architecture
+
 I like to think that as you’re slowly finding your way through the treacle, you’re also developing a better sense of what it’s actually made of, and where there might be room to move. Because once you’ve got an experiment off the ground, you never come back to quite the same place. You know a little more about which assumptions are negotiable, which decisions sit elsewhere and which relationships might help you move next time. Some of that can be written down, but much of it sits between people, carried in the conversations and shared experiences that made the experiment possible in the first place. If it’s going to outlast them, it has to be built into the organisation somewhere.
 
 So, for me, the question becomes what an organisation is capable of doing differently because an experiment happened. Beyond simply testing what works, how do we learn from what it took to make the experiment happen?
@@ -98,7 +101,8 @@ All of these arrangements lean on one another, and that’s where I think the sc
 
 Almost none of it will ever appear on an organisational chart, but perhaps the most meaningful test is whether the next team can pick up where we left off, rather than having to find its own way through the same treacle.
 
-## Experimentation as stewardship\n
+## Experimentation as stewardship
+
 Of course, none of this happens without an organisation responding to what we’re trying to change. Systems have many actors, each with their own responsibilities, interests and understanding of what matters. Change rarely moves in the direction we expect, and even the smallest experiment can encounter an extraordinary amount of resistance. It becomes our role as practitioners to hold that tension and care for those around us.
 
 The RSA’s From Design Thinking to System Change describes this as the system immune response, illustrating how innovations can encounter a wall of competing incentives, regulation, organisational cultures and established practices when they try to scale. But I think this response begins much earlier. You encounter it from the very first experiment, as soon as you try to move something through the institution. And as we’ve explored in this article, what looks like resistance can tell us an enormous amount about how an organisation works.
@@ -113,14 +117,16 @@ It’s worth considering that some of this friction can be healthy too. It can p
 
 This is where stewardship becomes such an important part of experimentation. It takes time, care and a willingness to work through those responses with the people responsible, learning where there’s genuine room to move and where something important needs protecting. I’ve previously written about the bureaucracy we need and the bureaucracy we can cut, and as Rainer Kattel has recently argued, treating innovation only as disruption misunderstands the institutions, capabilities and practices through which most public value, and hence trust and legitimacy, is actually produced. Sometimes that means starting smaller, changing the experiment or investing in a relationship long before the thing you wanted to test can happen. Sometimes it means holding firm when the constraint itself is what needs to change.
 
-## Improving the present or modelling the future?\n
+## Improving the present or modelling the future?
+
 What I’ve been wrestling with most through our work at CustomerFirst is what we’re ultimately experimenting towards. There is enormous value in improving the services we have. Hell, a small change might mean someone receives their driving licence earlier and can get to work tomorrow. And these improvements matter, as they often give us the evidence, momentum and capabilities to pursue something more ambitious in the long run.
 
 Yet the ambition of actual transformation asks us to start somewhere else. Because if we begin with the public value we want to create, how might we organise the people, technology and processes needed to achieve it? And how much of that future organisation can we begin to model through the experiments we’re running today?
 
 Much of this article has been an attempt to explore these practices. Not as a framework or a how-to, but as a way of looking at and holding transformational change, the kind that rewiring the state is going to need, and of getting to know the treacle well enough to start changing it.
 
-## References & further reading\n
+## References & further reading
+
 -
 Braams, R. B., Wesseling, J. H., Meijer, A. J. and Hekkert, M. P. (2022) ‘Understanding why civil servants are reluctant to carry out transition tasks’, Science and Public Policy, 49(6), pp. 905–914. https://doi.org/10.1093/scipol/scac037
 
